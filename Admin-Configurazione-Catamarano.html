@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script src="catamaran-config.js"></script>
 <style>
 :where([class^="ri-"])::before { content: "\f3c2"; }
 body {
@@ -2440,6 +2441,169 @@ parentItem.remove();
 }
 });
 });
+
+// ===== SISTEMA DI GESTIONE CONFIGURAZIONE =====
+
+// Carica configurazione all'avvio
+function loadConfiguration() {
+try {
+const config = CatamaranStorage.load();
+
+// Carica informazioni base
+document.querySelector('input[value="Bali Catsmart - Violante"]').value = config.basic.name;
+document.querySelector('input[value="3499"]').value = config.basic.basePrice;
+document.querySelector('input[value="2025"]').value = config.basic.year;
+document.querySelector('input[value="11,8 metri"]').value = config.basic.length;
+document.querySelector('input[value="4 cabine +1 skipper"]').value = config.basic.cabins;
+document.querySelector('input[value="2 bagni +1 skipper"]').value = config.basic.bathrooms;
+
+// Carica descrizione
+const descTextarea = document.querySelector('textarea');
+if (descTextarea && descTextarea.placeholder.includes('Violante è il nostro')) {
+descTextarea.value = config.description;
+}
+
+// Carica sconto Instagram
+const discountCheckbox = document.querySelector('input[type="checkbox"][checked]');
+if (discountCheckbox) {
+discountCheckbox.checked = config.pricing.instagramDiscount.enabled;
+}
+const discountInput = document.querySelector('input[value="10"]');
+if (discountInput) {
+discountInput.value = config.pricing.instagramDiscount.percentage;
+}
+const discountLabel = document.querySelector('input[value="Sconto Instagram -10%"]');
+if (discountLabel) {
+discountLabel.value = config.pricing.instagramDiscount.label;
+}
+
+// Carica prezzi pacchetti
+document.querySelector('input[value="400"]').value = config.mandatoryPackages.charter.price;
+document.querySelector('input[value="350"]').value = config.mandatoryPackages.fuel.price;
+document.querySelector('input[value="20"]').value = config.mandatoryPackages.linens.pricePerGuest;
+
+console.log('Configurazione caricata con successo');
+} catch (error) {
+console.error('Errore nel caricare la configurazione:', error);
+showNotification('Errore nel caricare la configurazione', 'error');
+}
+}
+
+// Salva configurazione corrente
+function saveConfiguration() {
+try {
+const config = CatamaranStorage.load();
+
+// Aggiorna informazioni base
+config.basic.name = document.querySelector('input[value*="Violante"]')?.value || config.basic.name;
+config.basic.basePrice = parseInt(document.querySelector('input[value="3499"]')?.value) || config.basic.basePrice;
+config.basic.year = parseInt(document.querySelector('input[value="2025"]')?.value) || config.basic.year;
+config.basic.length = document.querySelector('input[value*="metri"]')?.value || config.basic.length;
+config.basic.cabins = document.querySelector('input[value*="cabine"]')?.value || config.basic.cabins;
+config.basic.bathrooms = document.querySelector('input[value*="bagni"]')?.value || config.basic.bathrooms;
+
+// Aggiorna descrizione
+const descTextarea = document.querySelector('textarea');
+if (descTextarea && descTextarea.value) {
+config.description = descTextarea.value;
+}
+
+// Aggiorna sconto Instagram
+const discountCheckbox = document.querySelector('input[type="checkbox"]');
+if (discountCheckbox) {
+config.pricing.instagramDiscount.enabled = discountCheckbox.checked;
+}
+const discountInput = document.querySelector('input[type="number"][min="0"][max="100"]');
+if (discountInput) {
+config.pricing.instagramDiscount.percentage = parseInt(discountInput.value);
+}
+const discountLabel = document.querySelector('input[value*="Sconto Instagram"]');
+if (discountLabel) {
+config.pricing.instagramDiscount.label = discountLabel.value;
+}
+
+// Aggiorna prezzi pacchetti
+const priceInputs = document.querySelectorAll('input[type="number"]');
+priceInputs.forEach(input => {
+if (input.value === "400") config.mandatoryPackages.charter.price = parseInt(input.value);
+if (input.value === "350") config.mandatoryPackages.fuel.price = parseInt(input.value);
+if (input.value === "20") config.mandatoryPackages.linens.pricePerGuest = parseInt(input.value);
+});
+
+// Raccogli caratteristiche principali
+const featuresInputs = document.querySelectorAll('#main-features-container input');
+const features = Array.from(featuresInputs).map(input => input.value).filter(val => val.trim());
+if (features.length > 0) {
+config.mainFeatures = features;
+}
+
+// Raccogli dotazioni incluse
+const equipmentInputs = document.querySelectorAll('#equipment-container input');
+const equipment = Array.from(equipmentInputs).map(input => input.value).filter(val => val.trim());
+if (equipment.length > 0) {
+config.includedEquipment = equipment;
+}
+
+// Salva la configurazione
+const saved = CatamaranStorage.save(config);
+if (saved) {
+showNotification('Configurazione salvata con successo!', 'success');
+} else {
+showNotification('Errore nel salvataggio della configurazione', 'error');
+}
+
+} catch (error) {
+console.error('Errore nel salvare la configurazione:', error);
+showNotification('Errore nel salvataggio: ' + error.message, 'error');
+}
+}
+
+// Mostra notifiche
+function showNotification(message, type = 'info') {
+const notification = document.createElement('div');
+notification.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg ${
+type === 'success' ? 'bg-green-500 text-white' : 
+type === 'error' ? 'bg-red-500 text-white' : 
+'bg-blue-500 text-white'
+}`;
+notification.textContent = message;
+document.body.appendChild(notification);
+
+setTimeout(() => {
+notification.remove();
+}, 3000);
+}
+
+// Reset alla configurazione di default
+function resetConfiguration() {
+if (confirm('Sei sicuro di voler ripristinare la configurazione di default? Tutte le modifiche andranno perse.')) {
+CatamaranStorage.reset();
+location.reload();
+}
+}
+
+// Aggiungi gestori eventi
+document.addEventListener('DOMContentLoaded', function() {
+// Carica configurazione all'avvio
+loadConfiguration();
+
+// Aggiungi evento al pulsante salva
+const saveButton = document.getElementById('save-button');
+if (saveButton) {
+saveButton.addEventListener('click', saveConfiguration);
+}
+
+// Aggiungi pulsante reset nella header
+const headerActions = document.querySelector('.flex.items-center.space-x-2');
+if (headerActions) {
+const resetButton = document.createElement('button');
+resetButton.className = 'bg-gray-500 text-white px-4 py-2 rounded-lg flex items-center whitespace-nowrap';
+resetButton.innerHTML = '<i class="ri-refresh-line mr-2"></i><span class="hidden md:inline">Reset</span>';
+resetButton.addEventListener('click', resetConfiguration);
+headerActions.insertBefore(resetButton, headerActions.firstChild);
+}
+});
+
 });
 </script>
 </body>

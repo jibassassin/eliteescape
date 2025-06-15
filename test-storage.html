@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Sistema Storage</title>
+<script src="catamaran-config.js"></script>
+</head>
+<body>
+<h1>Test Sistema Storage Catamarano</h1>
+
+<div id="test-results">
+<h2>Risultati Test:</h2>
+<ul id="results-list"></ul>
+</div>
+
+<button onclick="testStorage()">Esegui Test</button>
+<button onclick="testSave()">Test Salvataggio</button>
+<button onclick="testLoad()">Test Caricamento</button>
+<button onclick="clearStorage()">Pulisci Storage</button>
+
+<script>
+function addResult(message, isSuccess = true) {
+const list = document.getElementById('results-list');
+const item = document.createElement('li');
+item.style.color = isSuccess ? 'green' : 'red';
+item.textContent = message;
+list.appendChild(item);
+}
+
+function testStorage() {
+const list = document.getElementById('results-list');
+list.innerHTML = '';
+
+try {
+// Test 1: Verifica che DEFAULT_CATAMARAN_CONFIG sia definito
+if (typeof DEFAULT_CATAMARAN_CONFIG !== 'undefined') {
+addResult('✓ DEFAULT_CATAMARAN_CONFIG definito correttamente');
+} else {
+addResult('✗ DEFAULT_CATAMARAN_CONFIG non definito', false);
+return;
+}
+
+// Test 2: Verifica che CatamaranStorage sia definito
+if (typeof CatamaranStorage !== 'undefined') {
+addResult('✓ CatamaranStorage definito correttamente');
+} else {
+addResult('✗ CatamaranStorage non definito', false);
+return;
+}
+
+// Test 3: Test caricamento configurazione
+const config = CatamaranStorage.load();
+if (config && config.basic && config.basic.name) {
+addResult('✓ Caricamento configurazione funzionante');
+addResult(`  Nome catamarano: ${config.basic.name}`);
+addResult(`  Prezzo base: €${config.basic.basePrice}`);
+} else {
+addResult('✗ Errore nel caricamento configurazione', false);
+}
+
+// Test 4: Test salvataggio
+const testConfig = { ...config };
+testConfig.basic.name = "Test Catamarano";
+const saved = CatamaranStorage.save(testConfig);
+if (saved) {
+addResult('✓ Salvataggio configurazione funzionante');
+} else {
+addResult('✗ Errore nel salvataggio configurazione', false);
+}
+
+// Test 5: Test verifica salvataggio
+const reloaded = CatamaranStorage.load();
+if (reloaded.basic.name === "Test Catamarano") {
+addResult('✓ Verifica salvataggio riuscita');
+} else {
+addResult('✗ Salvataggio non persistito', false);
+}
+
+// Ripristina configurazione originale
+CatamaranStorage.save(config);
+addResult('✓ Configurazione originale ripristinata');
+
+} catch (error) {
+addResult('✗ Errore durante i test: ' + error.message, false);
+}
+}
+
+function testSave() {
+try {
+const config = CatamaranStorage.load();
+config.basic.name = "Test Modificato - " + new Date().toLocaleTimeString();
+const saved = CatamaranStorage.save(config);
+addResult(saved ? '✓ Test salvataggio riuscito' : '✗ Test salvataggio fallito', saved);
+} catch (error) {
+addResult('✗ Errore test salvataggio: ' + error.message, false);
+}
+}
+
+function testLoad() {
+try {
+const config = CatamaranStorage.load();
+addResult('✓ Test caricamento riuscito');
+addResult(`  Nome attuale: ${config.basic.name}`);
+addResult(`  Ultimo aggiornamento: ${new Date().toLocaleString()}`);
+} catch (error) {
+addResult('✗ Errore test caricamento: ' + error.message, false);
+}
+}
+
+function clearStorage() {
+try {
+const reset = CatamaranStorage.reset();
+addResult(reset ? '✓ Storage pulito con successo' : '✗ Errore nella pulizia storage', reset);
+} catch (error) {
+addResult('✗ Errore pulizia storage: ' + error.message, false);
+}
+}
+
+// Esegui test automaticamente al caricamento
+window.onload = function() {
+testStorage();
+};
+</script>
+</body>
+</html>
