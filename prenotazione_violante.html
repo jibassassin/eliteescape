@@ -1163,11 +1163,15 @@ const decreaseBtn = document.getElementById('decreaseGuests');
 const increaseBtn = document.getElementById('increaseGuests');
 const guestsInput = document.getElementById('guestsCount');
 const bookingGuests = document.getElementById('booking-guests');
-const cleaningFeeElement = document.getElementById('cleaning-fee');
+const linensDetailElement = document.getElementById('linens-detail-price');
 function updateCleaningFee(guests) {
 const cleaningFee = guests * 20;
-cleaningFeeElement.textContent = `€${cleaningFee}`;
-document.getElementById('linens-detail-price').textContent = cleaningFee;
+if (linensDetailElement) {
+    linensDetailElement.textContent = cleaningFee;
+    console.log(`💰 Aggiornato prezzo lenzuola: €${cleaningFee} per ${guests} ospiti`);
+} else {
+    console.error('❌ Elemento linens-detail-price non trovato');
+}
 updatePartialTotal();
 updateTotalPrice();
 }
@@ -1175,7 +1179,8 @@ function updatePartialTotal() {
 const basePrice = 3499;
 const charterPackage = 400;
 const fuelPackage = 350;
-const cleaningFee = parseInt(document.getElementById('cleaning-fee').textContent.replace('€', ''));
+const linensElement = document.getElementById('linens-detail-price');
+const cleaningFee = linensElement ? parseInt(linensElement.textContent) : 120;
 const partialTotal = basePrice + charterPackage + fuelPackage + cleaningFee;
 document.getElementById('partial-total').textContent = `€${partialTotal}`;
 }
@@ -1361,11 +1366,13 @@ selectedServicesList.innerHTML += `
 });
 servicesTotal = (dailyTotal * 7) + onetimeTotal;
 }
-const cleaningFee = parseInt(document.getElementById('cleaning-fee').textContent.replace('€', ''));
+const linensElement = document.getElementById('linens-detail-price');
+const cleaningFee = linensElement ? parseInt(linensElement.textContent) : 120;
 servicesTotalElement.textContent = `€${servicesTotal}`;
 const instagramDiscount = currentBasePrice * 0.1;
 const finalTotal = currentBasePrice - instagramDiscount + servicesTotal + cleaningFee;
 totalPriceElement.textContent = `€${finalTotal}`;
+console.log('📊 Calcolo totale:', {currentBasePrice, instagramDiscount, servicesTotal, cleaningFee, finalTotal});
 }
 serviceCheckboxes.forEach(checkbox => {
 checkbox.addEventListener('change', window.updateTotals);
@@ -1421,7 +1428,7 @@ function loadCatamaranConfiguration() {
         // Aggiorna prezzo lenzuola (calcolato per numero ospiti di default)
         const defaultGuests = config.basic.defaultGuests || 6;
         const linensTotal = config.mandatoryPackages.linens.pricePerGuest * defaultGuests;
-        updateElement('cleaning-fee', `€${linensTotal}`);
+        updateElement('linens-detail-price', linensTotal.toString());
         
         // Aggiorna prezzo skipper
         updateElement('skipper-price', `€${config.additionalServices.skipper.price}/giorno`);
