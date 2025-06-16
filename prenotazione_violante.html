@@ -608,9 +608,9 @@ Raccomandato per chi ha poca esperienza di navigazione nelle acque della Sardegn
 <span class="text-gray-600">Prezzo base per questa settimana (7 giorni)</span>
 <span class="font-medium" id="summary-base-price">€ 3.499</span>
 </div>
-<div class="flex justify-between text-green-600">
-<span>Sconto Instagram -10%</span>
-<span>-€ 349,90</span>
+<div id="instagram-discount-section" class="flex justify-between text-green-600">
+<span id="discount-label">Sconto Instagram -10%</span>
+<span id="discount-amount">-€ 349,90</span>
 </div>
 <div class="bg-gray-50 p-4 rounded-lg">
 <div class="mb-4">
@@ -1325,6 +1325,34 @@ const selectedServicesList = document.getElementById('selected-services-list');
 const totalPriceElement = document.getElementById('total-price');
 let servicesTotal = 0;
 
+// Funzione per aggiornare il display del sconto Instagram
+function updateInstagramDiscountDisplay(discountConfig, discountAmount) {
+    const discountSection = document.getElementById('instagram-discount-section');
+    const discountLabel = document.getElementById('discount-label');
+    const discountAmountElement = document.getElementById('discount-amount');
+    
+    if (!discountSection || !discountLabel || !discountAmountElement) {
+        console.error('❌ Elementi sconto Instagram non trovati');
+        return;
+    }
+    
+    if (discountConfig.enabled && discountAmount > 0) {
+        // Mostra il sconto
+        discountSection.style.display = 'flex';
+        discountLabel.textContent = discountConfig.label || 'Sconto Instagram';
+        discountAmountElement.textContent = `-€ ${discountAmount.toFixed(2).replace('.', ',')}`;
+        console.log('💰 Sconto Instagram aggiornato:', {
+            label: discountConfig.label,
+            amount: discountAmount,
+            percentage: discountConfig.percentage
+        });
+    } else {
+        // Nascondi il sconto se disabilitato
+        discountSection.style.display = 'none';
+        console.log('💰 Sconto Instagram disabilitato');
+    }
+}
+
 // Rende updateTotals globale per il sistema di prezzi dinamici
 window.updateTotals = function() {
 console.log('🔄 updateTotals chiamata');
@@ -1394,9 +1422,21 @@ const cleaningFee = linensElement ? parseInt(linensElement.textContent) : 120;
 // Verifica finale prima di aggiornare UI
 if (servicesTotalElement && totalPriceElement) {
     servicesTotalElement.textContent = `€${servicesTotal}`;
-    const instagramDiscount = currentBasePrice * 0.1;
+    // Carica configurazione sconto Instagram dinamica
+    const config = CatamaranStorage.load();
+    const discountConfig = config.pricing && config.pricing.instagramDiscount ? config.pricing.instagramDiscount : {
+        enabled: true,
+        percentage: 10,
+        label: "Sconto Instagram -10%"
+    };
+    
+    const instagramDiscount = discountConfig.enabled ? (currentBasePrice * (discountConfig.percentage / 100)) : 0;
     const finalTotal = currentBasePrice - instagramDiscount + servicesTotal + cleaningFee;
     totalPriceElement.textContent = `€${finalTotal}`;
+    
+    // Aggiorna display sconto Instagram
+    updateInstagramDiscountDisplay(discountConfig, instagramDiscount);
+    
     console.log('📊 Calcolo totale completato:', {currentBasePrice, instagramDiscount, servicesTotal, cleaningFee, finalTotal});
 } else {
     console.error('❌ Impossibile aggiornare totali: elementi mancanti', {
