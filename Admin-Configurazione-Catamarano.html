@@ -267,6 +267,111 @@ class="w-24 px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-prim
 
 </div>
 
+<!-- Calendario Prezzi Settimanali -->
+<div class="mt-8">
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-200">
+<div class="flex justify-between items-center">
+<h2 class="text-lg font-semibold text-gray-900">Calendario Prezzi Settimanali</h2>
+<div class="flex items-center space-x-2">
+<label class="flex items-center">
+<input type="checkbox" id="weekly-pricing-enabled" checked class="mr-2">
+<span class="text-sm text-gray-600">Abilita prezzi dinamici</span>
+</label>
+</div>
+</div>
+</div>
+<div class="p-6">
+
+<!-- Controlli Navigazione -->
+<div class="flex justify-between items-center mb-6">
+<div class="flex items-center space-x-4">
+<select id="calendar-year" class="px-3 py-2 border border-gray-300 rounded focus:border-primary">
+<option value="2025">2025</option>
+<option value="2026">2026</option>
+</select>
+<div class="flex items-center space-x-2">
+<button id="prev-month" class="p-2 hover:bg-gray-100 rounded-full">
+<i class="ri-arrow-left-s-line"></i>
+</button>
+<span id="current-month-display" class="text-lg font-medium min-w-[120px] text-center">Maggio 2025</span>
+<button id="next-month" class="p-2 hover:bg-gray-100 rounded-full">
+<i class="ri-arrow-right-s-line"></i>
+</button>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-sm text-gray-600">Prezzo default:</span>
+<div class="flex items-center">
+<span class="bg-gray-100 px-2 py-1 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" id="default-weekly-price" value="3999" 
+class="w-20 px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-primary">
+</div>
+</div>
+</div>
+
+<!-- Template Stagionali -->
+<div class="mb-6 p-4 bg-gray-50 rounded-lg">
+<h4 class="font-medium text-gray-900 mb-3">Template Stagionali</h4>
+<div class="flex flex-wrap gap-2">
+<button class="template-btn px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm hover:bg-blue-200" data-price="2999">
+Bassa Stagione (€2.999)
+</button>
+<button class="template-btn px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm hover:bg-green-200" data-price="3999">
+Media Stagione (€3.999)
+</button>
+<button class="template-btn px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm hover:bg-red-200" data-price="4999">
+Alta Stagione (€4.999)
+</button>
+</div>
+</div>
+
+<!-- Calendario -->
+<div class="border border-gray-200 rounded-lg overflow-hidden">
+<div class="grid grid-cols-8 text-center border-b border-gray-200 bg-gray-50">
+<div class="py-3 text-xs font-medium text-gray-500">Settimana</div>
+<div class="py-3 text-xs font-medium text-gray-500">Dom</div>
+<div class="py-3 text-xs font-medium text-gray-500">Lun</div>
+<div class="py-3 text-xs font-medium text-gray-500">Mar</div>
+<div class="py-3 text-xs font-medium text-gray-500">Mer</div>
+<div class="py-3 text-xs font-medium text-gray-500">Gio</div>
+<div class="py-3 text-xs font-medium text-gray-500">Ven</div>
+<div class="py-3 text-xs font-medium text-gray-500">Sab</div>
+</div>
+<div id="pricing-calendar" class="divide-y divide-gray-200">
+<!-- Le righe del calendario verranno generate dinamicamente -->
+</div>
+</div>
+
+<!-- Editor Prezzo Settimana -->
+<div id="week-price-editor" class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg hidden">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-medium text-gray-900 mb-2">Modifica Prezzo Settimana</h4>
+<p class="text-sm text-gray-600" id="selected-week-info">Settimana selezionata</p>
+</div>
+<button id="close-editor" class="text-gray-400 hover:text-gray-600">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<div class="mt-4 flex items-center space-x-4">
+<div class="flex items-center">
+<span class="bg-gray-100 px-3 py-2 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" id="week-price-input" value="3999" 
+class="w-24 px-3 py-2 border border-gray-300 text-sm focus:border-primary">
+</div>
+<input type="text" id="week-note-input" placeholder="Note (opzionale)" 
+class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm focus:border-primary">
+<button id="save-week-price" class="bg-primary text-white px-4 py-2 rounded text-sm hover:bg-opacity-90">
+Salva
+</button>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
 <!-- Bottom Save Button -->
 <div class="mt-8 flex justify-center">
 <button id="save-button-bottom" class="bg-primary text-white px-6 py-3 rounded-lg flex items-center">
@@ -372,6 +477,20 @@ window.saveConfiguration = function() {
             console.log('Logo text aggiornato:', logoTextInput.value);
         }
         
+        // Aggiorna impostazioni calendario prezzi settimanali
+        const weeklyPricingEnabled = document.getElementById('weekly-pricing-enabled');
+        const defaultWeeklyPriceInput = document.getElementById('default-weekly-price');
+        
+        if (weeklyPricingEnabled) {
+            config.weeklyPricing.enabled = weeklyPricingEnabled.checked;
+            console.log('Prezzi settimanali abilitati:', weeklyPricingEnabled.checked);
+        }
+        
+        if (defaultWeeklyPriceInput && defaultWeeklyPriceInput.value) {
+            config.weeklyPricing.defaultPrice = parseInt(defaultWeeklyPriceInput.value);
+            console.log('Prezzo default settimanale aggiornato:', defaultWeeklyPriceInput.value);
+        }
+        
         // Salva la configurazione
         const saved = CatamaranStorage.save(config);
         
@@ -463,6 +582,33 @@ window.loadConfiguration = function() {
         // Aggiorna anteprima logo
         updateLogoPreview(config.theme.logo);
         
+        // Carica impostazioni calendario prezzi settimanali
+        const weeklyPricingEnabled = document.getElementById('weekly-pricing-enabled');
+        const defaultWeeklyPriceInput = document.getElementById('default-weekly-price');
+        
+        // Assicurati che la struttura weeklyPricing esista
+        if (!config.weeklyPricing) {
+            config.weeklyPricing = {
+                enabled: true,
+                defaultPrice: 3999,
+                weeks: {},
+                templates: {
+                    "alta_stagione": 4999,
+                    "media_stagione": 3999,
+                    "bassa_stagione": 2999
+                }
+            };
+        }
+        
+        if (weeklyPricingEnabled) {
+            weeklyPricingEnabled.checked = config.weeklyPricing.enabled !== false;
+        }
+        
+        if (defaultWeeklyPriceInput) {
+            defaultWeeklyPriceInput.value = config.weeklyPricing.defaultPrice || 3999;
+        }
+        
+        console.log('📅 Configurazione calendario prezzi caricata');
         console.log('✓ Configurazione caricata');
         
     } catch (error) {
@@ -520,6 +666,265 @@ function syncColorInputs() {
                 updateBadgePreview();
             }
         });
+    }
+}
+
+// === GESTIONE CALENDARIO PREZZI SETTIMANALI ===
+let currentCalendarMonth = new Date().getMonth() + 1; // Gennaio = 1
+let currentCalendarYear = new Date().getFullYear();
+let selectedWeek = null;
+
+// Genera il calendario dei prezzi per il mese corrente
+function generatePricingCalendar(month, year) {
+    const calendar = document.getElementById('pricing-calendar');
+    if (!calendar) return;
+    
+    const config = CatamaranStorage.load();
+    const monthNames = ['', 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 
+                       'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+    
+    // Aggiorna display mese corrente
+    const monthDisplay = document.getElementById('current-month-display');
+    if (monthDisplay) {
+        monthDisplay.textContent = `${monthNames[month]} ${year}`;
+    }
+    
+    // Calcola le settimane del mese
+    const weeks = getWeeksInMonth(month, year);
+    
+    // Pulisci calendario esistente
+    calendar.innerHTML = '';
+    
+    // Genera le righe per ogni settimana
+    weeks.forEach(week => {
+        const weekKey = `${year}-W${week.weekNumber.toString().padStart(2, '0')}`;
+        const weekData = config.weeklyPricing.weeks[weekKey] || {
+            price: config.weeklyPricing.defaultPrice,
+            note: ''
+        };
+        
+        const row = document.createElement('div');
+        row.className = 'grid grid-cols-8 border-b border-gray-100 hover:bg-gray-50 cursor-pointer week-row';
+        row.dataset.weekKey = weekKey;
+        row.dataset.weekNumber = week.weekNumber;
+        
+        // Colonna settimana (numero + prezzo)
+        const weekCell = document.createElement('div');
+        weekCell.className = 'p-3 text-center border-r border-gray-100';
+        weekCell.innerHTML = `
+            <div class="text-sm font-medium text-gray-900">W${week.weekNumber}</div>
+            <div class="text-xs text-primary font-bold">€${weekData.price.toLocaleString()}</div>
+            ${weekData.note ? `<div class="text-xs text-gray-500 mt-1">${weekData.note}</div>` : ''}
+        `;
+        row.appendChild(weekCell);
+        
+        // Colonne giorni della settimana
+        week.days.forEach(day => {
+            const dayCell = document.createElement('div');
+            dayCell.className = 'p-3 text-center text-sm';
+            
+            if (day.date) {
+                const isCurrentMonth = day.date.getMonth() + 1 === month;
+                dayCell.className += isCurrentMonth ? ' text-gray-900' : ' text-gray-400';
+                dayCell.textContent = day.date.getDate();
+            }
+            
+            row.appendChild(dayCell);
+        });
+        
+        // Aggiungi evento click per modifica
+        row.addEventListener('click', () => openWeekEditor(weekKey, week.weekNumber, weekData));
+        
+        calendar.appendChild(row);
+    });
+}
+
+// Calcola le settimane di un mese
+function getWeeksInMonth(month, year) {
+    const weeks = [];
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+    
+    // Trova il primo lunedì del mese (o il lunedì della settimana che contiene il primo giorno)
+    let startDate = new Date(firstDay);
+    const dayOfWeek = startDate.getDay();
+    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    startDate.setDate(startDate.getDate() + mondayOffset);
+    
+    let currentDate = new Date(startDate);
+    
+    while (currentDate <= lastDay || currentDate.getMonth() === month - 1) {
+        const weekNumber = getWeekNumber(currentDate);
+        const days = [];
+        
+        // Genera i 7 giorni della settimana (Domenica-Sabato)
+        for (let i = 0; i < 7; i++) {
+            const dayDate = new Date(currentDate);
+            dayDate.setDate(currentDate.getDate() + (i === 0 ? 6 : i - 1)); // Domenica prima
+            
+            days.push({
+                date: dayDate,
+                isCurrentMonth: dayDate.getMonth() + 1 === month
+            });
+        }
+        
+        weeks.push({
+            weekNumber: weekNumber,
+            days: days,
+            startDate: new Date(currentDate)
+        });
+        
+        // Vai alla settimana successiva
+        currentDate.setDate(currentDate.getDate() + 7);
+        
+        // Evita loop infinito
+        if (weeks.length > 6) break;
+    }
+    
+    return weeks;
+}
+
+// Calcola il numero della settimana ISO
+function getWeekNumber(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+// Apre l'editor per modificare il prezzo di una settimana
+function openWeekEditor(weekKey, weekNumber, weekData) {
+    selectedWeek = weekKey;
+    const editor = document.getElementById('week-price-editor');
+    const weekInfo = document.getElementById('selected-week-info');
+    const priceInput = document.getElementById('week-price-input');
+    const noteInput = document.getElementById('week-note-input');
+    
+    if (editor && weekInfo && priceInput && noteInput) {
+        weekInfo.textContent = `Settimana ${weekNumber} (${weekKey})`;
+        priceInput.value = weekData.price;
+        noteInput.value = weekData.note || '';
+        editor.classList.remove('hidden');
+        
+        // Evidenzia la riga selezionata
+        document.querySelectorAll('.week-row').forEach(row => {
+            row.classList.remove('bg-blue-100');
+        });
+        const selectedRow = document.querySelector(`[data-week-key="${weekKey}"]`);
+        if (selectedRow) {
+            selectedRow.classList.add('bg-blue-100');
+        }
+    }
+}
+
+// Chiude l'editor prezzi
+function closeWeekEditor() {
+    const editor = document.getElementById('week-price-editor');
+    if (editor) {
+        editor.classList.add('hidden');
+    }
+    
+    // Rimuovi evidenziazione
+    document.querySelectorAll('.week-row').forEach(row => {
+        row.classList.remove('bg-blue-100');
+    });
+    
+    selectedWeek = null;
+}
+
+// Salva il prezzo della settimana
+function saveWeekPrice() {
+    if (!selectedWeek) return;
+    
+    const priceInput = document.getElementById('week-price-input');
+    const noteInput = document.getElementById('week-note-input');
+    
+    if (!priceInput) return;
+    
+    const price = parseInt(priceInput.value) || 0;
+    const note = noteInput ? noteInput.value.trim() : '';
+    
+    // Aggiorna configurazione
+    const config = CatamaranStorage.load();
+    if (!config.weeklyPricing.weeks) {
+        config.weeklyPricing.weeks = {};
+    }
+    
+    config.weeklyPricing.weeks[selectedWeek] = {
+        price: price,
+        note: note
+    };
+    
+    // Salva la configurazione
+    const saved = CatamaranStorage.save(config);
+    
+    if (saved) {
+        showNotification('✓ Prezzo settimana salvato!', 'success');
+        // Rigenera calendario per mostrare le modifiche
+        generatePricingCalendar(currentCalendarMonth, currentCalendarYear);
+        closeWeekEditor();
+    } else {
+        showNotification('✗ Errore nel salvataggio', 'error');
+    }
+}
+
+// Applica un template stagionale alle settimane selezionate
+function applySeasonalTemplate(templatePrice) {
+    if (!selectedWeek) {
+        showNotification('Seleziona prima una settimana', 'error');
+        return;
+    }
+    
+    const priceInput = document.getElementById('week-price-input');
+    if (priceInput) {
+        priceInput.value = templatePrice;
+    }
+}
+
+// Naviga al mese precedente
+function navigateToPreviousMonth() {
+    currentCalendarMonth--;
+    if (currentCalendarMonth < 1) {
+        currentCalendarMonth = 12;
+        currentCalendarYear--;
+    }
+    generatePricingCalendar(currentCalendarMonth, currentCalendarYear);
+    closeWeekEditor();
+}
+
+// Naviga al mese successivo
+function navigateToNextMonth() {
+    currentCalendarMonth++;
+    if (currentCalendarMonth > 12) {
+        currentCalendarMonth = 1;
+        currentCalendarYear++;
+    }
+    generatePricingCalendar(currentCalendarMonth, currentCalendarYear);
+    closeWeekEditor();
+}
+
+// Cambia anno del calendario
+function changeCalendarYear(year) {
+    currentCalendarYear = parseInt(year);
+    generatePricingCalendar(currentCalendarMonth, currentCalendarYear);
+    closeWeekEditor();
+}
+
+// Aggiorna il prezzo di default per tutte le settimane future
+function updateDefaultPrice() {
+    const defaultPriceInput = document.getElementById('default-weekly-price');
+    if (!defaultPriceInput) return;
+    
+    const newDefaultPrice = parseInt(defaultPriceInput.value) || 3999;
+    
+    const config = CatamaranStorage.load();
+    config.weeklyPricing.defaultPrice = newDefaultPrice;
+    
+    const saved = CatamaranStorage.save(config);
+    if (saved) {
+        showNotification('✓ Prezzo default aggiornato!', 'success');
+        generatePricingCalendar(currentCalendarMonth, currentCalendarYear);
     }
 }
 
@@ -656,6 +1061,77 @@ window.addEventListener('load', function() {
         // Aggiorna anteprima iniziale
         updateBadgePreview();
         
+        // === INIZIALIZZAZIONE CALENDARIO PREZZI SETTIMANALI ===
+        
+        // Imposta il mese corrente (Maggio 2025 come da configurazione)
+        const config = CatamaranStorage.load();
+        if (config.calendar && config.calendar.defaultDate) {
+            const defaultDate = new Date(config.calendar.defaultDate);
+            currentCalendarMonth = defaultDate.getMonth() + 1;
+            currentCalendarYear = defaultDate.getFullYear();
+        } else {
+            currentCalendarMonth = 5; // Maggio
+            currentCalendarYear = 2025;
+        }
+        
+        // Genera calendario iniziale
+        generatePricingCalendar(currentCalendarMonth, currentCalendarYear);
+        
+        // Collega controlli navigazione calendario
+        const prevMonthBtn = document.getElementById('prev-month');
+        const nextMonthBtn = document.getElementById('next-month');
+        const calendarYearSelect = document.getElementById('calendar-year');
+        
+        if (prevMonthBtn) {
+            prevMonthBtn.addEventListener('click', navigateToPreviousMonth);
+            console.log('✓ Pulsante mese precedente collegato');
+        }
+        
+        if (nextMonthBtn) {
+            nextMonthBtn.addEventListener('click', navigateToNextMonth);
+            console.log('✓ Pulsante mese successivo collegato');
+        }
+        
+        if (calendarYearSelect) {
+            calendarYearSelect.value = currentCalendarYear;
+            calendarYearSelect.addEventListener('change', function() {
+                changeCalendarYear(this.value);
+            });
+            console.log('✓ Selettore anno collegato');
+        }
+        
+        // Collega editor settimana
+        const closeEditorBtn = document.getElementById('close-editor');
+        const saveWeekBtn = document.getElementById('save-week-price');
+        
+        if (closeEditorBtn) {
+            closeEditorBtn.addEventListener('click', closeWeekEditor);
+            console.log('✓ Pulsante chiudi editor collegato');
+        }
+        
+        if (saveWeekBtn) {
+            saveWeekBtn.addEventListener('click', saveWeekPrice);
+            console.log('✓ Pulsante salva settimana collegato');
+        }
+        
+        // Collega template stagionali
+        const templateBtns = document.querySelectorAll('.template-btn');
+        templateBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const price = parseInt(this.dataset.price);
+                applySeasonalTemplate(price);
+            });
+        });
+        console.log(`✓ ${templateBtns.length} template stagionali collegati`);
+        
+        // Collega input prezzo default
+        const defaultPriceInput = document.getElementById('default-weekly-price');
+        if (defaultPriceInput) {
+            defaultPriceInput.addEventListener('change', updateDefaultPrice);
+            console.log('✓ Input prezzo default collegato');
+        }
+        
+        console.log('📅 Calendario prezzi settimanali inizializzato');
         console.log('✅ Inizializzazione completata');
         
     } catch (error) {

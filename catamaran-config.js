@@ -32,6 +32,40 @@ const DEFAULT_CATAMARAN_CONFIG = {
     color: "#f8b400", // Colore di default (secondary)
     textColor: "#ffffff"
   },
+
+  // Sistema prezzi settimanali
+  weeklyPricing: {
+    enabled: true,
+    defaultPrice: 3999,
+    weeks: {
+      // Formato: "YYYY-Www" (ISO week format)
+      // Settimane 2025 preconfigurate con prezzo default
+      "2025-W20": { price: 3999, note: "Maggio" },
+      "2025-W21": { price: 3999, note: "Maggio" },
+      "2025-W22": { price: 3999, note: "Maggio" },
+      "2025-W23": { price: 3999, note: "Giugno" },
+      "2025-W24": { price: 3999, note: "Giugno" },
+      "2025-W25": { price: 3999, note: "Giugno" },
+      "2025-W26": { price: 3999, note: "Giugno" },
+      "2025-W27": { price: 3999, note: "Luglio" },
+      "2025-W28": { price: 3999, note: "Luglio" },
+      "2025-W29": { price: 3999, note: "Luglio" },
+      "2025-W30": { price: 3999, note: "Luglio" },
+      "2025-W31": { price: 3999, note: "Agosto" },
+      "2025-W32": { price: 3999, note: "Agosto" },
+      "2025-W33": { price: 3999, note: "Agosto" },
+      "2025-W34": { price: 3999, note: "Agosto" },
+      "2025-W35": { price: 3999, note: "Settembre" },
+      "2025-W36": { price: 3999, note: "Settembre" },
+      "2025-W37": { price: 3999, note: "Settembre" },
+      "2025-W38": { price: 3999, note: "Settembre" }
+    },
+    templates: {
+      "alta_stagione": 4999,
+      "media_stagione": 3999,
+      "bassa_stagione": 2999
+    }
+  },
   
   // Immagini
   images: {
