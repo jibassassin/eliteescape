@@ -1216,7 +1216,11 @@ function getWeekNumber(date) {
 function getWeeklyPrice(date) {
     const config = CatamaranStorage.load();
     
+    console.log('🔍 getWeeklyPrice chiamata per data:', date.toISOString().slice(0,10));
+    console.log('📊 Config weeklyPricing:', config.weeklyPricing);
+    
     if (!config.weeklyPricing || !config.weeklyPricing.enabled) {
+        console.log('⚠️ Prezzi settimanali disabilitati, uso basePrice:', config.basic.basePrice);
         return config.basic.basePrice || 3499;
     }
     
@@ -1224,20 +1228,29 @@ function getWeeklyPrice(date) {
     const year = date.getFullYear();
     const weekKey = `${year}-W${weekNumber.toString().padStart(2, '0')}`;
     
+    console.log(`📅 Settimana calcolata: ${weekKey} (numero ${weekNumber})`);
+    console.log('💰 Settimane configurate:', config.weeklyPricing.weeks);
+    
     // Controlla se esiste un prezzo specifico per questa settimana
     if (config.weeklyPricing.weeks && config.weeklyPricing.weeks[weekKey]) {
-        return config.weeklyPricing.weeks[weekKey].price;
+        const price = config.weeklyPricing.weeks[weekKey].price;
+        console.log(`✅ Prezzo specifico trovato per ${weekKey}: €${price}`);
+        return price;
     }
     
     // Altrimenti usa il prezzo default del calendario
-    return config.weeklyPricing.defaultPrice || config.basic.basePrice || 3499;
+    const defaultPrice = config.weeklyPricing.defaultPrice || config.basic.basePrice || 3499;
+    console.log(`📋 Uso prezzo default: €${defaultPrice}`);
+    return defaultPrice;
 }
 
 // Funzione per aggiornare il prezzo base quando viene selezionata una settimana
 function updateBasePriceForWeek(startDate) {
     if (startDate) {
+        console.log('💰 updateBasePriceForWeek chiamata per:', startDate.toISOString().slice(0,10));
         const config = CatamaranStorage.load();
         currentBasePrice = getWeeklyPrice(startDate);
+        console.log('📊 Nuovo currentBasePrice:', currentBasePrice);
         
         // Ottieni informazioni sulla settimana
         const weekNumber = getWeekNumber(startDate);
@@ -1359,6 +1372,8 @@ function loadCatamaranConfiguration() {
         
         // Aggiorna prezzo base (inizializza currentBasePrice con il valore dalla configurazione)
         currentBasePrice = config.basic.basePrice || 3499;
+        console.log('🚀 Inizializzazione currentBasePrice:', currentBasePrice);
+        console.log('🔧 Config all\'inizializzazione:', config);
         updateElement('base-price', `€ ${currentBasePrice.toLocaleString()}`);
         
         // Aggiorna anno 
