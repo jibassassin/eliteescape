@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
 <script src="catamaran-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
 :where([class^="ri-"])::before { content: "\f3c2"; }
 @media (max-width: 768px) {
@@ -677,22 +678,367 @@ Raccomandato per chi ha poca esperienza di navigazione nelle acque della Sardegn
 </div>
 </div>
 <script>
+// === SISTEMA INVIO EMAIL E GESTIONE CTA ===
+
+// Inizializza EmailJS e configura interfaccia
 document.addEventListener('DOMContentLoaded', function() {
-const termsCheckbox = document.getElementById('terms-checkbox');
-const submitButton = document.getElementById('submit-booking');
-termsCheckbox.addEventListener('change', function() {
-if(this.checked) {
-submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
-} else {
-submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+    initializeEmailSystem();
+});
+
+function initializeEmailSystem() {
+    try {
+        console.log('🚀 Inizializzando sistema email...');
+        
+        // Carica configurazione
+        const config = CatamaranStorage.load();
+        
+        // Aggiorna testi CTA dalla configurazione
+        updateCTATexts(config);
+        
+        // Inizializza EmailJS se configurato
+        if (config.email && config.email.enabled && config.email.emailjs.publicKey) {
+            emailjs.init(config.email.emailjs.publicKey);
+            console.log('✓ EmailJS inizializzato');
+        }
+        
+        // Setup controlli form
+        setupFormControls();
+        
+        console.log('✅ Sistema email inizializzato con successo');
+        
+    } catch (error) {
+        console.error('❌ Errore inizializzazione sistema email:', error);
+    }
 }
-});
-submitButton.addEventListener('click', function(e) {
-if(!termsCheckbox.checked) {
-e.preventDefault();
+
+function updateCTATexts(config) {
+    const buttonText = document.getElementById('booking-button-text');
+    const subtext = document.getElementById('booking-subtext');
+    
+    if (buttonText && config.ui && config.ui.bookingButton) {
+        buttonText.textContent = config.ui.bookingButton;
+    }
+    
+    if (subtext && config.ui && config.ui.bookingSubtext) {
+        subtext.textContent = config.ui.bookingSubtext;
+    }
+    
+    console.log('🔄 Testi CTA aggiornati dalla configurazione');
 }
-});
-});
+
+function setupFormControls() {
+    const termsCheckbox = document.getElementById('terms-checkbox');
+    const submitButton = document.getElementById('submit-booking');
+    
+    if (!termsCheckbox || !submitButton) {
+        console.error('❌ Elementi form non trovati');
+        return;
+    }
+    
+    // Gestione abilitazione pulsante
+    termsCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            submitButton.disabled = false;
+        } else {
+            submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+            submitButton.disabled = true;
+        }
+    });
+    
+    // Gestione click submit
+    submitButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (!termsCheckbox.checked) {
+            showNotification('Devi accettare i termini e condizioni per procedere', 'error');
+            return;
+        }
+        
+        handleBookingSubmit();
+    });
+    
+    console.log('✓ Controlli form configurati');
+}
+
+async function handleBookingSubmit() {
+    const config = CatamaranStorage.load();
+    
+    try {
+        // Controlla se il sistema email è abilitato
+        if (!config.email || !config.email.enabled) {
+            showNotification('Sistema di invio email non configurato', 'error');
+            return;
+        }
+        
+        // Mostra loading
+        showSubmitLoading(true);
+        
+        // Raccogli dati
+        const bookingData = collectBookingData();
+        
+        if (!bookingData) {
+            showSubmitLoading(false);
+            return;
+        }
+        
+        // Invia email
+        await sendBookingEmail(bookingData, config);
+        
+        // Successo
+        showSubmitLoading(false);
+        showNotification(config.email.notifications.successMessage || 'Richiesta inviata con successo!', 'success');
+        
+        // Opzionale: resetta form o reindirizza
+        // resetForm();
+        
+    } catch (error) {
+        console.error('❌ Errore invio prenotazione:', error);
+        showSubmitLoading(false);
+        showNotification(config.email.notifications.errorMessage || 'Errore nell\'invio. Riprova.', 'error');
+    }
+}
+
+function collectBookingData() {
+    try {
+        console.log('📋 Raccogliendo dati prenotazione...');
+        
+        // Dati personali
+        const personalData = {
+            firstName: document.getElementById('first-name')?.value || '',
+            lastName: document.getElementById('last-name')?.value || '',
+            email: document.getElementById('email')?.value || '',
+            phone: document.getElementById('phone')?.value || '',
+            nationality: document.getElementById('nationality')?.value || '',
+            navigationExperience: document.querySelector('input[name="navigation-experience"]:checked')?.value || 'Non specificata',
+            specialNotes: document.getElementById('special-requests')?.value || ''
+        };
+        
+        // Validazione campi obbligatori
+        const requiredFields = ['firstName', 'lastName', 'email', 'phone'];
+        for (const field of requiredFields) {
+            if (!personalData[field]) {
+                showNotification(`Il campo ${field} è obbligatorio`, 'error');
+                return null;
+            }
+        }
+        
+        // Validazione email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(personalData.email)) {
+            showNotification('Inserisci un indirizzo email valido', 'error');
+            return null;
+        }
+        
+        // Date e ospiti
+        const selectedDateElement = document.querySelector('.selected-week');
+        const bookingDetails = {
+            selectedWeek: selectedDateElement ? selectedDateElement.textContent : 'Non selezionata',
+            numberOfGuests: document.getElementById('guests')?.value || '1',
+            checkinDate: 'Sabato ore 16:00',
+            checkoutDate: 'Sabato ore 10:00'
+        };
+        
+        // Servizi selezionati
+        const selectedServices = [];
+        const serviceCheckboxes = document.querySelectorAll('.service-checkbox:checked');
+        serviceCheckboxes.forEach(checkbox => {
+            const serviceCard = checkbox.closest('.service-card, .border');
+            if (serviceCard) {
+                const nameElement = serviceCard.querySelector('h4, .font-medium');
+                const priceElement = serviceCard.querySelector('[id*="price"]');
+                
+                selectedServices.push({
+                    name: nameElement ? nameElement.textContent.trim() : 'Servizio non identificato',
+                    price: priceElement ? priceElement.textContent.trim() : 'Prezzo non disponibile'
+                });
+            }
+        });
+        
+        // Calcolo prezzi
+        const basePrice = document.getElementById('summary-base-price')?.textContent || '€ 0';
+        const servicesTotal = document.getElementById('services-total')?.textContent || '€ 0';
+        const finalTotal = document.getElementById('total-price')?.textContent || '€ 0';
+        
+        // Sconto Instagram
+        const discountSection = document.getElementById('instagram-discount-section');
+        const discountLabel = document.getElementById('discount-label')?.textContent || '';
+        const discountAmount = document.getElementById('discount-amount')?.textContent || '';
+        const hasDiscount = discountSection && discountSection.style.display !== 'none';
+        
+        const pricingBreakdown = {
+            basePrice,
+            servicesTotal,
+            finalTotal,
+            discount: hasDiscount ? {
+                label: discountLabel,
+                amount: discountAmount
+            } : null
+        };
+        
+        // Configurazione catamarano
+        const config = CatamaranStorage.load();
+        const catamaranInfo = {
+            name: config.basic.name || 'Catamarano',
+            year: config.basic.year || 2025,
+            length: config.basic.length || '11,8 metri',
+            cabins: config.basic.cabins || '4 cabine',
+            maxGuests: config.basic.maxGuests || 8,
+            location: config.basic.location || 'Sardegna'
+        };
+        
+        // Consensi
+        const newsletter = document.getElementById('newsletter-checkbox')?.checked || false;
+        
+        const bookingData = {
+            personalData,
+            bookingDetails,
+            selectedServices,
+            pricingBreakdown,
+            catamaranInfo,
+            newsletter,
+            timestamp: new Date().toLocaleString('it-IT'),
+            source: 'Sito Web Elite Escape'
+        };
+        
+        console.log('✓ Dati raccolti:', bookingData);
+        return bookingData;
+        
+    } catch (error) {
+        console.error('❌ Errore raccolta dati:', error);
+        showNotification('Errore nella raccolta dei dati. Controlla i campi inseriti.', 'error');
+        return null;
+    }
+}
+
+async function sendBookingEmail(bookingData, config) {
+    console.log('📧 Inviando email prenotazione...');
+    
+    // Verifica configurazione EmailJS
+    if (!config.email.emailjs.serviceId || !config.email.emailjs.templateId) {
+        throw new Error('Configurazione EmailJS incompleta');
+    }
+    
+    // Prepara template parameters per EmailJS
+    const templateParams = {
+        // Informazioni catamarano
+        catamaran_name: bookingData.catamaranInfo.name,
+        catamaran_year: bookingData.catamaranInfo.year,
+        catamaran_details: `${bookingData.catamaranInfo.length}, ${bookingData.catamaranInfo.cabins}, max ${bookingData.catamaranInfo.maxGuests} ospiti`,
+        
+        // Dati cliente
+        client_name: `${bookingData.personalData.firstName} ${bookingData.personalData.lastName}`,
+        client_email: bookingData.personalData.email,
+        client_phone: bookingData.personalData.phone,
+        client_nationality: bookingData.personalData.nationality,
+        
+        // Dettagli prenotazione
+        selected_week: bookingData.bookingDetails.selectedWeek,
+        number_of_guests: bookingData.bookingDetails.numberOfGuests,
+        checkin_info: bookingData.bookingDetails.checkinDate,
+        checkout_info: bookingData.bookingDetails.checkoutDate,
+        
+        // Servizi
+        selected_services: bookingData.selectedServices.length > 0 
+            ? bookingData.selectedServices.map(s => `• ${s.name} - ${s.price}`).join('\n')
+            : 'Nessun servizio aggiuntivo selezionato',
+        
+        // Prezzi
+        base_price: bookingData.pricingBreakdown.basePrice,
+        services_total: bookingData.pricingBreakdown.servicesTotal,
+        discount_info: bookingData.pricingBreakdown.discount 
+            ? `${bookingData.pricingBreakdown.discount.label}: ${bookingData.pricingBreakdown.discount.amount}`
+            : 'Nessuno sconto applicato',
+        final_total: bookingData.pricingBreakdown.finalTotal,
+        
+        // Extra info
+        navigation_experience: bookingData.personalData.navigationExperience,
+        special_notes: bookingData.personalData.specialNotes || 'Nessuna nota speciale',
+        newsletter_subscription: bookingData.newsletter ? 'Sì' : 'No',
+        
+        // Metadati
+        booking_timestamp: bookingData.timestamp,
+        booking_source: bookingData.source,
+        
+        // Email destinatario
+        to_email: config.email.template.adminEmail
+    };
+    
+    console.log('📧 Parametri template preparati');
+    
+    // Invia email tramite EmailJS
+    const response = await emailjs.send(
+        config.email.emailjs.serviceId,
+        config.email.emailjs.templateId,
+        templateParams
+    );
+    
+    console.log('✅ Email inviata con successo:', response);
+    return response;
+}
+
+function showSubmitLoading(isLoading) {
+    const submitButton = document.getElementById('submit-booking');
+    const buttonText = document.getElementById('booking-button-text');
+    
+    if (!submitButton || !buttonText) return;
+    
+    if (isLoading) {
+        submitButton.disabled = true;
+        submitButton.classList.add('opacity-75');
+        buttonText.innerHTML = '<i class="ri-loader-4-line animate-spin mr-2"></i>Invio in corso...';
+    } else {
+        submitButton.disabled = false;
+        submitButton.classList.remove('opacity-75');
+        
+        // Ripristina testo originale
+        const config = CatamaranStorage.load();
+        buttonText.textContent = (config.ui && config.ui.bookingButton) || 'Invia Richiesta di Prenotazione';
+    }
+}
+
+function showNotification(message, type = 'info') {
+    // Rimuovi notifiche esistenti
+    const existingNotifications = document.querySelectorAll('.booking-notification');
+    existingNotifications.forEach(n => n.remove());
+    
+    // Crea nuova notifica
+    const notification = document.createElement('div');
+    notification.className = `booking-notification fixed top-4 right-4 px-6 py-4 rounded-lg text-white z-50 max-w-md shadow-lg transform transition-all duration-300 translate-x-full`;
+    
+    // Stili per tipo
+    if (type === 'success') {
+        notification.classList.add('bg-green-600');
+    } else if (type === 'error') {
+        notification.classList.add('bg-red-600');
+    } else {
+        notification.classList.add('bg-blue-600');
+    }
+    
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <span class="flex-1">${message}</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animazione entrata
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Auto rimozione dopo 5 secondi
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.classList.add('translate-x-full');
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, 5000);
+}
 </script>
 </div>
 </div>
@@ -801,9 +1147,9 @@ e.preventDefault();
 </label>
 <button id="submit-booking" class="w-full bg-primary text-white py-3 !rounded-button font-medium hover:bg-opacity-90 transition-colors whitespace-nowrap flex items-center justify-center opacity-50 cursor-not-allowed">
 <i class="ri-mail-send-line mr-2"></i>
-Invia Richiesta di Prenotazione
+<span id="booking-button-text">Invia Richiesta di Prenotazione</span>
 </button>
-<p class="mt-4 text-sm text-gray-600 text-center">Sarai ricontattato da Cagliari Sailing Charter entro 24h per confermare e procedere al pagamento dell'anticipo</p>
+<p id="booking-subtext" class="mt-4 text-sm text-gray-600 text-center">Sarai ricontattato da Cagliari Sailing Charter entro 24h per confermare e procedere al pagamento dell'anticipo</p>
 </div>
 </div>
 </div>

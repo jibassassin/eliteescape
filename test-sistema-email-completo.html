@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sistema Email Completo - Elite Escape</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="catamaran-config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        .test-section {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-success {
+            border-color: #10b981;
+            background-color: #f0fdf4;
+        }
+        .test-error {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+        .test-warning {
+            border-color: #f59e0b;
+            background-color: #fffbeb;
+        }
+        .config-display {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-6">
+
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold text-center mb-8">🧪 Test Sistema Email Completo</h1>
+    
+    <!-- Status Sistema -->
+    <div class="test-section">
+        <h2 class="text-xl font-semibold mb-4">📊 Status Sistema</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-4 rounded border">
+                <div class="font-medium text-gray-700">Configurazione</div>
+                <div id="config-status" class="text-lg font-bold">⏳ Verifica...</div>
+            </div>
+            <div class="bg-white p-4 rounded border">
+                <div class="font-medium text-gray-700">EmailJS</div>
+                <div id="emailjs-status" class="text-lg font-bold">⏳ Verifica...</div>
+            </div>
+            <div class="bg-white p-4 rounded border">
+                <div class="font-medium text-gray-700">Template</div>
+                <div id="template-status" class="text-lg font-bold">⏳ Verifica...</div>
+            </div>
+            <div class="bg-white p-4 rounded border">
+                <div class="font-medium text-gray-700">CTA Dinamica</div>
+                <div id="cta-status" class="text-lg font-bold">⏳ Verifica...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Configurazione -->
+    <div class="test-section" id="config-test">
+        <h2 class="text-xl font-semibold mb-4">⚙️ Test Configurazione</h2>
+        <button onclick="testConfiguration()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4">
+            Verifica Configurazione
+        </button>
+        <div id="config-results" class="config-display"></div>
+    </div>
+
+    <!-- Test CTA Dinamica -->
+    <div class="test-section" id="cta-test">
+        <h2 class="text-xl font-semibold mb-4">🎯 Test Call-to-Action Dinamica</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Controlli -->
+            <div>
+                <div class="mb-4">
+                    <label class="block font-medium mb-2">Testo Pulsante</label>
+                    <input type="text" id="test-button-text" value="Invia Richiesta di Prenotazione" 
+                           class="w-full px-3 py-2 border rounded">
+                </div>
+                <div class="mb-4">
+                    <label class="block font-medium mb-2">Sottotesto</label>
+                    <textarea id="test-subtext" rows="3" class="w-full px-3 py-2 border rounded"
+                    >Sarai ricontattato da Cagliari Sailing Charter entro 24h per confermare e procedere al pagamento dell'anticipo</textarea>
+                </div>
+                <button onclick="updateCTATest()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Aggiorna CTA
+                </button>
+            </div>
+            
+            <!-- Anteprima -->
+            <div>
+                <label class="block font-medium mb-2">Anteprima Call-to-Action</label>
+                <div class="bg-white p-6 border rounded-lg">
+                    <button id="test-cta-button" class="w-full bg-blue-600 text-white py-3 rounded-lg font-medium flex items-center justify-center transition-colors hover:bg-blue-700">
+                        <i class="ri-mail-send-line mr-2"></i>
+                        <span id="test-cta-text">Invia Richiesta di Prenotazione</span>
+                    </button>
+                    <p id="test-cta-subtext" class="mt-4 text-sm text-gray-600 text-center">
+                        Sarai ricontattato da Cagliari Sailing Charter entro 24h per confermare e procedere al pagamento dell'anticipo
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Raccolta Dati -->
+    <div class="test-section" id="data-test">
+        <h2 class="text-xl font-semibold mb-4">📋 Test Raccolta Dati</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Form Simulato -->
+            <div>
+                <h3 class="font-semibold mb-3">Dati di Test</h3>
+                <div class="space-y-3">
+                    <input type="text" id="test-firstname" placeholder="Nome" value="Mario" class="w-full px-3 py-2 border rounded">
+                    <input type="text" id="test-lastname" placeholder="Cognome" value="Rossi" class="w-full px-3 py-2 border rounded">
+                    <input type="email" id="test-email" placeholder="Email" value="mario.rossi@email.com" class="w-full px-3 py-2 border rounded">
+                    <input type="tel" id="test-phone" placeholder="Telefono" value="+39 333 1234567" class="w-full px-3 py-2 border rounded">
+                    <select id="test-nationality" class="w-full px-3 py-2 border rounded">
+                        <option value="Italia">Italia</option>
+                        <option value="Francia">Francia</option>
+                        <option value="Germania">Germania</option>
+                    </select>
+                    <textarea id="test-notes" placeholder="Note speciali..." class="w-full px-3 py-2 border rounded" rows="2">Test di prenotazione dal sistema di test</textarea>
+                </div>
+                <button onclick="testDataCollection()" class="mt-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                    Simula Raccolta Dati
+                </button>
+            </div>
+            
+            <!-- Risultati -->
+            <div>
+                <h3 class="font-semibold mb-3">Dati Raccolti</h3>
+                <div id="collected-data" class="config-display h-64"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Invio Email -->
+    <div class="test-section" id="email-test">
+        <h2 class="text-xl font-semibold mb-4">📧 Test Invio Email</h2>
+        
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+            <div class="flex items-center">
+                <i class="ri-alert-line text-yellow-600 mr-2"></i>
+                <strong class="text-yellow-800">Attenzione:</strong>
+                <span class="ml-2 text-yellow-700">Questo test invierà una email reale se EmailJS è configurato correttamente.</span>
+            </div>
+        </div>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block font-medium mb-2">Email Destinatario Test</label>
+                <input type="email" id="test-recipient" placeholder="email@test.com" class="w-full px-3 py-2 border rounded">
+            </div>
+            
+            <div class="flex space-x-4">
+                <button onclick="testEmailSend(false)" class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700">
+                    Test Simulato (No Email)
+                </button>
+                <button onclick="testEmailSend(true)" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                    Test Reale (Invia Email)
+                </button>
+            </div>
+        </div>
+        
+        <div id="email-results" class="mt-4"></div>
+    </div>
+
+    <!-- Log Attività -->
+    <div class="test-section">
+        <h2 class="text-xl font-semibold mb-4">📜 Log Attività</h2>
+        <button onclick="clearLog()" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 mb-4">
+            Pulisci Log
+        </button>
+        <div id="activity-log" class="config-display h-48"></div>
+    </div>
+</div>
+
+<script>
+// Sistema di logging
+function log(message, type = 'info') {
+    const timestamp = new Date().toLocaleTimeString();
+    const logElement = document.getElementById('activity-log');
+    const icon = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+    logElement.textContent += `[${timestamp}] ${icon} ${message}\n`;
+    logElement.scrollTop = logElement.scrollHeight;
+    console.log(`${type.toUpperCase()}: ${message}`);
+}
+
+function clearLog() {
+    document.getElementById('activity-log').textContent = '';
+}
+
+// Test Configurazione
+function testConfiguration() {
+    log('Inizio test configurazione sistema...');
+    
+    try {
+        const config = CatamaranStorage.load();
+        
+        // Verifica struttura email
+        const emailConfigOk = config.email && 
+                             config.email.emailjs && 
+                             config.email.template && 
+                             config.email.notifications;
+        
+        // Verifica UI
+        const uiConfigOk = config.ui && 
+                          config.ui.bookingButton && 
+                          config.ui.bookingSubtext;
+        
+        // Verifica EmailJS
+        const emailjsConfigOk = config.email.emailjs.serviceId && 
+                               config.email.emailjs.templateId && 
+                               config.email.emailjs.publicKey;
+        
+        const results = {
+            'Struttura Email': emailConfigOk ? '✅ OK' : '❌ Mancante',
+            'Configurazione UI': uiConfigOk ? '✅ OK' : '❌ Mancante',
+            'Credenziali EmailJS': emailjsConfigOk ? '✅ OK' : '❌ Incomplete',
+            'Sistema Abilitato': config.email.enabled ? '✅ Abilitato' : '⚠️ Disabilitato',
+            'Service ID': config.email.emailjs.serviceId || '❌ Non configurato',
+            'Template ID': config.email.emailjs.templateId || '❌ Non configurato',
+            'Public Key': config.email.emailjs.publicKey ? '✅ Configurato' : '❌ Non configurato',
+            'Email Admin': config.email.template.adminEmail || '❌ Non configurata'
+        };
+        
+        document.getElementById('config-results').textContent = JSON.stringify(results, null, 2);
+        
+        // Aggiorna status
+        updateStatus('config-status', emailConfigOk && uiConfigOk ? '✅ OK' : '❌ Errore');
+        updateStatus('emailjs-status', emailjsConfigOk ? '✅ OK' : '❌ Incompleto');
+        updateStatus('template-status', config.email.emailjs.templateId ? '✅ OK' : '❌ Mancante');
+        updateStatus('cta-status', uiConfigOk ? '✅ OK' : '❌ Errore');
+        
+        log('Test configurazione completato', emailConfigOk ? 'success' : 'error');
+        
+    } catch (error) {
+        log(`Errore test configurazione: ${error.message}`, 'error');
+        document.getElementById('config-results').textContent = `ERRORE: ${error.message}`;
+    }
+}
+
+function updateStatus(elementId, status) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = status;
+        element.className = status.includes('✅') ? 'text-lg font-bold text-green-600' : 'text-lg font-bold text-red-600';
+    }
+}
+
+// Test CTA
+function updateCTATest() {
+    const buttonText = document.getElementById('test-button-text').value;
+    const subtext = document.getElementById('test-subtext').value;
+    
+    document.getElementById('test-cta-text').textContent = buttonText;
+    document.getElementById('test-cta-subtext').textContent = subtext;
+    
+    log(`CTA aggiornata: "${buttonText}"`);
+}
+
+// Test Raccolta Dati
+function testDataCollection() {
+    log('Simulando raccolta dati...');
+    
+    // Simula i dati come nel sistema reale
+    const testData = {
+        personalData: {
+            firstName: document.getElementById('test-firstname').value,
+            lastName: document.getElementById('test-lastname').value,
+            email: document.getElementById('test-email').value,
+            phone: document.getElementById('test-phone').value,
+            nationality: document.getElementById('test-nationality').value,
+            navigationExperience: 'Intermedia',
+            specialNotes: document.getElementById('test-notes').value
+        },
+        bookingDetails: {
+            selectedWeek: '20-27 Maggio 2025',
+            numberOfGuests: '4',
+            checkinDate: 'Sabato ore 16:00',
+            checkoutDate: 'Sabato ore 10:00'
+        },
+        selectedServices: [
+            { name: 'Skipper Professionale', price: '€ 1.400' },
+            { name: 'Wi-Fi', price: '€ 50' }
+        ],
+        pricingBreakdown: {
+            basePrice: '€ 3.499',
+            servicesTotal: '€ 1.450',
+            finalTotal: '€ 4.949',
+            discount: {
+                label: 'Sconto Instagram -10%',
+                amount: '-€ 349,90'
+            }
+        },
+        catamaranInfo: {
+            name: 'Bali Catsmart - Violante',
+            year: 2025,
+            length: '11,8 metri',
+            cabins: '4 cabine +1 skipper',
+            maxGuests: 8,
+            location: 'Cagliari, Sardegna'
+        },
+        newsletter: true,
+        timestamp: new Date().toLocaleString('it-IT'),
+        source: 'Test Sistema Email'
+    };
+    
+    document.getElementById('collected-data').textContent = JSON.stringify(testData, null, 2);
+    log('Dati raccolti con successo', 'success');
+    
+    return testData;
+}
+
+// Test Invio Email
+async function testEmailSend(realSend = false) {
+    log(`Inizio test invio email (${realSend ? 'REALE' : 'SIMULATO'})...`);
+    
+    try {
+        const config = CatamaranStorage.load();
+        
+        if (!config.email || !config.email.enabled) {
+            throw new Error('Sistema email non abilitato');
+        }
+        
+        if (!config.email.emailjs.serviceId || !config.email.emailjs.templateId || !config.email.emailjs.publicKey) {
+            throw new Error('Configurazione EmailJS incompleta');
+        }
+        
+        // Prepara dati di test
+        const testData = testDataCollection();
+        const recipient = document.getElementById('test-recipient').value || config.email.template.adminEmail;
+        
+        // Prepara parametri template
+        const templateParams = {
+            catamaran_name: testData.catamaranInfo.name,
+            catamaran_year: testData.catamaranInfo.year,
+            catamaran_details: `${testData.catamaranInfo.length}, ${testData.catamaranInfo.cabins}, max ${testData.catamaranInfo.maxGuests} ospiti`,
+            client_name: `${testData.personalData.firstName} ${testData.personalData.lastName}`,
+            client_email: testData.personalData.email,
+            client_phone: testData.personalData.phone,
+            client_nationality: testData.personalData.nationality,
+            selected_week: testData.bookingDetails.selectedWeek,
+            number_of_guests: testData.bookingDetails.numberOfGuests,
+            checkin_info: testData.bookingDetails.checkinDate,
+            checkout_info: testData.bookingDetails.checkoutDate,
+            selected_services: testData.selectedServices.map(s => `• ${s.name} - ${s.price}`).join('\n'),
+            base_price: testData.pricingBreakdown.basePrice,
+            services_total: testData.pricingBreakdown.servicesTotal,
+            discount_info: testData.pricingBreakdown.discount ? 
+                `${testData.pricingBreakdown.discount.label}: ${testData.pricingBreakdown.discount.amount}` : 
+                'Nessuno sconto applicato',
+            final_total: testData.pricingBreakdown.finalTotal,
+            navigation_experience: testData.personalData.navigationExperience,
+            special_notes: testData.personalData.specialNotes || 'Nessuna nota speciale',
+            newsletter_subscription: testData.newsletter ? 'Sì' : 'No',
+            booking_timestamp: testData.timestamp,
+            booking_source: `${testData.source} - ${realSend ? 'TEST REALE' : 'TEST SIMULATO'}`,
+            to_email: recipient
+        };
+        
+        if (realSend) {
+            // Inizializza EmailJS
+            emailjs.init(config.email.emailjs.publicKey);
+            
+            // Invia email reale
+            const response = await emailjs.send(
+                config.email.emailjs.serviceId,
+                config.email.emailjs.templateId,
+                templateParams
+            );
+            
+            log(`Email inviata con successo a ${recipient}. Response: ${response.status}`, 'success');
+            
+            document.getElementById('email-results').innerHTML = `
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-green-800">✅ Email Inviata Con Successo!</h4>
+                    <p class="text-green-700">Destinatario: ${recipient}</p>
+                    <p class="text-green-700">Status: ${response.status}</p>
+                    <p class="text-green-700">Timestamp: ${new Date().toLocaleString()}</p>
+                </div>
+            `;
+            
+        } else {
+            // Test simulato
+            log('Test simulato completato - parametri preparati correttamente', 'success');
+            
+            document.getElementById('email-results').innerHTML = `
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h4 class="font-semibold text-blue-800">🔍 Test Simulato Completato</h4>
+                    <p class="text-blue-700">Tutti i parametri sono stati preparati correttamente.</p>
+                    <p class="text-blue-700">Email destinatario: ${recipient}</p>
+                    <details class="mt-2">
+                        <summary class="cursor-pointer text-blue-800 hover:underline">Mostra parametri template</summary>
+                        <pre class="text-xs bg-blue-100 p-2 rounded mt-2 max-h-40 overflow-y-auto">${JSON.stringify(templateParams, null, 2)}</pre>
+                    </details>
+                </div>
+            `;
+        }
+        
+    } catch (error) {
+        log(`Errore test email: ${error.message}`, 'error');
+        
+        document.getElementById('email-results').innerHTML = `
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                <h4 class="font-semibold text-red-800">❌ Errore Test Email</h4>
+                <p class="text-red-700">${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+// Inizializzazione
+document.addEventListener('DOMContentLoaded', function() {
+    log('Sistema di test inizializzato');
+    
+    // Test automatici iniziali
+    setTimeout(() => {
+        testConfiguration();
+        updateCTATest();
+    }, 500);
+    
+    // Event listeners per aggiornamenti in tempo reale
+    document.getElementById('test-button-text').addEventListener('input', updateCTATest);
+    document.getElementById('test-subtext').addEventListener('input', updateCTATest);
+    
+    log('Test suite pronta per l\'uso', 'success');
+});
+</script>
+
+</body>
+</html>

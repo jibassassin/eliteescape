@@ -310,6 +310,196 @@ class="w-24 px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-prim
 </div>
 </div>
 
+<!-- Configurazione Email & Call-to-Action -->
+<div class="mt-8">
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-200">
+<h2 class="text-lg font-semibold text-gray-900">Email & Call-to-Action</h2>
+</div>
+<div class="p-6 space-y-8">
+
+<!-- Configurazione EmailJS -->
+<div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+<h4 class="font-medium text-gray-900 mb-4">Configurazione EmailJS</h4>
+
+<!-- Abilita Sistema Email -->
+<div class="mb-4">
+<label class="flex items-center">
+<input type="checkbox" id="email-system-enabled" checked class="mr-2">
+<span class="text-sm text-gray-700">Abilita sistema invio email</span>
+</label>
+<p class="mt-1 text-xs text-gray-500">Disattiva per testare senza inviare email reali</p>
+</div>
+
+<!-- Service ID -->
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">EmailJS Service ID</label>
+<input type="text" id="emailjs-service-id" placeholder="service_xxxxxxx" 
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+<p class="mt-1 text-xs text-gray-500">ID del servizio email configurato su EmailJS</p>
+</div>
+
+<!-- Template ID -->
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">EmailJS Template ID</label>
+<input type="text" id="emailjs-template-id" placeholder="template_xxxxxxx" 
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+<p class="mt-1 text-xs text-gray-500">ID del template email configurato su EmailJS</p>
+</div>
+
+<!-- Public Key -->
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">EmailJS Public Key</label>
+<input type="text" id="emailjs-public-key" placeholder="user_xxxxxxxxxxxxxxxx" 
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+<p class="mt-1 text-xs text-gray-500">Chiave pubblica del tuo account EmailJS</p>
+</div>
+
+<!-- Email Admin -->
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Email Destinatario</label>
+<input type="email" id="admin-email" value="prenotazioni@eliteescape.it" 
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+<p class="mt-1 text-xs text-gray-500">Email dove ricevere le richieste di prenotazione</p>
+</div>
+
+</div>
+
+<!-- Configurazione Template Email -->
+<div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+<h4 class="font-medium text-gray-900 mb-4">Template Email</h4>
+
+<!-- Oggetto Email -->
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Oggetto Email</label>
+<input type="text" id="email-subject" value="Nuova Richiesta Prenotazione Catamarano - {catamaran_name}" 
+placeholder="Oggetto dell'email inviata al cliente"
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+<p class="mt-1 text-xs text-gray-500">Usa {catamaran_name} per inserire automaticamente il nome del catamarano</p>
+</div>
+
+<!-- Campi da Includere -->
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-3">Campi da Includere nell'Email</label>
+<div class="grid grid-cols-2 gap-3">
+<label class="flex items-center">
+<input type="checkbox" id="include-personal-data" checked class="mr-2">
+<span class="text-sm text-gray-700">Dati Personali</span>
+</label>
+<label class="flex items-center">
+<input type="checkbox" id="include-contact-info" checked class="mr-2">
+<span class="text-sm text-gray-700">Info Contatto</span>
+</label>
+<label class="flex items-center">
+<input type="checkbox" id="include-booking-details" checked class="mr-2">
+<span class="text-sm text-gray-700">Dettagli Prenotazione</span>
+</label>
+<label class="flex items-center">
+<input type="checkbox" id="include-selected-services" checked class="mr-2">
+<span class="text-sm text-gray-700">Servizi Selezionati</span>
+</label>
+<label class="flex items-center">
+<input type="checkbox" id="include-pricing-breakdown" checked class="mr-2">
+<span class="text-sm text-gray-700">Riepilogo Prezzi</span>
+</label>
+<label class="flex items-center">
+<input type="checkbox" id="include-special-notes" checked class="mr-2">
+<span class="text-sm text-gray-700">Note Speciali</span>
+</label>
+<label class="flex items-center">
+<input type="checkbox" id="include-navigation-experience" checked class="mr-2">
+<span class="text-sm text-gray-700">Esperienza Navigazione</span>
+</label>
+</div>
+</div>
+
+<!-- Risposta Automatica -->
+<div class="border border-blue-200 rounded-lg p-4 bg-blue-50">
+<label class="flex items-center mb-3">
+<input type="checkbox" id="enable-auto-reply" checked class="mr-2">
+<span class="text-sm font-medium text-gray-900">Abilita Risposta Automatica al Cliente</span>
+</label>
+
+<div id="auto-reply-config" class="space-y-3">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Oggetto Risposta Automatica</label>
+<input type="text" id="auto-reply-subject" value="Conferma Ricezione Richiesta Prenotazione" 
+class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:border-primary">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Messaggio Risposta Automatica</label>
+<textarea id="auto-reply-message" rows="3" 
+class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:border-primary"
+>Grazie per la tua richiesta di prenotazione. Ti ricontatteremo entro 24 ore per confermare la disponibilità e procedere con la prenotazione.</textarea>
+</div>
+</div>
+</div>
+
+</div>
+
+<!-- Configurazione Call-to-Action -->
+<div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+<h4 class="font-medium text-gray-900 mb-4">Call-to-Action</h4>
+
+<!-- Testo Pulsante -->
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Testo Pulsante</label>
+<input type="text" id="cta-button-text" value="Invia Richiesta di Prenotazione" 
+placeholder="Testo che appare sul pulsante principale"
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+
+<!-- Sottotesto -->
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Sottotesto</label>
+<textarea id="cta-subtext" rows="2" 
+placeholder="Testo che appare sotto il pulsante"
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary"
+>Sarai ricontattato da Cagliari Sailing Charter entro 24h per confermare e procedere al pagamento dell'anticipo</textarea>
+</div>
+
+<!-- Anteprima CTA -->
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Anteprima Call-to-Action</label>
+<div class="p-4 bg-white border border-gray-200 rounded-lg">
+<button id="cta-preview" class="w-full bg-primary text-white py-3 rounded-lg font-medium flex items-center justify-center transition-colors">
+<i class="ri-mail-send-line mr-2"></i>
+<span id="cta-preview-text">Invia Richiesta di Prenotazione</span>
+</button>
+<p id="cta-preview-subtext" class="mt-4 text-sm text-gray-600 text-center">Sarai ricontattato da Cagliari Sailing Charter entro 24h per confermare e procedere al pagamento dell'anticipo</p>
+</div>
+</div>
+
+</div>
+
+<!-- Messaggi di Notifica -->
+<div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+<h4 class="font-medium text-gray-900 mb-4">Messaggi di Notifica</h4>
+
+<div class="space-y-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Messaggio di Successo</label>
+<input type="text" id="success-message" value="✓ Richiesta inviata con successo! Ti ricontatteremo entro 24 ore." 
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Messaggio di Errore</label>
+<input type="text" id="error-message" value="✗ Errore nell'invio. Riprova o contattaci direttamente." 
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Messaggio di Caricamento</label>
+<input type="text" id="loading-message" value="Invio richiesta in corso..." 
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
 </div>
 
 <!-- Calendario Prezzi Settimanali -->
@@ -587,6 +777,9 @@ window.saveConfiguration = function() {
             console.log('Percentuale sconto aggiornata:', percentage + '%', 'Importo:', config.pricing.instagramDiscount.amount);
         }
         
+        // Aggiorna configurazioni email e CTA
+        saveEmailConfiguration(config);
+        
         // Salva la configurazione
         const saved = CatamaranStorage.save(config);
         
@@ -748,6 +941,9 @@ window.loadConfiguration = function() {
         // Aggiorna anteprima sconto dopo il caricamento
         updateDiscountPreview();
         
+        // Carica configurazioni email e CTA
+        loadEmailConfiguration(config);
+        
         console.log('✓ Configurazione caricata');
         
     } catch (error) {
@@ -866,6 +1062,252 @@ function toggleDiscountSection() {
         });
         
         updateDiscountPreview();
+    }
+}
+
+// === GESTIONE EMAIL E CALL-TO-ACTION ===
+
+function saveEmailConfiguration(config) {
+    try {
+        console.log('💌 Salvando configurazioni email e CTA...');
+        
+        // Assicurati che la struttura email esista
+        if (!config.email) {
+            config.email = {
+                enabled: true,
+                service: "emailjs",
+                emailjs: { serviceId: "", templateId: "", publicKey: "" },
+                template: {
+                    subject: "Nuova Richiesta Prenotazione Catamarano - {catamaran_name}",
+                    adminEmail: "prenotazioni@eliteescape.it",
+                    includeFields: {
+                        personalData: true,
+                        contactInfo: true,
+                        bookingDetails: true,
+                        selectedServices: true,
+                        pricingBreakdown: true,
+                        specialNotes: true,
+                        navigationExperience: true
+                    },
+                    autoReply: {
+                        enabled: true,
+                        subject: "Conferma Ricezione Richiesta Prenotazione",
+                        message: "Grazie per la tua richiesta di prenotazione. Ti ricontatteremo entro 24 ore per confermare la disponibilità e procedere con la prenotazione."
+                    }
+                },
+                notifications: {
+                    successMessage: "✓ Richiesta inviata con successo! Ti ricontatteremo entro 24 ore.",
+                    errorMessage: "✗ Errore nell'invio. Riprova o contattaci direttamente.",
+                    loadingMessage: "Invio richiesta in corso..."
+                }
+            };
+        }
+        
+        // Salva configurazioni EmailJS
+        const emailSystemEnabled = document.getElementById('email-system-enabled');
+        const serviceId = document.getElementById('emailjs-service-id');
+        const templateId = document.getElementById('emailjs-template-id');
+        const publicKey = document.getElementById('emailjs-public-key');
+        const adminEmail = document.getElementById('admin-email');
+        
+        if (emailSystemEnabled) config.email.enabled = emailSystemEnabled.checked;
+        if (serviceId && serviceId.value) config.email.emailjs.serviceId = serviceId.value;
+        if (templateId && templateId.value) config.email.emailjs.templateId = templateId.value;
+        if (publicKey && publicKey.value) config.email.emailjs.publicKey = publicKey.value;
+        if (adminEmail && adminEmail.value) config.email.template.adminEmail = adminEmail.value;
+        
+        // Salva configurazioni template
+        const emailSubject = document.getElementById('email-subject');
+        if (emailSubject && emailSubject.value) {
+            config.email.template.subject = emailSubject.value;
+        }
+        
+        // Salva campi da includere
+        const includeFields = {
+            personalData: document.getElementById('include-personal-data')?.checked || false,
+            contactInfo: document.getElementById('include-contact-info')?.checked || false,
+            bookingDetails: document.getElementById('include-booking-details')?.checked || false,
+            selectedServices: document.getElementById('include-selected-services')?.checked || false,
+            pricingBreakdown: document.getElementById('include-pricing-breakdown')?.checked || false,
+            specialNotes: document.getElementById('include-special-notes')?.checked || false,
+            navigationExperience: document.getElementById('include-navigation-experience')?.checked || false
+        };
+        config.email.template.includeFields = includeFields;
+        
+        // Salva risposta automatica
+        const autoReplyEnabled = document.getElementById('enable-auto-reply');
+        const autoReplySubject = document.getElementById('auto-reply-subject');
+        const autoReplyMessage = document.getElementById('auto-reply-message');
+        
+        if (autoReplyEnabled) config.email.template.autoReply.enabled = autoReplyEnabled.checked;
+        if (autoReplySubject && autoReplySubject.value) config.email.template.autoReply.subject = autoReplySubject.value;
+        if (autoReplyMessage && autoReplyMessage.value) config.email.template.autoReply.message = autoReplyMessage.value;
+        
+        // Salva configurazioni CTA
+        const ctaButtonText = document.getElementById('cta-button-text');
+        const ctaSubtext = document.getElementById('cta-subtext');
+        
+        if (ctaButtonText && ctaButtonText.value) config.ui.bookingButton = ctaButtonText.value;
+        if (ctaSubtext && ctaSubtext.value) config.ui.bookingSubtext = ctaSubtext.value;
+        
+        // Salva messaggi di notifica
+        const successMessage = document.getElementById('success-message');
+        const errorMessage = document.getElementById('error-message');
+        const loadingMessage = document.getElementById('loading-message');
+        
+        if (successMessage && successMessage.value) config.email.notifications.successMessage = successMessage.value;
+        if (errorMessage && errorMessage.value) config.email.notifications.errorMessage = errorMessage.value;
+        if (loadingMessage && loadingMessage.value) config.email.notifications.loadingMessage = loadingMessage.value;
+        
+        console.log('✓ Configurazioni email e CTA salvate');
+        
+    } catch (error) {
+        console.error('❌ Errore salvataggio email config:', error);
+    }
+}
+
+function loadEmailConfiguration(config) {
+    try {
+        console.log('📧 Caricando configurazioni email e CTA...');
+        
+        // Assicurati che la struttura email esista
+        if (!config.email) {
+            config.email = {
+                enabled: true,
+                service: "emailjs",
+                emailjs: { serviceId: "", templateId: "", publicKey: "" },
+                template: {
+                    subject: "Nuova Richiesta Prenotazione Catamarano - {catamaran_name}",
+                    adminEmail: "prenotazioni@eliteescape.it",
+                    includeFields: {
+                        personalData: true,
+                        contactInfo: true,
+                        bookingDetails: true,
+                        selectedServices: true,
+                        pricingBreakdown: true,
+                        specialNotes: true,
+                        navigationExperience: true
+                    },
+                    autoReply: {
+                        enabled: true,
+                        subject: "Conferma Ricezione Richiesta Prenotazione",
+                        message: "Grazie per la tua richiesta di prenotazione. Ti ricontatteremo entro 24 ore per confermare la disponibilità e procedere con la prenotazione."
+                    }
+                },
+                notifications: {
+                    successMessage: "✓ Richiesta inviata con successo! Ti ricontatteremo entro 24 ore.",
+                    errorMessage: "✗ Errore nell'invio. Riprova o contattaci direttamente.",
+                    loadingMessage: "Invio richiesta in corso..."
+                }
+            };
+        }
+        
+        // Carica configurazioni EmailJS
+        const emailSystemEnabled = document.getElementById('email-system-enabled');
+        const serviceId = document.getElementById('emailjs-service-id');
+        const templateId = document.getElementById('emailjs-template-id');
+        const publicKey = document.getElementById('emailjs-public-key');
+        const adminEmail = document.getElementById('admin-email');
+        
+        if (emailSystemEnabled) emailSystemEnabled.checked = config.email.enabled !== false;
+        if (serviceId) serviceId.value = config.email.emailjs.serviceId || "";
+        if (templateId) templateId.value = config.email.emailjs.templateId || "";
+        if (publicKey) publicKey.value = config.email.emailjs.publicKey || "";
+        if (adminEmail) adminEmail.value = config.email.template.adminEmail || "prenotazioni@eliteescape.it";
+        
+        // Carica configurazioni template
+        const emailSubject = document.getElementById('email-subject');
+        if (emailSubject) {
+            emailSubject.value = config.email.template.subject || "Nuova Richiesta Prenotazione Catamarano - {catamaran_name}";
+        }
+        
+        // Carica campi da includere
+        if (config.email.template.includeFields) {
+            const fields = config.email.template.includeFields;
+            document.getElementById('include-personal-data').checked = fields.personalData !== false;
+            document.getElementById('include-contact-info').checked = fields.contactInfo !== false;
+            document.getElementById('include-booking-details').checked = fields.bookingDetails !== false;
+            document.getElementById('include-selected-services').checked = fields.selectedServices !== false;
+            document.getElementById('include-pricing-breakdown').checked = fields.pricingBreakdown !== false;
+            document.getElementById('include-special-notes').checked = fields.specialNotes !== false;
+            document.getElementById('include-navigation-experience').checked = fields.navigationExperience !== false;
+        }
+        
+        // Carica risposta automatica
+        const autoReplyEnabled = document.getElementById('enable-auto-reply');
+        const autoReplySubject = document.getElementById('auto-reply-subject');
+        const autoReplyMessage = document.getElementById('auto-reply-message');
+        
+        if (autoReplyEnabled && config.email.template.autoReply) {
+            autoReplyEnabled.checked = config.email.template.autoReply.enabled !== false;
+        }
+        if (autoReplySubject && config.email.template.autoReply) {
+            autoReplySubject.value = config.email.template.autoReply.subject || "Conferma Ricezione Richiesta Prenotazione";
+        }
+        if (autoReplyMessage && config.email.template.autoReply) {
+            autoReplyMessage.value = config.email.template.autoReply.message || "Grazie per la tua richiesta di prenotazione. Ti ricontatteremo entro 24 ore per confermare la disponibilità e procedere con la prenotazione.";
+        }
+        
+        // Carica configurazioni CTA
+        const ctaButtonText = document.getElementById('cta-button-text');
+        const ctaSubtext = document.getElementById('cta-subtext');
+        
+        if (ctaButtonText) ctaButtonText.value = config.ui.bookingButton || "Invia Richiesta di Prenotazione";
+        if (ctaSubtext) ctaSubtext.value = config.ui.bookingSubtext || "Sarai ricontattato da Cagliari Sailing Charter entro 24h per confermare e procedere al pagamento dell'anticipo";
+        
+        // Carica messaggi di notifica
+        const successMessage = document.getElementById('success-message');
+        const errorMessage = document.getElementById('error-message');
+        const loadingMessage = document.getElementById('loading-message');
+        
+        if (successMessage && config.email.notifications) {
+            successMessage.value = config.email.notifications.successMessage || "✓ Richiesta inviata con successo! Ti ricontatteremo entro 24 ore.";
+        }
+        if (errorMessage && config.email.notifications) {
+            errorMessage.value = config.email.notifications.errorMessage || "✗ Errore nell'invio. Riprova o contattaci direttamente.";
+        }
+        if (loadingMessage && config.email.notifications) {
+            loadingMessage.value = config.email.notifications.loadingMessage || "Invio richiesta in corso...";
+        }
+        
+        // Aggiorna anteprima CTA
+        updateCTAPreview();
+        
+        console.log('✓ Configurazioni email e CTA caricate');
+        
+    } catch (error) {
+        console.error('❌ Errore caricamento email config:', error);
+    }
+}
+
+function updateCTAPreview() {
+    const ctaButtonText = document.getElementById('cta-button-text');
+    const ctaSubtext = document.getElementById('cta-subtext');
+    const ctaPreviewText = document.getElementById('cta-preview-text');
+    const ctaPreviewSubtext = document.getElementById('cta-preview-subtext');
+    
+    if (ctaPreviewText && ctaButtonText) {
+        ctaPreviewText.textContent = ctaButtonText.value || 'Invia Richiesta di Prenotazione';
+    }
+    
+    if (ctaPreviewSubtext && ctaSubtext) {
+        ctaPreviewSubtext.textContent = ctaSubtext.value || 'Sarai ricontattato da Cagliari Sailing Charter entro 24h per confermare e procedere al pagamento dell\'anticipo';
+    }
+    
+    console.log('🔄 Anteprima CTA aggiornata');
+}
+
+function toggleAutoReplyConfig() {
+    const autoReplyEnabled = document.getElementById('enable-auto-reply');
+    const autoReplyConfig = document.getElementById('auto-reply-config');
+    
+    if (autoReplyEnabled && autoReplyConfig) {
+        if (autoReplyEnabled.checked) {
+            autoReplyConfig.style.display = 'block';
+            autoReplyConfig.style.opacity = '1';
+        } else {
+            autoReplyConfig.style.opacity = '0.5';
+        }
     }
 }
 
@@ -1345,6 +1787,32 @@ window.addEventListener('load', function() {
         // Aggiorna anteprima sconto iniziale
         updateDiscountPreview();
         console.log('💰 Controlli sconto Instagram inizializzati');
+        
+        // === INIZIALIZZAZIONE CONTROLLI EMAIL E CTA ===
+        
+        // Collega controlli email
+        const ctaButtonTextInput = document.getElementById('cta-button-text');
+        const ctaSubtextInput = document.getElementById('cta-subtext');
+        const autoReplyEnabledCheckbox = document.getElementById('enable-auto-reply');
+        
+        if (ctaButtonTextInput) {
+            ctaButtonTextInput.addEventListener('input', updateCTAPreview);
+            console.log('✓ Input testo CTA collegato');
+        }
+        
+        if (ctaSubtextInput) {
+            ctaSubtextInput.addEventListener('input', updateCTAPreview);
+            console.log('✓ Input sottotesto CTA collegato');
+        }
+        
+        if (autoReplyEnabledCheckbox) {
+            autoReplyEnabledCheckbox.addEventListener('change', toggleAutoReplyConfig);
+            console.log('✓ Checkbox risposta automatica collegato');
+        }
+        
+        // Aggiorna anteprima CTA iniziale
+        updateCTAPreview();
+        console.log('📧 Controlli email e CTA inizializzati');
         
         // === INIZIALIZZAZIONE CALENDARIO PREZZI SETTIMANALI ===
         

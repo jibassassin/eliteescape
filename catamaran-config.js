@@ -229,6 +229,40 @@ const DEFAULT_CATAMARAN_CONFIG = {
     monthNames: ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
   },
   
+  // Configurazione sistema email
+  email: {
+    enabled: true,
+    service: "emailjs", // "emailjs" | "formspree" | "custom"
+    emailjs: {
+      serviceId: "",
+      templateId: "",
+      publicKey: ""
+    },
+    template: {
+      subject: "Nuova Richiesta Prenotazione Catamarano - {catamaran_name}",
+      adminEmail: "prenotazioni@eliteescape.it",
+      includeFields: {
+        personalData: true,
+        contactInfo: true,
+        bookingDetails: true,
+        selectedServices: true,
+        pricingBreakdown: true,
+        specialNotes: true,
+        navigationExperience: true
+      },
+      autoReply: {
+        enabled: true,
+        subject: "Conferma Ricezione Richiesta Prenotazione",
+        message: "Grazie per la tua richiesta di prenotazione. Ti ricontatteremo entro 24 ore per confermare la disponibilità e procedere con la prenotazione."
+      }
+    },
+    notifications: {
+      successMessage: "✓ Richiesta inviata con successo! Ti ricontatteremo entro 24 ore.",
+      errorMessage: "✗ Errore nell'invio. Riprova o contattaci direttamente.",
+      loadingMessage: "Invio richiesta in corso..."
+    }
+  },
+  
   // Testi dell'interfaccia
   ui: {
     pageTitle: "Prenota il tuo Catamarano - Vacanze in Sardegna",
