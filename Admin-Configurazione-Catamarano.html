@@ -729,12 +729,13 @@ function generatePricingCalendar(month, year) {
     calendar.innerHTML = '';
     
     // Genera le righe per ogni settimana
-    weeks.forEach(week => {
+    weeks.forEach((week, weekIndex) => {
         const weekKey = `${year}-W${week.weekNumber.toString().padStart(2, '0')}`;
         const weekData = config.weeklyPricing.weeks[weekKey] || {
             price: config.weeklyPricing.defaultPrice,
             note: ''
         };
+        
         
         const row = document.createElement('div');
         row.className = 'grid grid-cols-8 border-b border-gray-100 hover:bg-gray-50 cursor-pointer week-row';
@@ -780,22 +781,35 @@ function getWeeksInMonth(month, year) {
     const firstDay = new Date(year, month - 1, 1);
     const lastDay = new Date(year, month, 0);
     
-    // Trova il primo lunedì del mese (o il lunedì della settimana che contiene il primo giorno)
+    console.log(`📅 Generando settimane per ${month}/${year}: dal ${firstDay.toISOString().slice(0,10)} al ${lastDay.toISOString().slice(0,10)}`);
+    
+    // Trova il lunedì della settimana che contiene il primo giorno del mese
     let startDate = new Date(firstDay);
     const dayOfWeek = startDate.getDay();
     const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
     startDate.setDate(startDate.getDate() + mondayOffset);
     
+    console.log(`🗓️ Prima settimana inizia lunedì: ${startDate.toISOString().slice(0,10)}`);
+    
     let currentDate = new Date(startDate);
     
-    while (currentDate <= lastDay || currentDate.getMonth() === month - 1) {
+    // Genera tutte le settimane che toccano il mese
+    while (true) {
         const weekNumber = getWeekNumber(currentDate);
         const days = [];
         
-        // Genera i 7 giorni della settimana (Domenica-Sabato)
+        console.log(`🔄 Processando settimana W${weekNumber} che inizia ${currentDate.toISOString().slice(0,10)}`);
+        
+        // Genera i 7 giorni della settimana (Dom-Lun-Mar-Mer-Gio-Ven-Sab)
         for (let i = 0; i < 7; i++) {
             const dayDate = new Date(currentDate);
-            dayDate.setDate(currentDate.getDate() + (i === 0 ? 6 : i - 1)); // Domenica prima
+            if (i === 0) {
+                // Domenica: vai indietro di 1 giorno dal lunedì
+                dayDate.setDate(currentDate.getDate() - 1);
+            } else {
+                // Lun-Sab: currentDate + (i-1)
+                dayDate.setDate(currentDate.getDate() + (i - 1));
+            }
             
             days.push({
                 date: dayDate,
@@ -803,19 +817,34 @@ function getWeeksInMonth(month, year) {
             });
         }
         
-        weeks.push({
-            weekNumber: weekNumber,
-            days: days,
-            startDate: new Date(currentDate)
-        });
+        // Controlla se questa settimana tocca il mese corrente
+        const weekTouchesMonth = days.some(day => day.isCurrentMonth);
+        
+        if (weekTouchesMonth) {
+            weeks.push({
+                weekNumber: weekNumber,
+                days: days,
+                startDate: new Date(currentDate)
+            });
+            console.log(`✅ Settimana W${weekNumber} aggiunta: giorni [${days.map(d => d.date.getDate()).join(', ')}]`);
+        }
         
         // Vai alla settimana successiva
         currentDate.setDate(currentDate.getDate() + 7);
         
-        // Evita loop infinito
-        if (weeks.length > 6) break;
+        // Stop se siamo andati troppo oltre il mese corrente
+        if (currentDate.getMonth() > month - 1 && currentDate.getDate() > 7) {
+            break;
+        }
+        
+        // Sicurezza per evitare loop infinito
+        if (weeks.length > 6) {
+            console.warn('⚠️ Limite di 6 settimane raggiunto');
+            break;
+        }
     }
     
+    console.log(`✅ Totale settimane generate: ${weeks.length}`);
     return weeks;
 }
 
