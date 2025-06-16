@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Fase 1 - Admin Panel Riorganizzato</title>
+    <script src="catamaran-config.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5; }
+        .test-container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-section { margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 5px; }
+        .test-success { background-color: #e8f5e8; border-color: #4caf50; }
+        .test-error { background-color: #ffeaea; border-color: #f44336; }
+        .test-warning { background-color: #fff8e1; border-color: #ff9800; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 4px; font-size: 12px; overflow-x: auto; }
+        .status { font-weight: bold; margin: 10px 0; }
+        button { background: #2196F3; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #1976D2; }
+    </style>
+</head>
+<body>
+
+<div class="test-container">
+    <h1>🧪 Test Fase 1 - Admin Panel Riorganizzato</h1>
+    
+    <div class="test-section" id="config-test">
+        <h2>⚙️ Test 1: Caricamento Configurazione</h2>
+        <button onclick="testConfigLoad()">Testa Caricamento Config</button>
+        <div id="config-results" class="status"></div>
+        <pre id="config-details"></pre>
+    </div>
+
+    <div class="test-section" id="services-test">
+        <h2>🛠️ Test 2: Servizi Aggiuntivi</h2>
+        <button onclick="testAdditionalServices()">Testa Servizi</button>
+        <div id="services-results" class="status"></div>
+        <pre id="services-details"></pre>
+    </div>
+
+    <div class="test-section" id="structure-test">
+        <h2>📋 Test 3: Struttura Dati</h2>
+        <button onclick="testDataStructure()">Testa Struttura</button>
+        <div id="structure-results" class="status"></div>
+        <pre id="structure-details"></pre>
+    </div>
+
+    <div class="test-section" id="save-test">
+        <h2>💾 Test 4: Salvataggio</h2>
+        <button onclick="testSaveLoad()">Testa Save/Load</button>
+        <div id="save-results" class="status"></div>
+        <pre id="save-details"></pre>
+    </div>
+
+    <div class="test-section" id="integration-test">
+        <h2>🔗 Test 5: Integrazione Completa</h2>
+        <button onclick="testCompleteIntegration()">Test Integrazione</button>
+        <div id="integration-results" class="status"></div>
+        <pre id="integration-details"></pre>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Riepilogo Test</h2>
+        <div id="summary"></div>
+    </div>
+</div>
+
+<script>
+let testResults = {};
+
+function testConfigLoad() {
+    try {
+        const config = CatamaranStorage.load();
+        const success = config && typeof config === 'object';
+        
+        testResults.configLoad = success;
+        
+        if (success) {
+            document.getElementById('config-results').innerHTML = '✅ Configurazione caricata correttamente';
+            document.getElementById('config-test').className = 'test-section test-success';
+            document.getElementById('config-details').textContent = JSON.stringify({
+                basic: !!config.basic,
+                additionalServices: !!config.additionalServices,
+                servicesCount: config.additionalServices ? Object.keys(config.additionalServices).length : 0,
+                priceBadge: !!config.priceBadge,
+                email: !!config.email,
+                ui: !!config.ui
+            }, null, 2);
+        } else {
+            document.getElementById('config-results').innerHTML = '❌ Errore nel caricamento configurazione';
+            document.getElementById('config-test').className = 'test-section test-error';
+        }
+    } catch (error) {
+        testResults.configLoad = false;
+        document.getElementById('config-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('config-test').className = 'test-section test-error';
+        document.getElementById('config-details').textContent = error.stack;
+    }
+    updateSummary();
+}
+
+function testAdditionalServices() {
+    try {
+        const config = CatamaranStorage.load();
+        const services = config.additionalServices || {};
+        
+        const requiredServices = ['skipper', 'wifi', 'watersports', 'pizza', 'bimby', 'kitchen', 'fishing'];
+        const foundServices = Object.keys(services);
+        const missingServices = requiredServices.filter(s => !foundServices.includes(s));
+        
+        const success = missingServices.length === 0;
+        testResults.additionalServices = success;
+        
+        if (success) {
+            document.getElementById('services-results').innerHTML = `✅ Tutti i ${requiredServices.length} servizi trovati`;
+            document.getElementById('services-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('services-results').innerHTML = `⚠️ Mancano ${missingServices.length} servizi: ${missingServices.join(', ')}`;
+            document.getElementById('services-test').className = 'test-section test-warning';
+        }
+        
+        const serviceDetails = {};
+        requiredServices.forEach(serviceKey => {
+            const service = services[serviceKey];
+            serviceDetails[serviceKey] = service ? {
+                name: service.name,
+                price: service.price,
+                unit: service.unit,
+                hasDescription: !!service.description,
+                hasIcon: !!service.icon
+            } : 'MANCANTE';
+        });
+        
+        document.getElementById('services-details').textContent = JSON.stringify(serviceDetails, null, 2);
+        
+    } catch (error) {
+        testResults.additionalServices = false;
+        document.getElementById('services-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('services-test').className = 'test-section test-error';
+    }
+    updateSummary();
+}
+
+function testDataStructure() {
+    try {
+        const config = CatamaranStorage.load();
+        
+        const checks = {
+            hasBasic: !!config.basic,
+            hasName: !!(config.basic && config.basic.name),
+            hasPriceBadge: !!config.priceBadge,
+            hasMandatoryPackages: !!config.mandatoryPackages,
+            hasCharterPackage: !!(config.mandatoryPackages && config.mandatoryPackages.charter),
+            hasFuelPackage: !!(config.mandatoryPackages && config.mandatoryPackages.fuel),
+            hasLinensPackage: !!(config.mandatoryPackages && config.mandatoryPackages.linens),
+            hasAdditionalServices: !!config.additionalServices,
+            hasEmail: !!config.email,
+            hasUI: !!config.ui
+        };
+        
+        const passedChecks = Object.values(checks).filter(Boolean).length;
+        const totalChecks = Object.keys(checks).length;
+        const success = passedChecks === totalChecks;
+        
+        testResults.dataStructure = success;
+        
+        if (success) {
+            document.getElementById('structure-results').innerHTML = `✅ Struttura dati completa (${passedChecks}/${totalChecks})`;
+            document.getElementById('structure-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('structure-results').innerHTML = `⚠️ Struttura parziale (${passedChecks}/${totalChecks})`;
+            document.getElementById('structure-test').className = 'test-section test-warning';
+        }
+        
+        document.getElementById('structure-details').textContent = JSON.stringify(checks, null, 2);
+        
+    } catch (error) {
+        testResults.dataStructure = false;
+        document.getElementById('structure-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('structure-test').className = 'test-section test-error';
+    }
+    updateSummary();
+}
+
+function testSaveLoad() {
+    try {
+        // Test di salvataggio/caricamento
+        const originalConfig = CatamaranStorage.load();
+        
+        // Modifica temporanea
+        const testConfig = JSON.parse(JSON.stringify(originalConfig));
+        testConfig.basic.name = "TEST_NAME_" + Date.now();
+        testConfig.additionalServices.skipper.price = 999;
+        
+        // Salva
+        const saveResult = CatamaranStorage.save(testConfig);
+        
+        // Ricarica
+        const reloadedConfig = CatamaranStorage.load();
+        
+        // Verifica
+        const nameMatches = reloadedConfig.basic.name === testConfig.basic.name;
+        const priceMatches = reloadedConfig.additionalServices.skipper.price === 999;
+        
+        // Ripristina configurazione originale
+        CatamaranStorage.save(originalConfig);
+        
+        const success = saveResult && nameMatches && priceMatches;
+        testResults.saveLoad = success;
+        
+        if (success) {
+            document.getElementById('save-results').innerHTML = '✅ Salvataggio e caricamento funzionanti';
+            document.getElementById('save-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('save-results').innerHTML = '❌ Problemi con save/load';
+            document.getElementById('save-test').className = 'test-section test-error';
+        }
+        
+        document.getElementById('save-details').textContent = JSON.stringify({
+            saveResult,
+            nameMatches,
+            priceMatches
+        }, null, 2);
+        
+    } catch (error) {
+        testResults.saveLoad = false;
+        document.getElementById('save-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('save-test').className = 'test-section test-error';
+    }
+    updateSummary();
+}
+
+function testCompleteIntegration() {
+    try {
+        const config = CatamaranStorage.load();
+        
+        // Test integrazione completa
+        const integrationChecks = {
+            configurationExists: !!config,
+            hasAllMandatoryPackages: !!(config.mandatoryPackages && 
+                config.mandatoryPackages.charter && 
+                config.mandatoryPackages.fuel && 
+                config.mandatoryPackages.linens),
+            hasAllAdditionalServices: !!(config.additionalServices && 
+                Object.keys(config.additionalServices).length >= 7),
+            emailSystemConfigured: !!(config.email && 
+                config.email.emailjs && 
+                config.email.template),
+            uiConfigured: !!(config.ui && 
+                config.ui.bookingButton && 
+                config.ui.bookingSubtext),
+            pricingConfigured: !!(config.pricing && 
+                config.pricing.instagramDiscount),
+            badgeConfigured: !!(config.priceBadge && 
+                config.priceBadge.text)
+        };
+        
+        const passedIntegrationChecks = Object.values(integrationChecks).filter(Boolean).length;
+        const totalIntegrationChecks = Object.keys(integrationChecks).length;
+        const success = passedIntegrationChecks >= totalIntegrationChecks - 1; // Allow 1 failure
+        
+        testResults.integration = success;
+        
+        if (success) {
+            document.getElementById('integration-results').innerHTML = `✅ Integrazione completa (${passedIntegrationChecks}/${totalIntegrationChecks})`;
+            document.getElementById('integration-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('integration-results').innerHTML = `⚠️ Integrazione parziale (${passedIntegrationChecks}/${totalIntegrationChecks})`;
+            document.getElementById('integration-test').className = 'test-section test-warning';
+        }
+        
+        document.getElementById('integration-details').textContent = JSON.stringify(integrationChecks, null, 2);
+        
+    } catch (error) {
+        testResults.integration = false;
+        document.getElementById('integration-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('integration-test').className = 'test-section test-error';
+    }
+    updateSummary();
+}
+
+function updateSummary() {
+    const results = Object.values(testResults);
+    const passed = results.filter(Boolean).length;
+    const total = results.length;
+    
+    if (total === 0) return;
+    
+    const percentage = Math.round((passed / total) * 100);
+    let summaryClass = 'test-success';
+    if (percentage < 80) summaryClass = 'test-warning';
+    if (percentage < 60) summaryClass = 'test-error';
+    
+    document.getElementById('summary').innerHTML = `
+        <div class="${summaryClass}" style="padding: 15px; border-radius: 5px;">
+            <h3>📊 Risultati Test Fase 1</h3>
+            <p><strong>Test superati: ${passed}/${total} (${percentage}%)</strong></p>
+            <p>Stato Phase 1: ${percentage >= 80 ? '✅ PRONTA PER PHASE 2' : '⚠️ NECESSARIE CORREZIONI'}</p>
+        </div>
+    `;
+}
+
+// Auto-test all
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        testConfigLoad();
+        setTimeout(() => testAdditionalServices(), 100);
+        setTimeout(() => testDataStructure(), 200);
+        setTimeout(() => testSaveLoad(), 300);
+        setTimeout(() => testCompleteIntegration(), 400);
+    }, 500);
+});
+</script>
+
+</body>
+</html>
