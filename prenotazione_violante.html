@@ -591,13 +591,9 @@ Raccomandato per chi ha poca esperienza di navigazione nelle acque della Sardegn
 </div>
 </div>
 </div>
-<div class="border-t border-b border-gray-200 py-4 mb-4">
-<h4 class="font-medium text-gray-900 mb-3">Servizi selezionati</h4>
-<ul class="space-y-2" id="selected-services">
-<li class="text-sm text-gray-500 italic">Nessun servizio selezionato</li>
-</ul>
-</div>
-<div class="space-y-2 mb-6">
+<div class="border-t border-gray-200 pt-4 mb-6">
+<h4 class="font-medium text-gray-900 mb-4">Riepilogo Costi</h4>
+<div class="space-y-2">
 <div class="flex justify-between">
 <span class="text-gray-600">Prezzo base (7 giorni)</span>
 <span class="font-medium" id="summary-base-price">€ 3.499</span>
@@ -605,6 +601,50 @@ Raccomandato per chi ha poca esperienza di navigazione nelle acque della Sardegn
 <div class="flex justify-between text-green-600">
 <span>Sconto Instagram -10%</span>
 <span>-€ 349,90</span>
+</div>
+<div class="bg-gray-50 p-4 rounded-lg">
+<div class="mb-4">
+<h5 class="text-gray-700 font-medium text-center mb-4">Servizi obbligatori</h5>
+</div>
+<div class="space-y-4 text-sm text-gray-600">
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="font-medium">Pacchetto Charter obbligatorio:</span>
+<span class="font-medium">€ <span id="charter-detail-price">400</span></span>
+</div>
+<ul class="list-disc ml-4 space-y-1 text-xs">
+<li>Pulizie finali</li>
+<li>Tender + motore fuoribordo</li>
+<li>Bombola del gas</li>
+</ul>
+</div>
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="font-medium">Pacchetto carburante no-stress:</span>
+<span class="font-medium">€ <span id="fuel-detail-price">350</span></span>
+</div>
+<ul class="list-disc ml-4 space-y-1 text-xs">
+<li>Nessun obbligo di pieno al rientro, nessuna coda al distributore</li>
+<li>Goditi la vacanza fino all'ultimo secondo</li>
+<li>Rifornimento gratuito illimitato al distributore convenzionato in porto</li>
+</ul>
+</div>
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="font-medium">Pacchetto Toilette:</span>
+<span class="font-medium">€ <span id="linens-detail-price">20</span> per ospite</span>
+</div>
+<ul class="list-disc ml-4 space-y-1 text-xs">
+<li>Lenzuola e salviette toilette</li>
+</ul>
+</div>
+</div>
+<div class="border-t border-gray-300 mt-4 pt-3">
+<div class="flex justify-between items-center">
+<span class="font-semibold text-gray-700">TOTALE SERVIZI OBBLIGATORI:</span>
+<span class="font-semibold text-gray-700" id="mandatory-services-total">€ 870</span>
+</div>
+</div>
 </div>
 <div class="flex justify-between" id="services-total-container" style="display: none;">
 <span class="text-gray-600">Servizi aggiuntivi</span>
@@ -614,6 +654,13 @@ Raccomandato per chi ha poca esperienza di navigazione nelle acque della Sardegn
 <span>Totale</span>
 <span class="text-primary" id="total-price">€7.340</span>
 </div>
+</div>
+</div>
+<div class="border-t border-b border-gray-200 py-4 mb-4">
+<h4 class="font-medium text-gray-900 mb-3">Servizi selezionati</h4>
+<ul class="space-y-2" id="selected-services">
+<li class="text-sm text-gray-500 italic">Nessun servizio selezionato</li>
+</ul>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
