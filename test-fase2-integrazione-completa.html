@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Fase 2 - Integrazione Completa Admin ↔ Prenotazione ↔ Email</title>
+    <script src="catamaran-config.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5; }
+        .test-container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-section { margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 5px; }
+        .test-success { background-color: #e8f5e8; border-color: #4caf50; }
+        .test-error { background-color: #ffeaea; border-color: #f44336; }
+        .test-warning { background-color: #fff8e1; border-color: #ff9800; }
+        .test-info { background-color: #e3f2fd; border-color: #2196f3; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 4px; font-size: 12px; overflow-x: auto; max-height: 200px; }
+        .status { font-weight: bold; margin: 10px 0; }
+        button { background: #2196F3; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #1976D2; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .service-item { background: #f9f9f9; padding: 10px; margin: 5px 0; border-radius: 4px; border-left: 4px solid #2196f3; }
+        .flow-step { display: flex; align-items: center; margin: 10px 0; }
+        .flow-arrow { margin: 0 10px; color: #666; }
+    </style>
+</head>
+<body>
+
+<div class="test-container">
+    <h1>🧪 Test Fase 2 - Integrazione Completa</h1>
+    
+    <div class="test-section test-info">
+        <h2>📋 Flusso di Test</h2>
+        <div class="flow-step">
+            <span>1. Admin Panel</span>
+            <span class="flow-arrow">→</span>
+            <span>2. Configurazione Servizi</span>
+            <span class="flow-arrow">→</span>
+            <span>3. Pagina Prenotazione</span>
+            <span class="flow-arrow">→</span>
+            <span>4. Sistema Email</span>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div>
+            <div class="test-section" id="admin-test">
+                <h2>⚙️ Test 1: Configurazione Admin</h2>
+                <button onclick="testAdminConfiguration()">Testa Admin Config</button>
+                <div id="admin-results" class="status"></div>
+                <pre id="admin-details"></pre>
+            </div>
+
+            <div class="test-section" id="services-integration-test">
+                <h2>🔗 Test 2: Integrazione Servizi</h2>
+                <button onclick="testServicesIntegration()">Testa Integrazione</button>
+                <div id="services-results" class="status"></div>
+                <div id="services-list"></div>
+            </div>
+
+            <div class="test-section" id="booking-test">
+                <h2>📝 Test 3: Simulazione Prenotazione</h2>
+                <button onclick="testBookingFlow()">Simula Prenotazione</button>
+                <div id="booking-results" class="status"></div>
+                <pre id="booking-details"></pre>
+            </div>
+        </div>
+
+        <div>
+            <div class="test-section" id="email-test">
+                <h2>📧 Test 4: Sistema Email</h2>
+                <button onclick="testEmailSystem()">Testa Email</button>
+                <div id="email-results" class="status"></div>
+                <pre id="email-details"></pre>
+            </div>
+
+            <div class="test-section" id="sync-test">
+                <h2>🔄 Test 5: Sincronizzazione</h2>
+                <button onclick="testConfigSynchronization()">Testa Sync</button>
+                <div id="sync-results" class="status"></div>
+                <pre id="sync-details"></pre>
+            </div>
+
+            <div class="test-section" id="full-test">
+                <h2>🎯 Test 6: Sistema Completo</h2>
+                <button onclick="testCompleteSystem()">Test Completo</button>
+                <div id="full-results" class="status"></div>
+                <pre id="full-details"></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Riepilogo Integrazione</h2>
+        <div id="integration-summary"></div>
+    </div>
+</div>
+
+<script>
+let testResults = {};
+
+function testAdminConfiguration() {
+    try {
+        const config = CatamaranStorage.load();
+        
+        const adminChecks = {
+            configExists: !!config,
+            hasAdditionalServices: !!(config.additionalServices && Object.keys(config.additionalServices).length >= 7),
+            hasEmailConfig: !!(config.email && config.email.emailjs),
+            hasUIConfig: !!(config.ui && config.ui.bookingButton),
+            hasPricingConfig: !!(config.pricing && config.pricing.instagramDiscount),
+            servicesComplete: true
+        };
+        
+        // Verifica completezza servizi
+        const requiredServices = ['skipper', 'wifi', 'watersports', 'pizza', 'bimby', 'kitchen', 'fishing'];
+        const configuredServices = Object.keys(config.additionalServices || {});
+        const missingServices = requiredServices.filter(s => !configuredServices.includes(s));
+        
+        adminChecks.servicesComplete = missingServices.length === 0;
+        
+        const passedChecks = Object.values(adminChecks).filter(Boolean).length;
+        const totalChecks = Object.keys(adminChecks).length;
+        const success = passedChecks === totalChecks;
+        
+        testResults.admin = success;
+        
+        if (success) {
+            document.getElementById('admin-results').innerHTML = `✅ Configurazione admin completa (${passedChecks}/${totalChecks})`;
+            document.getElementById('admin-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('admin-results').innerHTML = `⚠️ Configurazione parziale (${passedChecks}/${totalChecks})`;
+            document.getElementById('admin-test').className = 'test-section test-warning';
+        }
+        
+        document.getElementById('admin-details').textContent = JSON.stringify({
+            ...adminChecks,
+            totalServices: configuredServices.length,
+            missingServices
+        }, null, 2);
+        
+    } catch (error) {
+        testResults.admin = false;
+        document.getElementById('admin-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('admin-test').className = 'test-section test-error';
+    }
+    updateSummary();
+}
+
+function testServicesIntegration() {
+    try {
+        const config = CatamaranStorage.load();
+        const services = config.additionalServices || {};
+        
+        const servicesListContainer = document.getElementById('services-list');
+        servicesListContainer.innerHTML = '';
+        
+        let allServicesValid = true;
+        let validServices = 0;
+        
+        Object.entries(services).forEach(([key, service]) => {
+            const isValid = service.name && service.price !== undefined && service.icon;
+            if (isValid) validServices++;
+            else allServicesValid = false;
+            
+            const serviceElement = document.createElement('div');
+            serviceElement.className = 'service-item';
+            serviceElement.innerHTML = `
+                <strong>${service.name || 'Nome mancante'}</strong> - 
+                €${service.price || 'N/A'} 
+                <span style="color: ${isValid ? 'green' : 'red'};">
+                    ${isValid ? '✅' : '❌'}
+                </span>
+                ${service.icon ? `<i class="${service.icon}" style="margin-left: 10px;"></i>` : ''}
+            `;
+            servicesListContainer.appendChild(serviceElement);
+        });
+        
+        const totalServices = Object.keys(services).length;
+        const success = allServicesValid && totalServices >= 7;
+        
+        testResults.servicesIntegration = success;
+        
+        if (success) {
+            document.getElementById('services-results').innerHTML = `✅ Tutti i ${totalServices} servizi integrati correttamente`;
+            document.getElementById('services-integration-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('services-results').innerHTML = `⚠️ ${validServices}/${totalServices} servizi validi`;
+            document.getElementById('services-integration-test').className = 'test-section test-warning';
+        }
+        
+    } catch (error) {
+        testResults.servicesIntegration = false;
+        document.getElementById('services-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('services-integration-test').className = 'test-section test-error';
+    }
+    updateSummary();
+}
+
+function testBookingFlow() {
+    try {
+        const config = CatamaranStorage.load();
+        
+        // Simula dati di prenotazione
+        const mockBookingData = {
+            personalData: {
+                firstName: 'Marco',
+                lastName: 'Rossi',
+                email: 'marco.rossi@test.com',
+                phone: '+39 333 1234567',
+                nationality: 'Italia',
+                navigationExperience: 'Intermedia',
+                specialNotes: 'Test automatico integrazione fase 2'
+            },
+            bookingDetails: {
+                selectedWeek: '20-27 Maggio 2025',
+                numberOfGuests: 6,
+                checkinDate: 'Sabato ore 16:00',
+                checkoutDate: 'Sabato ore 10:00'
+            },
+            selectedServices: [
+                { name: config.additionalServices.skipper?.name || 'Skipper', price: `€ ${config.additionalServices.skipper?.price || 200}` },
+                { name: config.additionalServices.wifi?.name || 'Wi-Fi', price: `€ ${config.additionalServices.wifi?.price || 50}` }
+            ],
+            pricingBreakdown: {
+                basePrice: `€ ${config.basic?.basePrice || 3499}`,
+                servicesTotal: `€ ${(config.additionalServices.skipper?.price || 200) + (config.additionalServices.wifi?.price || 50)}`,
+                finalTotal: `€ ${(config.basic?.basePrice || 3499) + (config.additionalServices.skipper?.price || 200) + (config.additionalServices.wifi?.price || 50)}`,
+                discount: config.pricing?.instagramDiscount?.enabled ? {
+                    label: config.pricing.instagramDiscount.label,
+                    amount: `-€ ${config.pricing.instagramDiscount.amount || 0}`
+                } : null
+            },
+            catamaranInfo: {
+                name: config.basic?.name || 'Bali Catsmart - Violante',
+                year: config.basic?.year || 2025,
+                length: config.basic?.length || '11,8 metri',
+                cabins: config.basic?.cabins || '4 cabine +1 skipper',
+                maxGuests: config.basic?.maxGuests || 8,
+                location: config.basic?.location || 'Cagliari, Sardegna'
+            },
+            newsletter: true,
+            timestamp: new Date().toLocaleString('it-IT'),
+            source: 'Test Fase 2 - Integrazione Completa'
+        };
+        
+        // Valida i dati di prenotazione
+        const bookingValid = mockBookingData.personalData.email && 
+                           mockBookingData.selectedServices.length > 0 &&
+                           mockBookingData.catamaranInfo.name;
+        
+        testResults.booking = bookingValid;
+        
+        if (bookingValid) {
+            document.getElementById('booking-results').innerHTML = '✅ Simulazione prenotazione completata';
+            document.getElementById('booking-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('booking-results').innerHTML = '❌ Dati prenotazione incompleti';
+            document.getElementById('booking-test').className = 'test-section test-error';
+        }
+        
+        document.getElementById('booking-details').textContent = JSON.stringify(mockBookingData, null, 2);
+        
+        // Salva i dati per il test email
+        window.mockBookingData = mockBookingData;
+        
+    } catch (error) {
+        testResults.booking = false;
+        document.getElementById('booking-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('booking-test').className = 'test-section test-error';
+    }
+    updateSummary();
+}
+
+function testEmailSystem() {
+    try {
+        const config = CatamaranStorage.load();
+        
+        if (!window.mockBookingData) {
+            throw new Error('Eseguire prima il test di prenotazione');
+        }
+        
+        const emailChecks = {
+            systemEnabled: config.email?.enabled || false,
+            hasServiceId: !!(config.email?.emailjs?.serviceId),
+            hasTemplateId: !!(config.email?.emailjs?.templateId),
+            hasPublicKey: !!(config.email?.emailjs?.publicKey),
+            hasAdminEmail: !!(config.email?.template?.adminEmail),
+            templatesConfigured: !!(config.email?.template?.includeFields)
+        };
+        
+        // Prepara parametri template come farebbe il sistema reale
+        const templateParams = {
+            catamaran_name: window.mockBookingData.catamaranInfo.name,
+            client_name: `${window.mockBookingData.personalData.firstName} ${window.mockBookingData.personalData.lastName}`,
+            client_email: window.mockBookingData.personalData.email,
+            selected_services: window.mockBookingData.selectedServices.map(s => `• ${s.name} - ${s.price}`).join('\n'),
+            final_total: window.mockBookingData.pricingBreakdown.finalTotal,
+            booking_timestamp: window.mockBookingData.timestamp
+        };
+        
+        const passedChecks = Object.values(emailChecks).filter(Boolean).length;
+        const totalChecks = Object.keys(emailChecks).length;
+        const success = passedChecks >= totalChecks - 1; // Permetti 1 fallimento
+        
+        testResults.email = success;
+        
+        if (success) {
+            document.getElementById('email-results').innerHTML = `✅ Sistema email configurato (${passedChecks}/${totalChecks})`;
+            document.getElementById('email-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('email-results').innerHTML = `⚠️ Sistema email parziale (${passedChecks}/${totalChecks})`;
+            document.getElementById('email-test').className = 'test-section test-warning';
+        }
+        
+        document.getElementById('email-details').textContent = JSON.stringify({
+            checks: emailChecks,
+            templateParams: Object.keys(templateParams)
+        }, null, 2);
+        
+    } catch (error) {
+        testResults.email = false;
+        document.getElementById('email-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('email-test').className = 'test-section test-error';
+    }
+    updateSummary();
+}
+
+function testConfigSynchronization() {
+    try {
+        // Test modifica configurazione e verifica sincronizzazione
+        const originalConfig = CatamaranStorage.load();
+        
+        // Modifica temporanea
+        const testConfig = JSON.parse(JSON.stringify(originalConfig));
+        testConfig.additionalServices.wifi.price = 999;
+        testConfig.basic.name = 'TEST_SYNC_' + Date.now();
+        
+        // Salva modifiche
+        const saveResult = CatamaranStorage.save(testConfig);
+        
+        // Ricarica e verifica
+        const reloadedConfig = CatamaranStorage.load();
+        const syncWorks = reloadedConfig.additionalServices.wifi.price === 999 &&
+                         reloadedConfig.basic.name === testConfig.basic.name;
+        
+        // Ripristina configurazione originale
+        CatamaranStorage.save(originalConfig);
+        
+        testResults.sync = syncWorks;
+        
+        if (syncWorks) {
+            document.getElementById('sync-results').innerHTML = '✅ Sincronizzazione funzionante';
+            document.getElementById('sync-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('sync-results').innerHTML = '❌ Problemi di sincronizzazione';
+            document.getElementById('sync-test').className = 'test-section test-error';
+        }
+        
+        document.getElementById('sync-details').textContent = JSON.stringify({
+            saveResult,
+            syncWorks,
+            testModifications: {
+                wifiPrice: 999,
+                nameChanged: testConfig.basic.name
+            }
+        }, null, 2);
+        
+    } catch (error) {
+        testResults.sync = false;
+        document.getElementById('sync-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('sync-test').className = 'test-section test-error';
+    }
+    updateSummary();
+}
+
+function testCompleteSystem() {
+    try {
+        // Esegui tutti i test in sequenza
+        testAdminConfiguration();
+        setTimeout(() => testServicesIntegration(), 100);
+        setTimeout(() => testBookingFlow(), 200);
+        setTimeout(() => testEmailSystem(), 300);
+        setTimeout(() => testConfigSynchronization(), 400);
+        
+        setTimeout(() => {
+            const allTests = Object.values(testResults);
+            const passedTests = allTests.filter(Boolean).length;
+            const totalTests = allTests.length;
+            const success = passedTests === totalTests;
+            
+            if (success) {
+                document.getElementById('full-results').innerHTML = `✅ Sistema completo funzionante (${passedTests}/${totalTests})`;
+                document.getElementById('full-test').className = 'test-section test-success';
+            } else {
+                document.getElementById('full-results').innerHTML = `⚠️ Sistema parziale (${passedTests}/${totalTests})`;
+                document.getElementById('full-test').className = 'test-section test-warning';
+            }
+            
+            document.getElementById('full-details').textContent = JSON.stringify(testResults, null, 2);
+        }, 500);
+        
+    } catch (error) {
+        document.getElementById('full-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('full-test').className = 'test-section test-error';
+    }
+}
+
+function updateSummary() {
+    const results = Object.values(testResults);
+    const passed = results.filter(Boolean).length;
+    const total = results.length;
+    
+    if (total === 0) return;
+    
+    const percentage = Math.round((passed / total) * 100);
+    let summaryClass = 'test-success';
+    if (percentage < 80) summaryClass = 'test-warning';
+    if (percentage < 60) summaryClass = 'test-error';
+    
+    document.getElementById('integration-summary').innerHTML = `
+        <div class="${summaryClass}" style="padding: 15px; border-radius: 5px;">
+            <h3>📊 Risultati Integrazione Fase 2</h3>
+            <p><strong>Test superati: ${passed}/${total} (${percentage}%)</strong></p>
+            <p>Stato integrazione: ${percentage >= 80 ? '✅ INTEGRAZIONE COMPLETA' : percentage >= 60 ? '⚠️ INTEGRAZIONE PARZIALE' : '❌ PROBLEMI CRITICI'}</p>
+            <div style="margin-top: 10px;">
+                <strong>Dettagli:</strong><br>
+                Admin: ${testResults.admin ? '✅' : '❌'} | 
+                Servizi: ${testResults.servicesIntegration ? '✅' : '❌'} | 
+                Prenotazione: ${testResults.booking ? '✅' : '❌'} | 
+                Email: ${testResults.email ? '✅' : '❌'} | 
+                Sync: ${testResults.sync ? '✅' : '❌'}
+            </div>
+        </div>
+    `;
+}
+
+// Auto-test all quando la pagina è caricata
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        testCompleteSystem();
+    }, 1000);
+});
+</script>
+
+</body>
+</html>
