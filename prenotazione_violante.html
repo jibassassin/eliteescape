@@ -1125,7 +1125,9 @@ if (summaryBasePriceElement) {
 }
 
 // Aggiorna i totali
-updateTotals();
+if (typeof window.updateTotals === 'function') {
+    window.updateTotals();
+}
 
 renderCalendar();
 });
@@ -1193,15 +1195,9 @@ updateCleaningFee(currentValue);
 updateCleaningFee(parseInt(guestsInput.value));
 });
 </script>
-<script id="services-calculator-script">
-document.addEventListener('DOMContentLoaded', function() {
-const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
-const servicesTotalContainer = document.getElementById('services-total-container');
-const servicesTotalElement = document.getElementById('services-total');
-const selectedServicesList = document.getElementById('selected-services-list');
-const totalPriceElement = document.getElementById('total-price');
+<script id="dynamic-pricing-script">
+// === SISTEMA PREZZI DINAMICI GLOBALE ===
 let currentBasePrice = 3499; // Prezzo dinamico basato sulla settimana selezionata
-let servicesTotal = 0;
 
 // Funzione per calcolare il numero della settimana ISO
 function getWeekNumber(date) {
@@ -1284,12 +1280,25 @@ function updateBasePriceForWeek(startDate) {
             weekNoteElement.style.display = 'none';
         }
         
-        // Aggiorna anche i totali
-        updateTotals();
+        // Aggiorna anche i totali se la funzione esiste
+        if (typeof window.updateTotals === 'function') {
+            window.updateTotals();
+        }
     }
 }
+</script>
 
-function updateTotals() {
+<script id="services-calculator-script">
+document.addEventListener('DOMContentLoaded', function() {
+const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
+const servicesTotalContainer = document.getElementById('services-total-container');
+const servicesTotalElement = document.getElementById('services-total');
+const selectedServicesList = document.getElementById('selected-services-list');
+const totalPriceElement = document.getElementById('total-price');
+let servicesTotal = 0;
+
+// Rende updateTotals globale per il sistema di prezzi dinamici
+window.updateTotals = function() {
 const selectedServices = Array.from(serviceCheckboxes).filter(checkbox => checkbox.checked);
 if (selectedServices.length === 0) {
 servicesTotalContainer.style.display = 'none';
@@ -1336,9 +1345,9 @@ const finalTotal = currentBasePrice - instagramDiscount + servicesTotal + cleani
 totalPriceElement.textContent = `€${finalTotal}`;
 }
 serviceCheckboxes.forEach(checkbox => {
-checkbox.addEventListener('change', updateTotals);
+checkbox.addEventListener('change', window.updateTotals);
 });
-updateTotals();
+window.updateTotals();
 });
 </script>
 <script id="mobile-menu-script">
