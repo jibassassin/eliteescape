@@ -213,7 +213,7 @@ transform: translateX(26px);
 <div class="flex flex-col gap-8">
 <!-- Left Column - Catamaran Details -->
 <div class="w-full">
-<h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Prenota il tuo Catamarano</h1>
+<h1 id="page-main-title" class="text-3xl md:text-4xl font-bold text-gray-900 mb-6">Prenota il tuo Catamarano</h1>
 <!-- Catamaran Card -->
 <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
 <div class="relative">
@@ -913,6 +913,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 logoElement.className = 'text-3xl font-["Pacifico"] text-primary';
             }
         }
+        
+        // Carica titolo principale
+        const titleElement = document.getElementById('page-main-title');
+        if (titleElement && config.ui && config.ui.mainHeading) {
+            console.log('📝 Aggiornando titolo principale:', config.ui.mainHeading);
+            titleElement.textContent = config.ui.mainHeading;
+        }
+        
     } catch (error) {
         console.error('❌ Errore nel caricamento del logo:', error);
     }
