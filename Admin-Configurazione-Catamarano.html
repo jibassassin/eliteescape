@@ -481,6 +481,20 @@ window.saveConfiguration = function() {
         const weeklyPricingEnabled = document.getElementById('weekly-pricing-enabled');
         const defaultWeeklyPriceInput = document.getElementById('default-weekly-price');
         
+        // Assicurati che la struttura weeklyPricing esista
+        if (!config.weeklyPricing) {
+            config.weeklyPricing = {
+                enabled: true,
+                defaultPrice: 3999,
+                weeks: {},
+                templates: {
+                    "alta_stagione": 4999,
+                    "media_stagione": 3999,
+                    "bassa_stagione": 2999
+                }
+            };
+        }
+        
         if (weeklyPricingEnabled) {
             config.weeklyPricing.enabled = weeklyPricingEnabled.checked;
             console.log('Prezzi settimanali abilitati:', weeklyPricingEnabled.checked);
@@ -676,10 +690,29 @@ let selectedWeek = null;
 
 // Genera il calendario dei prezzi per il mese corrente
 function generatePricingCalendar(month, year) {
+    console.log(`🗓️ Generando calendario per ${month}/${year}`);
     const calendar = document.getElementById('pricing-calendar');
-    if (!calendar) return;
+    if (!calendar) {
+        console.error('❌ Elemento pricing-calendar non trovato');
+        return;
+    }
     
     const config = CatamaranStorage.load();
+    
+    // Assicurati che la struttura weeklyPricing esista
+    if (!config.weeklyPricing) {
+        config.weeklyPricing = {
+            enabled: true,
+            defaultPrice: 3999,
+            weeks: {},
+            templates: {
+                "alta_stagione": 4999,
+                "media_stagione": 3999,
+                "bassa_stagione": 2999
+            }
+        };
+    }
+    
     const monthNames = ['', 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 
                        'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
     
@@ -737,6 +770,8 @@ function generatePricingCalendar(month, year) {
         
         calendar.appendChild(row);
     });
+    
+    console.log(`✅ Calendario generato con ${weeks.length} settimane`);
 }
 
 // Calcola le settimane di un mese
