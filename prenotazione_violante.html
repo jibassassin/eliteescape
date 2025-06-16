@@ -1007,6 +1007,15 @@ function getSunday(date) {
 const day = date.getDay();
 return new Date(date.setDate(date.getDate() - day));
 }
+
+// Funzione per ottenere il lunedì della settimana ISO (per compatibilità con admin)
+function getMondayISO(date) {
+const day = date.getDay();
+const mondayOffset = day === 0 ? -6 : 1 - day; // Se domenica (-6), altrimenti (1 - day)
+const monday = new Date(date);
+monday.setDate(date.getDate() + mondayOffset);
+return monday;
+}
 function formatDate(date) {
 const day = date.getDate().toString().padStart(2, '0');
 const month = monthNames[date.getMonth()];
@@ -1063,9 +1072,23 @@ const dayElements = calendarDays.querySelectorAll('[data-date]');
 dayElements.forEach(dayElement => {
 dayElement.addEventListener('click', () => {
 const clickedDate = new Date(dayElement.dataset.date);
+
+// Per la visualizzazione: usa domenica-sabato (tradizionale)
 const weekStart = getSunday(new Date(clickedDate));
 const weekEnd = new Date(weekStart);
 weekEnd.setDate(weekStart.getDate() + 6);
+
+// Per il calcolo prezzi: usa lunedì ISO (compatibile con admin)
+const mondayISO = getMondayISO(new Date(clickedDate));
+
+console.log('📅 Click calendario:', {
+    clickedDate: clickedDate.toISOString().slice(0,10),
+    weekStart_domenica: weekStart.toISOString().slice(0,10),
+    mondayISO: mondayISO.toISOString().slice(0,10),
+    weekNumber_domenica: getWeekNumber(weekStart),
+    weekNumber_mondayISO: getWeekNumber(mondayISO)
+});
+
 selectedStartDate = weekStart;
 selectedEndDate = weekEnd;
 const boardingDate = new Date(weekStart);
@@ -1081,8 +1104,8 @@ if (weekPriceSection) {
     weekPriceSection.classList.remove('hidden');
 }
 
-// Aggiorna il prezzo base per la settimana selezionata
-updateBasePriceForWeek(weekStart);
+// Aggiorna il prezzo base per la settimana selezionata (usa lunedì ISO)
+updateBasePriceForWeek(mondayISO);
 
 renderCalendar();
 });
