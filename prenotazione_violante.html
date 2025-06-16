@@ -395,7 +395,8 @@ Salpa e vivi il mare con uno spirito libero e consapevole.</p>
 <div class="flex justify-between items-center">
 <div>
 <span class="text-sm text-gray-700">Prezzo base per questa settimana</span>
-<p class="text-xs text-gray-500 mt-1">7 giorni selezionati</p>
+<p class="text-xs text-gray-500 mt-1" id="week-details">7 giorni selezionati</p>
+<p class="text-xs text-primary font-medium mt-1" id="week-note"></p>
 </div>
 <div class="text-right">
 <p class="text-2xl font-bold text-primary" id="base-price">€ 3.499</p>
@@ -1080,6 +1081,9 @@ if (weekPriceSection) {
     weekPriceSection.classList.remove('hidden');
 }
 
+// Aggiorna il prezzo base per la settimana selezionata
+updateBasePriceForWeek(weekStart);
+
 renderCalendar();
 });
 });
@@ -1104,6 +1108,24 @@ const weekPriceSection = document.getElementById('week-price-section');
 if (weekPriceSection) {
     weekPriceSection.classList.add('hidden');
 }
+
+// Ripristina il prezzo base default
+const config = CatamaranStorage.load();
+currentBasePrice = config.basic.basePrice || 3499;
+
+// Aggiorna la visualizzazione del prezzo base
+const basePriceElement = document.getElementById('base-price');
+const summaryBasePriceElement = document.getElementById('summary-base-price');
+
+if (basePriceElement) {
+    basePriceElement.textContent = `€ ${currentBasePrice.toLocaleString()}`;
+}
+if (summaryBasePriceElement) {
+    summaryBasePriceElement.textContent = `€ ${currentBasePrice.toLocaleString()}`;
+}
+
+// Aggiorna i totali
+updateTotals();
 
 renderCalendar();
 });
@@ -1178,9 +1200,82 @@ const servicesTotalContainer = document.getElementById('services-total-container
 const servicesTotalElement = document.getElementById('services-total');
 const selectedServicesList = document.getElementById('selected-services-list');
 const totalPriceElement = document.getElementById('total-price');
-const basePrice = 3499;
-const instagramDiscount = basePrice * 0.1;
+let currentBasePrice = 3499; // Prezzo dinamico basato sulla settimana selezionata
 let servicesTotal = 0;
+
+// Funzione per calcolare il numero della settimana ISO
+function getWeekNumber(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+// Funzione per ottenere il prezzo per una settimana specifica
+function getWeeklyPrice(date) {
+    const config = CatamaranStorage.load();
+    
+    if (!config.weeklyPricing || !config.weeklyPricing.enabled) {
+        return config.basic.basePrice || 3499;
+    }
+    
+    const weekNumber = getWeekNumber(date);
+    const year = date.getFullYear();
+    const weekKey = `${year}-W${weekNumber.toString().padStart(2, '0')}`;
+    
+    // Controlla se esiste un prezzo specifico per questa settimana
+    if (config.weeklyPricing.weeks && config.weeklyPricing.weeks[weekKey]) {
+        return config.weeklyPricing.weeks[weekKey].price;
+    }
+    
+    // Altrimenti usa il prezzo default del calendario
+    return config.weeklyPricing.defaultPrice || config.basic.basePrice || 3499;
+}
+
+// Funzione per aggiornare il prezzo base quando viene selezionata una settimana
+function updateBasePriceForWeek(startDate) {
+    if (startDate) {
+        const config = CatamaranStorage.load();
+        currentBasePrice = getWeeklyPrice(startDate);
+        
+        // Ottieni informazioni sulla settimana
+        const weekNumber = getWeekNumber(startDate);
+        const year = startDate.getFullYear();
+        const weekKey = `${year}-W${weekNumber.toString().padStart(2, '0')}`;
+        const weekData = config.weeklyPricing?.weeks?.[weekKey];
+        
+        // Aggiorna la visualizzazione del prezzo base
+        const basePriceElement = document.getElementById('base-price');
+        const summaryBasePriceElement = document.getElementById('summary-base-price');
+        
+        if (basePriceElement) {
+            basePriceElement.textContent = `€ ${currentBasePrice.toLocaleString()}`;
+        }
+        if (summaryBasePriceElement) {
+            summaryBasePriceElement.textContent = `€ ${currentBasePrice.toLocaleString()}`;
+        }
+        
+        // Aggiorna le informazioni della settimana
+        const weekDetailsElement = document.getElementById('week-details');
+        const weekNoteElement = document.getElementById('week-note');
+        
+        if (weekDetailsElement) {
+            weekDetailsElement.textContent = `Settimana ${weekNumber} (${weekKey}) - 7 giorni selezionati`;
+        }
+        
+        if (weekNoteElement && weekData?.note) {
+            weekNoteElement.textContent = weekData.note;
+            weekNoteElement.style.display = 'block';
+        } else if (weekNoteElement) {
+            weekNoteElement.style.display = 'none';
+        }
+        
+        // Aggiorna anche i totali
+        updateTotals();
+    }
+}
+
 function updateTotals() {
 const selectedServices = Array.from(serviceCheckboxes).filter(checkbox => checkbox.checked);
 if (selectedServices.length === 0) {
@@ -1223,7 +1318,8 @@ servicesTotal = (dailyTotal * 7) + onetimeTotal;
 }
 const cleaningFee = parseInt(document.getElementById('cleaning-fee').textContent.replace('€', ''));
 servicesTotalElement.textContent = `€${servicesTotal}`;
-const finalTotal = basePrice - instagramDiscount + servicesTotal + cleaningFee;
+const instagramDiscount = currentBasePrice * 0.1;
+const finalTotal = currentBasePrice - instagramDiscount + servicesTotal + cleaningFee;
 totalPriceElement.textContent = `€${finalTotal}`;
 }
 serviceCheckboxes.forEach(checkbox => {
@@ -1261,14 +1357,15 @@ function loadCatamaranConfiguration() {
         // Aggiorna nome catamarano
         updateElement('catamaran-name', config.basic.name);
         
-        // Aggiorna prezzo base
-        updateElement('base-price', `€ ${config.basic.basePrice}`);
+        // Aggiorna prezzo base (inizializza currentBasePrice con il valore dalla configurazione)
+        currentBasePrice = config.basic.basePrice || 3499;
+        updateElement('base-price', `€ ${currentBasePrice.toLocaleString()}`);
         
         // Aggiorna anno 
         updateElement('catamaran-year', `Anno ${config.basic.year}`);
         
-        // Aggiorna prezzo nel riepilogo
-        updateElement('summary-base-price', `€ ${config.basic.basePriceDisplay}`);
+        // Aggiorna prezzo nel riepilogo (usa il currentBasePrice)
+        updateElement('summary-base-price', `€ ${currentBasePrice.toLocaleString()}`);
         
         // Aggiorna prezzi pacchetti
         updateElement('charter-package-price', `€ ${config.mandatoryPackages.charter.price}`);
