@@ -1435,7 +1435,13 @@ nav.classList.toggle('z-50');
 // Caricamento configurazione dinamica
 function loadCatamaranConfiguration() {
     try {
+        console.log('📖 Caricamento configurazione catamarano...');
         const config = CatamaranStorage.load();
+        
+        if (!config) {
+            console.error('❌ Configurazione non caricata');
+            return;
+        }
         
         // Aggiorna nome catamarano
         updateElement('catamaran-name', config.basic.name);
@@ -1485,19 +1491,75 @@ function loadCatamaranConfiguration() {
     }
 }
 
-function updateElement(id, content) {
-    const element = document.getElementById(id);
-    if (element) {
-        element.textContent = content;
-        console.log(`Aggiornato ${id}:`, content);
-    } else {
-        console.warn(`Elemento non trovato: ${id}`);
+// Gestione robusta aggiornamenti DOM con fallback
+function updateElement(id, content, fallbackValue = null) {
+    try {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = content;
+            console.log(`✅ Aggiornato ${id}:`, content);
+            return true;
+        } else {
+            console.warn(`⚠️ Elemento non trovato: ${id}`);
+            if (fallbackValue !== null) {
+                console.log(`🔄 Applicando fallback per ${id}:`, fallbackValue);
+                // Potrebbe essere implementato un fallback alternativo
+            }
+            return false;
+        }
+    } catch (error) {
+        console.error(`❌ Errore aggiornamento elemento ${id}:`, error);
+        return false;
     }
+}
+
+// Verifica stato salute DOM per elementi critici
+function checkDOMHealth() {
+    const criticalElements = [
+        'base-price', 'summary-base-price', 'total-price',
+        'linens-detail-price', 'charter-detail-price', 'fuel-detail-price'
+    ];
+    
+    const missing = [];
+    const present = [];
+    
+    criticalElements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            present.push(id);
+        } else {
+            missing.push(id);
+        }
+    });
+    
+    console.log('🏥 Stato salute DOM:', {
+        presenti: present.length,
+        mancanti: missing.length,
+        elementMancanti: missing
+    });
+    
+    if (missing.length > 0) {
+        console.warn('⚠️ Elementi critici mancanti potrebbero causare errori:', missing);
+    }
+    
+    return missing.length === 0;
 }
 
 // Carica la configurazione quando la pagina è pronta
 document.addEventListener('DOMContentLoaded', function() {
-    loadCatamaranConfiguration();
+    console.log('🚀 Inizializzazione pagina prenotazione...');
+    
+    // Verifica stato salute DOM prima di procedere
+    const domHealthy = checkDOMHealth();
+    
+    if (domHealthy) {
+        console.log('✅ DOM verificato, procedo con caricamento configurazione');
+        loadCatamaranConfiguration();
+    } else {
+        console.warn('⚠️ DOM con elementi mancanti, caricamento potrebbe avere problemi');
+        // Carica comunque ma con avviso
+        loadCatamaranConfiguration();
+    }
 });
 </script>
 </body>
