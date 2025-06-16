@@ -220,6 +220,13 @@ transform: translateX(26px);
 <div class="swiper-container h-80">
 <img src="https://readdy.ai/api/search-image?query=luxury%2520catamaran%2520Fountaine%2520Pajot%252045%2520sailing%2520in%2520crystal%2520clear%2520turquoise%2520waters%2520near%2520Sardinia%2520coast%252C%2520Italy.%2520The%2520catamaran%2520is%2520white%2520with%2520elegant%2520lines%252C%2520spacious%2520deck%2520and%2520modern%2520design.%2520Beautiful%2520coastal%2520scenery%2520with%2520rocky%2520cliffs%2520and%2520sandy%2520beaches%2520visible%2520in%2520the%2520background.%2520Bright%2520sunny%2520day%2520with%2520deep%2520blue%2520sky.&width=1200&height=600&seq=10001&orientation=landscape" alt="Fountaine Pajot 45" class="w-full h-full object-cover object-top">
 </div>
+
+<!-- Badge Prezzo di Partenza -->
+<div id="price-badge" class="absolute top-4 right-4 px-4 py-2 rounded-full text-sm font-semibold shadow-lg flex flex-col items-center min-w-[120px]" style="background-color: #f8b400; color: #ffffff;">
+<span id="badge-text" class="text-xs mb-1">A partire da</span>
+<span id="badge-price" class="text-lg font-bold">€2.999</span>
+</div>
+
 <div class="absolute bottom-4 right-4 bg-white bg-opacity-90 px-3 py-1 rounded-full text-sm font-medium text-primary flex items-center">
 <span class="w-4 h-4 flex items-center justify-center mr-1">
 <i class="ri-image-line"></i>
@@ -229,15 +236,7 @@ Altre foto
 </div>
 <div class="p-6">
 <div class="mb-4">
-<div class="flex justify-between items-start mb-2">
-<div>
 <h2 class="text-2xl font-bold text-gray-900" id="catamaran-name">Bali Catsmart - Violante</h2>
-</div>
-<div class="text-right">
-<span class="text-sm text-gray-500">a partire da</span>
-<p class="text-xl font-bold text-gray-400 line-through" id="starting-price">€ 2.999</p>
-</div>
-</div>
 </div>
 <div class="grid grid-cols-2 gap-4 mb-6">
 <div class="flex flex-col items-center p-3 bg-gray-50 rounded-lg">
@@ -937,15 +936,46 @@ document.addEventListener('DOMContentLoaded', function() {
             titleElement.textContent = config.ui.mainHeading;
         }
         
+        // Carica badge prezzo di partenza
+        const priceBadge = document.getElementById('price-badge');
+        const badgeText = document.getElementById('badge-text');
+        const badgePrice = document.getElementById('badge-price');
+        
+        // Assicurati che la struttura badge esista
+        if (!config.priceBadge) {
+            config.priceBadge = {
+                enabled: true,
+                text: "A partire da",
+                color: "#f8b400",
+                textColor: "#ffffff"
+            };
+        }
+        
+        if (priceBadge && badgeText && badgePrice && config.priceBadge.enabled) {
+            console.log('🏷️ Aggiornando badge prezzo:', config.priceBadge);
+            
+            // Aggiorna il testo del badge
+            badgeText.textContent = config.priceBadge.text || 'A partire da';
+            
+            // Aggiorna il prezzo del badge
+            if (config.basic && config.basic.startingPrice) {
+                badgePrice.textContent = `€${config.basic.startingPrice.toLocaleString()}`;
+            }
+            
+            // Aggiorna i colori del badge
+            priceBadge.style.backgroundColor = config.priceBadge.color || '#f8b400';
+            priceBadge.style.color = config.priceBadge.textColor || '#ffffff';
+            
+            // Mostra il badge
+            priceBadge.style.display = 'flex';
+        } else if (priceBadge) {
+            // Nascondi il badge se disabilitato
+            priceBadge.style.display = 'none';
+        }
+        
         // Carica prezzi
-        const startingPriceElement = document.getElementById('starting-price');
         const basePriceElement = document.getElementById('base-price');
         const summaryBasePriceElement = document.getElementById('summary-base-price');
-        
-        if (startingPriceElement && config.basic && config.basic.startingPrice) {
-            console.log('💰 Aggiornando prezzo di partenza:', config.basic.startingPrice);
-            startingPriceElement.textContent = `€ ${config.basic.startingPrice.toLocaleString()}`;
-        }
         
         if (basePriceElement && config.basic && config.basic.basePrice) {
             console.log('💰 Aggiornando prezzo base:', config.basic.basePrice);

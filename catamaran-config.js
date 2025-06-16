@@ -24,6 +24,14 @@ const DEFAULT_CATAMARAN_CONFIG = {
     defaultGuests: 6,
     location: "Cagliari, Sardegna"
   },
+
+  // Badge prezzo di partenza
+  priceBadge: {
+    enabled: true,
+    text: "A partire da",
+    color: "#f8b400", // Colore di default (secondary)
+    textColor: "#ffffff"
+  },
   
   // Immagini
   images: {
