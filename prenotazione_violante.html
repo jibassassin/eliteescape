@@ -632,10 +632,10 @@ Raccomandato per chi ha poca esperienza di navigazione nelle acque della Sardegn
 <div>
 <div class="flex justify-between items-start mb-2">
 <span class="font-medium">Pacchetto Toilette:</span>
-<span class="font-medium">€ <span id="linens-detail-price">20</span> per ospite</span>
+<span class="font-medium">€ <span id="linens-detail-price">120</span></span>
 </div>
 <ul class="list-disc ml-4 space-y-1 text-xs">
-<li>Lenzuola e salviette toilette</li>
+<li>Lenzuola e salviette toilette (€20 a persona)</li>
 </ul>
 </div>
 </div>
@@ -646,21 +646,25 @@ Raccomandato per chi ha poca esperienza di navigazione nelle acque della Sardegn
 </div>
 </div>
 </div>
-<div class="flex justify-between" id="services-total-container" style="display: none;">
-<span class="text-gray-600">Servizi aggiuntivi</span>
-<span id="services-total">€0</span>
+<div class="bg-gray-50 p-4 rounded-lg" id="services-total-container" style="display: none;">
+<div class="mb-4">
+<h5 class="text-gray-700 font-medium mb-4">Servizi aggiuntivi</h5>
+</div>
+<div class="space-y-4 text-sm text-gray-600" id="selected-services-list">
+<!-- Servizi selezionati verranno inseriti qui dinamicamente -->
+</div>
+<div class="border-t border-gray-300 mt-4 pt-3">
+<div class="flex justify-between items-center">
+<span class="font-semibold text-gray-700">TOTALE SERVIZI AGGIUNTIVI:</span>
+<span class="font-semibold text-gray-700" id="services-total">€0</span>
+</div>
+</div>
 </div>
 <div class="flex justify-between pt-3 border-t border-gray-200 font-semibold text-lg">
 <span>Totale</span>
 <span class="text-primary" id="total-price">€7.340</span>
 </div>
 </div>
-</div>
-<div class="border-t border-b border-gray-200 py-4 mb-4">
-<h4 class="font-medium text-gray-900 mb-3">Servizi selezionati</h4>
-<ul class="space-y-2" id="selected-services">
-<li class="text-sm text-gray-500 italic">Nessun servizio selezionato</li>
-</ul>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -750,6 +754,7 @@ e.preventDefault();
 <span class="ml-2">Esperienza avanzata</span>
 </label>
 </div>
+
 <div class="bg-gray-50 p-4 rounded-lg mb-4">
 <h4 class="font-medium text-gray-900 mb-2">Politica di pagamento trasparente</h4>
 <p class="text-sm text-gray-600 mb-2">
@@ -987,6 +992,7 @@ const cleaningFeeElement = document.getElementById('cleaning-fee');
 function updateCleaningFee(guests) {
 const cleaningFee = guests * 20;
 cleaningFeeElement.textContent = `€${cleaningFee}`;
+document.getElementById('linens-detail-price').textContent = cleaningFee;
 updatePartialTotal();
 updateTotalPrice();
 }
@@ -1040,9 +1046,9 @@ updateCleaningFee(parseInt(guestsInput.value));
 <script id="services-calculator-script">
 document.addEventListener('DOMContentLoaded', function() {
 const serviceCheckboxes = document.querySelectorAll('.service-checkbox');
-const selectedServicesList = document.getElementById('selected-services');
 const servicesTotalContainer = document.getElementById('services-total-container');
 const servicesTotalElement = document.getElementById('services-total');
+const selectedServicesList = document.getElementById('selected-services-list');
 const totalPriceElement = document.getElementById('total-price');
 const basePrice = 3499;
 const instagramDiscount = basePrice * 0.1;
@@ -1050,10 +1056,9 @@ let servicesTotal = 0;
 function updateTotals() {
 const selectedServices = Array.from(serviceCheckboxes).filter(checkbox => checkbox.checked);
 if (selectedServices.length === 0) {
-selectedServicesList.innerHTML = '<li class="text-sm text-gray-500 italic">Nessun servizio selezionato</li>';
 servicesTotalContainer.style.display = 'none';
 } else {
-servicesTotalContainer.style.display = 'flex';
+servicesTotalContainer.style.display = 'block';
 selectedServicesList.innerHTML = '';
 let dailyTotal = 0;
 let onetimeTotal = 0;
@@ -1064,18 +1069,25 @@ const isOneTime = service.dataset.onetime === 'true';
 if (isOneTime) {
 onetimeTotal += price;
 selectedServicesList.innerHTML += `
-<li class="flex justify-between text-sm">
-<span>${name}</span>
-<span>€${isOneTime ? price : price * 7}</span>
-</li>
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="font-medium">${name}:</span>
+<span class="font-medium">€ ${price}</span>
+</div>
+</div>
 `;
 } else {
 dailyTotal += price;
 selectedServicesList.innerHTML += `
-<li class="flex justify-between text-sm">
-<span>${name} (€${price} x 7 giorni)</span>
-<span>€${price * 7}</span>
-</li>
+<div>
+<div class="flex justify-between items-start mb-2">
+<span class="font-medium">${name}:</span>
+<span class="font-medium">€ ${price * 7}</span>
+</div>
+<ul class="list-disc ml-4 space-y-1 text-xs">
+<li>€${price} x 7 giorni</li>
+</ul>
+</div>
 `;
 }
 });
