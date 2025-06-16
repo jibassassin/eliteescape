@@ -1327,7 +1327,29 @@ let servicesTotal = 0;
 
 // Rende updateTotals globale per il sistema di prezzi dinamici
 window.updateTotals = function() {
+console.log('🔄 updateTotals chiamata');
+
+// Verifica esistenza elementi DOM
+if (!servicesTotalContainer) {
+    console.error('❌ servicesTotalContainer non trovato');
+    return;
+}
+if (!servicesTotalElement) {
+    console.error('❌ servicesTotalElement non trovato');
+    return;
+}
+if (!selectedServicesList) {
+    console.error('❌ selectedServicesList non trovato');
+    return;
+}
+if (!totalPriceElement) {
+    console.error('❌ totalPriceElement non trovato');
+    return;
+}
+
 const selectedServices = Array.from(serviceCheckboxes).filter(checkbox => checkbox.checked);
+console.log('📋 Servizi selezionati:', selectedServices.length);
+
 if (selectedServices.length === 0) {
 servicesTotalContainer.style.display = 'none';
 } else {
@@ -1368,11 +1390,20 @@ servicesTotal = (dailyTotal * 7) + onetimeTotal;
 }
 const linensElement = document.getElementById('linens-detail-price');
 const cleaningFee = linensElement ? parseInt(linensElement.textContent) : 120;
-servicesTotalElement.textContent = `€${servicesTotal}`;
-const instagramDiscount = currentBasePrice * 0.1;
-const finalTotal = currentBasePrice - instagramDiscount + servicesTotal + cleaningFee;
-totalPriceElement.textContent = `€${finalTotal}`;
-console.log('📊 Calcolo totale:', {currentBasePrice, instagramDiscount, servicesTotal, cleaningFee, finalTotal});
+
+// Verifica finale prima di aggiornare UI
+if (servicesTotalElement && totalPriceElement) {
+    servicesTotalElement.textContent = `€${servicesTotal}`;
+    const instagramDiscount = currentBasePrice * 0.1;
+    const finalTotal = currentBasePrice - instagramDiscount + servicesTotal + cleaningFee;
+    totalPriceElement.textContent = `€${finalTotal}`;
+    console.log('📊 Calcolo totale completato:', {currentBasePrice, instagramDiscount, servicesTotal, cleaningFee, finalTotal});
+} else {
+    console.error('❌ Impossibile aggiornare totali: elementi mancanti', {
+        servicesTotalElement: !!servicesTotalElement,
+        totalPriceElement: !!totalPriceElement
+    });
+}
 }
 serviceCheckboxes.forEach(checkbox => {
 checkbox.addEventListener('change', window.updateTotals);
