@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<script src="catamaran-config.js"></script>
 <style>
 :where([class^="ri-"])::before { content: "\f3c2"; }
 @media (max-width: 768px) {
@@ -235,11 +236,11 @@ Altre foto
 <div class="p-6">
 <div class="flex justify-between items-start mb-4">
 <div>
-<h2 class="text-2xl font-bold text-gray-900">Bali Catsmart - Violante</h2>
+<h2 class="text-2xl font-bold text-gray-900" id="catamaran-name">Bali Catsmart - Violante</h2>
 </div>
 <div class="text-right">
 <span class="text-sm text-gray-500">Prezzo base</span>
-<p class="text-2xl font-bold text-primary">€ 3.499</p>
+<p class="text-2xl font-bold text-primary" id="base-price">€ 3.499</p>
 <span class="text-gray-600 text-xs">per settimana</span>
 </div>
 </div>
@@ -248,7 +249,7 @@ Altre foto
 <div class="w-8 h-8 flex items-center justify-center text-primary mb-2">
 <i class="ri-ship-line ri-lg"></i>
 </div>
-<span class="text-sm font-medium text-gray-900">Anno 2025</span>
+<span class="text-sm font-medium text-gray-900" id="catamaran-year">Anno 2025</span>
 </div>
 <div class="flex flex-col items-center p-3 bg-gray-50 rounded-lg">
 <div class="w-8 h-8 flex items-center justify-center text-primary mb-2">
@@ -401,7 +402,7 @@ Salpa e vivi il mare con uno spirito libero e consapevole.</p>
 </div>
 <div class="flex items-center justify-between text-sm text-gray-600 pb-2">
 <span>Pacchetto charter obbligatorio</span>
-<span>€ 400</span>
+<span id="charter-package-price">€ 400</span>
 </div>
 <div class="flex items-start text-xs text-gray-500 mb-2 pl-4">
 <ul class="list-disc space-y-1">
@@ -412,7 +413,7 @@ Salpa e vivi il mare con uno spirito libero e consapevole.</p>
 </div>
 <div class="flex items-center justify-between text-sm text-gray-600 pb-2">
 <span>Carburante no stress</span>
-<span>€ 350</span>
+<span id="fuel-package-price">€ 350</span>
 </div>
 <div class="flex items-start text-xs text-gray-500 mb-2 pl-4">
 <ul class="list-disc space-y-1">
@@ -706,7 +707,7 @@ Raccomandato per chi ha poca esperienza di navigazione nelle acque della Sardegn
 <div class="space-y-2 mb-6">
 <div class="flex justify-between">
 <span class="text-gray-600">Prezzo base (7 giorni)</span>
-<span class="font-medium">€ 3.499</span>
+<span class="font-medium" id="summary-base-price">€ 3.499</span>
 </div>
 <div class="flex justify-between text-green-600">
 <span>Sconto Instagram -10%</span>
@@ -1111,6 +1112,72 @@ nav.classList.toggle('shadow-lg');
 nav.classList.toggle('p-4');
 nav.classList.toggle('z-50');
 });
+});
+</script>
+
+<script id="config-loader">
+// Caricamento configurazione dinamica
+function loadCatamaranConfiguration() {
+    try {
+        const config = CatamaranStorage.load();
+        
+        // Aggiorna nome catamarano
+        updateElement('catamaran-name', config.basic.name);
+        
+        // Aggiorna prezzo base
+        updateElement('base-price', `€ ${config.basic.basePrice}`);
+        
+        // Aggiorna anno 
+        updateElement('catamaran-year', `Anno ${config.basic.year}`);
+        
+        // Aggiorna prezzo nel riepilogo
+        updateElement('summary-base-price', `€ ${config.basic.basePriceDisplay}`);
+        
+        // Aggiorna prezzi pacchetti
+        updateElement('charter-package-price', `€ ${config.mandatoryPackages.charter.price}`);
+        updateElement('fuel-package-price', `€ ${config.mandatoryPackages.fuel.price}`);
+        
+        // Aggiorna prezzo lenzuola (calcolato per numero ospiti di default)
+        const defaultGuests = config.basic.defaultGuests || 6;
+        const linensTotal = config.mandatoryPackages.linens.pricePerGuest * defaultGuests;
+        updateElement('cleaning-fee', `€${linensTotal}`);
+        
+        // Aggiorna prezzo skipper
+        updateElement('skipper-price', `€${config.additionalServices.skipper.price}/giorno`);
+        
+        // Aggiorna data-price del checkbox skipper
+        const skipperCheckbox = document.querySelector('.service-checkbox[data-name="Skipper"]');
+        if (skipperCheckbox) {
+            skipperCheckbox.setAttribute('data-price', config.additionalServices.skipper.price);
+        }
+        
+        console.log('Configurazione catamarano caricata con successo');
+        console.log('Dati caricati:', {
+            name: config.basic.name,
+            price: config.basic.basePrice,
+            year: config.basic.year,
+            linensPrice: config.mandatoryPackages.linens.pricePerGuest,
+            skipperPrice: config.additionalServices.skipper.price
+        });
+        
+    } catch (error) {
+        console.error('Errore nel caricare la configurazione:', error);
+    }
+}
+
+function updateElement(id, content) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.textContent = content;
+        console.log(`Aggiornato ${id}:`, content);
+    } else {
+        console.warn(`Elemento non trovato: ${id}`);
+    }
+}
+
+// Carica la configurazione quando la pagina è pronta
+document.addEventListener('DOMContentLoaded', function() {
+    loadCatamaranConfiguration();
 });
 </script>
 </body>
