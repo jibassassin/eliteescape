@@ -228,14 +228,15 @@ Altre foto
 </div>
 </div>
 <div class="p-6">
-<div class="flex justify-between items-start mb-4">
+<div class="mb-4">
+<div class="flex justify-between items-start mb-2">
 <div>
 <h2 class="text-2xl font-bold text-gray-900" id="catamaran-name">Bali Catsmart - Violante</h2>
 </div>
 <div class="text-right">
-<span class="text-sm text-gray-500">Prezzo base</span>
-<p class="text-2xl font-bold text-primary" id="base-price">€ 3.499</p>
-<span class="text-gray-600 text-xs">per settimana</span>
+<span class="text-sm text-gray-500">a partire da</span>
+<p class="text-xl font-bold text-gray-400 line-through" id="starting-price">€ 2.999</p>
+</div>
 </div>
 </div>
 <div class="grid grid-cols-2 gap-4 mb-6">
@@ -389,6 +390,21 @@ Salpa e vivi il mare con uno spirito libero e consapevole.</p>
 <span class="ml-3 text-sm text-gray-500">Massimo 8 ospiti</span>
 </div>
 </div>
+
+<!-- Prezzo Base (visibile solo quando è selezionata una settimana) -->
+<div id="week-price-section" class="mt-6 p-4 bg-primary bg-opacity-5 rounded-lg border-l-4 border-primary hidden">
+<div class="flex justify-between items-center">
+<div>
+<span class="text-sm text-gray-700">Prezzo base per questa settimana</span>
+<p class="text-xs text-gray-500 mt-1">7 giorni selezionati</p>
+</div>
+<div class="text-right">
+<p class="text-2xl font-bold text-primary" id="base-price">€ 3.499</p>
+<span class="text-gray-600 text-xs">per settimana</span>
+</div>
+</div>
+</div>
+
 </div>
 <!-- Additional Services -->
 <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -589,7 +605,7 @@ Raccomandato per chi ha poca esperienza di navigazione nelle acque della Sardegn
 <h4 class="font-medium text-gray-900 mb-4">Riepilogo Costi</h4>
 <div class="space-y-2">
 <div class="flex justify-between">
-<span class="text-gray-600">Prezzo base (7 giorni)</span>
+<span class="text-gray-600">Prezzo base per questa settimana (7 giorni)</span>
 <span class="font-medium" id="summary-base-price">€ 3.499</span>
 </div>
 <div class="flex justify-between text-green-600">
@@ -921,6 +937,25 @@ document.addEventListener('DOMContentLoaded', function() {
             titleElement.textContent = config.ui.mainHeading;
         }
         
+        // Carica prezzi
+        const startingPriceElement = document.getElementById('starting-price');
+        const basePriceElement = document.getElementById('base-price');
+        const summaryBasePriceElement = document.getElementById('summary-base-price');
+        
+        if (startingPriceElement && config.basic && config.basic.startingPrice) {
+            console.log('💰 Aggiornando prezzo di partenza:', config.basic.startingPrice);
+            startingPriceElement.textContent = `€ ${config.basic.startingPrice.toLocaleString()}`;
+        }
+        
+        if (basePriceElement && config.basic && config.basic.basePrice) {
+            console.log('💰 Aggiornando prezzo base:', config.basic.basePrice);
+            basePriceElement.textContent = `€ ${config.basic.basePrice.toLocaleString()}`;
+        }
+        
+        if (summaryBasePriceElement && config.basic && config.basic.basePrice) {
+            summaryBasePriceElement.textContent = `€ ${config.basic.basePrice.toLocaleString()}`;
+        }
+        
     } catch (error) {
         console.error('❌ Errore nel caricamento del logo:', error);
     }
@@ -1008,6 +1043,13 @@ selectedWeekElement.textContent = `${formatDate(weekStart)} - ${formatDate(weekE
 document.getElementById('boardingTimes').textContent = `Check-in: ${formatDateWithTime(boardingDate, '16:00')} | Check-out: ${formatDateWithTime(weekEnd, '10:00')}`;
 bookingDatesElement.textContent = `${formatDate(weekStart)} - ${formatDate(weekEnd)} 2025`;
 clearSelectionButton.classList.remove('hidden');
+
+// Mostra la sezione prezzo quando viene selezionata una settimana
+const weekPriceSection = document.getElementById('week-price-section');
+if (weekPriceSection) {
+    weekPriceSection.classList.remove('hidden');
+}
+
 renderCalendar();
 });
 });
@@ -1026,6 +1068,13 @@ selectedEndDate = null;
 selectedWeekElement.textContent = 'Nessuna settimana selezionata';
 bookingDatesElement.textContent = '23 Maggio - 30 Maggio 2025';
 clearSelectionButton.classList.add('hidden');
+
+// Nascondi la sezione prezzo quando viene cancellata la selezione
+const weekPriceSection = document.getElementById('week-price-section');
+if (weekPriceSection) {
+    weekPriceSection.classList.add('hidden');
+}
+
 renderCalendar();
 });
 renderCalendar();

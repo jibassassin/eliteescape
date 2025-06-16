@@ -14,8 +14,8 @@ const DEFAULT_CATAMARAN_CONFIG = {
   // Informazioni base
   basic: {
     name: "Bali Catsmart - Violante",
-    basePrice: 3499,
-    basePriceDisplay: 3500, // Prezzo mostrato nel riepilogo
+    basePrice: 3499, // Prezzo base per calcoli (questa settimana)
+    startingPrice: 2999, // Prezzo di partenza (solo marketing)
     year: 2025,
     length: "11,8 metri",
     cabins: "4 cabine +1 skipper",
