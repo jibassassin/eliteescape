@@ -417,7 +417,7 @@ Salpa e vivi il mare con uno spirito libero e consapevole.</p>
 </div>
 <div>
 <h4 class="font-medium text-gray-900">Skipper Professionale</h4>
-<p class="text-sm text-gray-600">€200/giorno</p>
+<p class="text-sm text-gray-600" id="skipper-price">€200/giorno</p>
 </div>
 </div>
 <label class="custom-switch">
@@ -1452,9 +1452,9 @@ function loadCatamaranConfiguration() {
         // Aggiorna prezzo nel riepilogo (usa il currentBasePrice)
         updateElement('summary-base-price', `€ ${currentBasePrice.toLocaleString()}`);
         
-        // Aggiorna prezzi pacchetti
-        updateElement('charter-package-price', `€ ${config.mandatoryPackages.charter.price}`);
-        updateElement('fuel-package-price', `€ ${config.mandatoryPackages.fuel.price}`);
+        // Aggiorna prezzi pacchetti (usa ID corretti dal DOM)
+        updateElement('charter-detail-price', config.mandatoryPackages.charter.price.toString());
+        updateElement('fuel-detail-price', config.mandatoryPackages.fuel.price.toString());
         
         // Aggiorna prezzo lenzuola (calcolato per numero ospiti di default)
         const defaultGuests = config.basic.defaultGuests || 6;
@@ -1468,6 +1468,7 @@ function loadCatamaranConfiguration() {
         const skipperCheckbox = document.querySelector('.service-checkbox[data-name="Skipper"]');
         if (skipperCheckbox) {
             skipperCheckbox.setAttribute('data-price', config.additionalServices.skipper.price);
+            console.log('✅ Skipper checkbox price aggiornato:', config.additionalServices.skipper.price);
         }
         
         console.log('Configurazione catamarano caricata con successo');
