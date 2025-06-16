@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Admin Simple</title>
+<script src="catamaran-config.js"></script>
+</head>
+<body>
+<h1>Test Admin Semplice</h1>
+
+<div style="margin: 20px 0; padding: 20px; border: 1px solid #ccc;">
+<h2>Test Caricamento Configurazione</h2>
+<input type="text" id="admin-catamaran-name" placeholder="Nome catamarano" style="width: 300px; padding: 10px; margin: 10px 0;">
+<br>
+<input type="number" id="admin-base-price" placeholder="Prezzo base" style="width: 300px; padding: 10px; margin: 10px 0;">
+<br>
+<button onclick="saveConfiguration()" style="padding: 10px 20px; margin: 10px 0;">Salva Configurazione</button>
+<button onclick="loadConfiguration()" style="padding: 10px 20px; margin: 10px 0;">Carica Configurazione</button>
+<div id="status" style="margin: 10px 0; padding: 10px; background: #f0f0f0;"></div>
+</div>
+
+<script>
+function saveConfiguration() {
+    try {
+        const nameInput = document.getElementById('admin-catamaran-name');
+        const priceInput = document.getElementById('admin-base-price');
+        const status = document.getElementById('status');
+        
+        if (!nameInput || !priceInput) {
+            status.innerHTML = '<span style="color: red;">Errore: Campi non trovati</span>';
+            return;
+        }
+        
+        const config = CatamaranStorage.load();
+        
+        config.basic.name = nameInput.value || config.basic.name;
+        config.basic.basePrice = parseInt(priceInput.value) || config.basic.basePrice;
+        
+        const saved = CatamaranStorage.save(config);
+        
+        if (saved) {
+            status.innerHTML = '<span style="color: green;">✓ Configurazione salvata con successo!</span>';
+            console.log('Configurazione salvata:', config.basic.name, config.basic.basePrice);
+        } else {
+            status.innerHTML = '<span style="color: red;">✗ Errore nel salvataggio</span>';
+        }
+        
+    } catch (error) {
+        document.getElementById('status').innerHTML = `<span style="color: red;">✗ Errore: ${error.message}</span>`;
+        console.error('Errore saveConfiguration:', error);
+    }
+}
+
+function loadConfiguration() {
+    try {
+        const config = CatamaranStorage.load();
+        const nameInput = document.getElementById('admin-catamaran-name');
+        const priceInput = document.getElementById('admin-base-price');
+        const status = document.getElementById('status');
+        
+        nameInput.value = config.basic.name;
+        priceInput.value = config.basic.basePrice;
+        
+        status.innerHTML = '<span style="color: blue;">✓ Configurazione caricata</span>';
+        console.log('Configurazione caricata:', config.basic.name, config.basic.basePrice);
+        
+    } catch (error) {
+        document.getElementById('status').innerHTML = `<span style="color: red;">✗ Errore caricamento: ${error.message}</span>`;
+        console.error('Errore loadConfiguration:', error);
+    }
+}
+
+// Carica automaticamente al caricamento della pagina
+window.addEventListener('load', loadConfiguration);
+</script>
+</body>
+</html>

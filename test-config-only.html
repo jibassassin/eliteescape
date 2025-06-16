@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Solo Config</title>
+    <script src="catamaran-config.js"></script>
+</head>
+<body>
+    <h1>Test Solo Configurazione</h1>
+    <div id="result"></div>
+    
+    <script>
+    try {
+        document.getElementById('result').innerHTML += '<p>Pagina caricata</p>';
+        
+        // Test 1: DEFAULT_CATAMARAN_CONFIG esiste?
+        if (typeof DEFAULT_CATAMARAN_CONFIG !== 'undefined') {
+            document.getElementById('result').innerHTML += '<p>✓ DEFAULT_CATAMARAN_CONFIG trovato</p>';
+            document.getElementById('result').innerHTML += '<p>Nome: ' + DEFAULT_CATAMARAN_CONFIG.basic.name + '</p>';
+        } else {
+            document.getElementById('result').innerHTML += '<p style="color: red;">✗ DEFAULT_CATAMARAN_CONFIG non trovato</p>';
+        }
+        
+        // Test 2: CatamaranStorage esiste?
+        if (typeof CatamaranStorage !== 'undefined') {
+            document.getElementById('result').innerHTML += '<p>✓ CatamaranStorage trovato</p>';
+            
+            // Test 3: load() funziona?
+            const config = CatamaranStorage.load();
+            document.getElementById('result').innerHTML += '<p>✓ Load funziona, nome: ' + config.basic.name + '</p>';
+            
+            // Test 4: save() funziona?
+            const testConfig = {...config};
+            testConfig.basic.name = "Test " + Date.now();
+            const saved = CatamaranStorage.save(testConfig);
+            document.getElementById('result').innerHTML += '<p>' + (saved ? '✓' : '✗') + ' Save risultato: ' + saved + '</p>';
+            
+        } else {
+            document.getElementById('result').innerHTML += '<p style="color: red;">✗ CatamaranStorage non trovato</p>';
+        }
+        
+    } catch (error) {
+        document.getElementById('result').innerHTML += '<p style="color: red;">✗ Errore: ' + error.message + '</p>';
+        console.error('Errore completo:', error);
+    }
+    </script>
+</body>
+</html>

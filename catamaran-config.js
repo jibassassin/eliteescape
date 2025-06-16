@@ -4,7 +4,11 @@ const DEFAULT_CATAMARAN_CONFIG = {
   theme: {
     primaryColor: "#0a5c8f",
     secondaryColor: "#f8b400",
-    logo: "logo"
+    logo: {
+      type: "text", // "text" or "image"
+      imageUrl: "",
+      text: "logo"
+    }
   },
   
   // Informazioni base

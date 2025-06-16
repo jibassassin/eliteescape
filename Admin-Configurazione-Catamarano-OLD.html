@@ -1,0 +1,2664 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Configurazione Catamarano</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#0a5c8f',secondary:'#f8b400'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script src="catamaran-config.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Raleway', sans-serif;
+background-color: #f9fafb;
+}
+h1, h2, h3, h4, h5, h6 {
+font-family: 'Playfair Display', serif;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+.custom-switch {
+position: relative;
+display: inline-block;
+width: 50px;
+height: 24px;
+}
+.custom-switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #ccc;
+transition: .4s;
+border-radius: 24px;
+}
+.slider:before {
+position: absolute;
+content: "";
+height: 16px;
+width: 16px;
+left: 4px;
+bottom: 4px;
+background-color: white;
+transition: .4s;
+border-radius: 50%;
+}
+input:checked + .slider {
+background-color: #0a5c8f;
+}
+input:checked + .slider:before {
+transform: translateX(26px);
+}
+.tab-content {
+display: none;
+}
+.tab-content.active {
+display: block;
+}
+.color-picker {
+-webkit-appearance: none;
+-moz-appearance: none;
+appearance: none;
+background-color: transparent;
+width: 40px;
+height: 40px;
+border: none;
+cursor: pointer;
+}
+.color-picker::-webkit-color-swatch {
+border-radius: 8px;
+border: 2px solid #ddd;
+}
+.color-picker::-moz-color-swatch {
+border-radius: 8px;
+border: 2px solid #ddd;
+}
+.editor-toolbar {
+display: flex;
+gap: 5px;
+margin-bottom: 10px;
+flex-wrap: wrap;
+background-color: #f1f5f9;
+padding: 8px;
+border-radius: 8px 8px 0 0;
+border: 1px solid #e2e8f0;
+border-bottom: none;
+}
+.editor-toolbar button {
+padding: 6px 10px;
+background-color: white;
+border: 1px solid #e2e8f0;
+border-radius: 4px;
+cursor: pointer;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.editor-toolbar button:hover {
+background-color: #f8fafc;
+}
+.editor-content {
+min-height: 200px;
+border: 1px solid #e2e8f0;
+border-radius: 0 0 8px 8px;
+padding: 12px;
+background-color: white;
+}
+.editor-content:focus {
+outline: none;
+border-color: #0a5c8f;
+}
+.calendar-day {
+position: relative;
+width: 100%;
+padding-top: 100%;
+}
+.calendar-day-content {
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+}
+.price-tag {
+font-size: 0.75rem;
+margin-top: 2px;
+}
+.price-input {
+width: 100%;
+border: none;
+background: transparent;
+text-align: center;
+font-size: 0.75rem;
+transition: all 0.2s ease-in-out;
+}
+.price-input:focus {
+outline: none;
+background-color: #f0f9ff;
+}
+.price-input.text-green-600 {
+font-weight: 500;
+}
+.price-input.text-red-600 {
+font-weight: 500;
+}
+.badge-preview {
+display: inline-flex;
+align-items: center;
+padding: 0.25rem 0.75rem;
+border-radius: 9999px;
+font-size: 0.75rem;
+font-weight: 600;
+margin-right: 0.5rem;
+margin-bottom: 0.5rem;
+}
+</style>
+</head>
+<body>
+<header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
+<div class="container mx-auto px-4 py-3 flex items-center justify-between">
+<div class="flex items-center">
+<a href="#" class="text-3xl font-['Pacifico'] text-primary">logo</a>
+</div>
+<div class="flex items-center space-x-4">
+<div class="hidden md:flex items-center space-x-1">
+<span class="text-sm text-gray-500">Ultima modifica:</span>
+<span class="text-sm font-medium">24 Maggio 2025, 15:30</span>
+</div>
+<div class="hidden md:block h-6 w-px bg-gray-300 mx-2"></div>
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center">
+<span class="text-sm font-medium">MS</span>
+</div>
+<span class="hidden md:inline text-sm font-medium">Marco Sartori</span>
+</div>
+<button id="save-button" class="bg-primary text-white px-4 py-2 !rounded-button flex items-center whitespace-nowrap">
+<i class="ri-save-line mr-2"></i>
+<span class="hidden md:inline">Salva Modifiche</span>
+<span class="md:hidden">Salva</span>
+</button>
+</div>
+</div>
+<div class="bg-gray-100 overflow-x-auto">
+<div class="container mx-auto px-4">
+<div class="flex space-x-6 py-2">
+<a href="#info-base" class="text-sm font-medium text-gray-700 hover:text-primary whitespace-nowrap py-2 border-b-2 border-transparent hover:border-primary">Informazioni Base</a>
+<a href="#caratteristiche" class="text-sm font-medium text-gray-700 hover:text-primary whitespace-nowrap py-2 border-b-2 border-transparent hover:border-primary">Caratteristiche</a>
+<a href="#servizi" class="text-sm font-medium text-gray-700 hover:text-primary whitespace-nowrap py-2 border-b-2 border-transparent hover:border-primary">Servizi</a>
+<a href="#calendario-prezzi" class="text-sm font-medium text-gray-700 hover:text-primary whitespace-nowrap py-2 border-b-2 border-transparent hover:border-primary">Calendario e Prezzi</a>
+<a href="#contatti-cta" class="text-sm font-medium text-gray-700 hover:text-primary whitespace-nowrap py-2 border-b-2 border-transparent hover:border-primary">Contatti e CTA</a>
+<a href="#seo-meta" class="text-sm font-medium text-gray-700 hover:text-primary whitespace-nowrap py-2 border-b-2 border-transparent hover:border-primary">SEO e Meta</a>
+<a href="#traduzioni" class="text-sm font-medium text-gray-700 hover:text-primary whitespace-nowrap py-2 border-b-2 border-transparent hover:border-primary">Traduzioni</a>
+<a href="#anteprima" class="text-sm font-medium text-gray-700 hover:text-primary whitespace-nowrap py-2 border-b-2 border-transparent hover:border-primary">Anteprima</a>
+</div>
+</div>
+</div>
+</header>
+<main class="container mx-auto px-4 pt-32 pb-16">
+<div class="flex items-center justify-between mb-6">
+<h1 class="text-3xl font-bold text-gray-900">Configurazione Pagina Catamarano</h1>
+<div class="flex items-center space-x-3">
+<div class="flex items-center">
+<span class="text-sm text-gray-700 mr-2">Stato:</span>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+<span class="w-2 h-2 bg-green-500 rounded-full mr-1.5"></span>
+Pubblicata
+</span>
+</div>
+<div class="flex items-center">
+<span class="text-sm text-gray-700 mr-2">Lingua:</span>
+<select class="text-sm border border-gray-300 rounded-md px-3 py-1.5 pr-8 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+<option value="it" selected>Italiano</option>
+<option value="en">English</option>
+<option value="fr">Français</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Informazioni Base -->
+<section id="info-base" class="bg-white rounded-lg shadow-md p-6 mb-8">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-semibold text-gray-900">Informazioni Base</h2>
+<button class="text-primary hover:text-primary-dark flex items-center text-sm">
+<i class="ri-question-line mr-1"></i>
+Guida
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Nome Catamarano*</label>
+<input type="text" value="Bali Catsmart - Violante" id="admin-catamaran-name" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Modello*</label>
+<input type="text" value="Bali Catsmart" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+<div class="mt-6">
+<label class="block text-sm font-medium text-gray-700 mb-2">Immagini Principali</label>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center bg-gray-50 relative">
+<img src="https://readdy.ai/api/search-image?query=luxury%252520catamaran%252520Fountaine%252520Pajot%25252045%252520sailing%252520in%252520crystal%252520clear%252520turquoise%252520waters%252520near%252520Sardinia%252520coast%25252C%252520Italy.%252520The%252520catamaran%252520is%252520white%252520with%252520elegant%252520lines%25252C%252520spacious%252520deck%252520and%252520modern%252520design.%252520Beautiful%252520coastal%252520scenery%252520with%252520rocky%252520cliffs%252520and%252520sandy%252520beaches%252520visible%252520in%252520the%252520background.%252520Bright%252520sunny%252520day%252520with%252520deep%252520blue%252520sky.&width=400&height=300&seq=10001&orientation=landscape" alt="Immagine catamarano" class="w-full h-auto rounded-lg">
+<div class="absolute top-2 right-2 flex space-x-1">
+<button class="w-8 h-8 bg-white rounded-full shadow flex items-center justify-center text-gray-500 hover:text-primary">
+<i class="ri-star-line"></i>
+</button>
+<button class="w-8 h-8 bg-white rounded-full shadow flex items-center justify-center text-gray-500 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+Immagine principale
+</div>
+</div>
+<div class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center bg-gray-50 relative">
+<img src="https://readdy.ai/api/search-image?query=luxury%252520catamaran%252520interior%252520view%252520showing%252520spacious%252520modern%252520salon%252520with%252520panoramic%252520windows%25252C%252520elegant%252520white%252520furniture%25252C%252520comfortable%252520seating%252520area%252520and%252520dining%252520table.%252520High-end%252520yacht%252520interior%252520design%252520with%252520wooden%252520accents%252520and%252520premium%252520finishes.%252520Bright%252520natural%252520lighting%252520coming%252520through%252520large%252520windows%252520with%252520ocean%252520view.&width=400&height=300&seq=10002&orientation=landscape" alt="Immagine catamarano" class="w-full h-auto rounded-lg">
+<div class="absolute top-2 right-2 flex space-x-1">
+<button class="w-8 h-8 bg-white rounded-full shadow flex items-center justify-center text-gray-500 hover:text-primary">
+<i class="ri-star-line"></i>
+</button>
+<button class="w-8 h-8 bg-white rounded-full shadow flex items-center justify-center text-gray-500 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+</div>
+<div class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center bg-gray-50">
+<div class="w-16 h-16 flex items-center justify-center bg-gray-200 rounded-full mb-2 text-gray-400">
+<i class="ri-add-line ri-2x"></i>
+</div>
+<p class="text-sm text-gray-500 text-center">Trascina qui o</p>
+<button class="mt-2 text-primary text-sm font-medium">Carica immagine</button>
+<p class="mt-1 text-xs text-gray-400">PNG, JPG fino a 5MB</p>
+</div>
+</div>
+</div>
+<div class="mt-6">
+<label class="block text-sm font-medium text-gray-700 mb-2">Descrizione Breve</label>
+<textarea class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary h-24">Violante è il nostro Bali Catsmart, varato nel 2025, pensato per vivere il mare in modo confortevole e autentico. Ogni mattina può iniziare in una caletta tranquilla, con il comfort di casa a portata di mano.</textarea>
+</div>
+<div class="mt-6">
+<label class="block text-sm font-medium text-gray-700 mb-2">Descrizione Completa</label>
+<div class="border border-gray-300 rounded-lg overflow-hidden">
+<div class="editor-toolbar">
+<button type="button"><i class="ri-bold"></i></button>
+<button type="button"><i class="ri-italic"></i></button>
+<button type="button"><i class="ri-underline"></i></button>
+<button type="button"><i class="ri-list-unordered"></i></button>
+<button type="button"><i class="ri-list-ordered"></i></button>
+<button type="button"><i class="ri-link"></i></button>
+<button type="button"><i class="ri-image-line"></i></button>
+<button type="button"><i class="ri-align-left"></i></button>
+<button type="button"><i class="ri-align-center"></i></button>
+<button type="button"><i class="ri-align-right"></i></button>
+</div>
+<div class="editor-content" contenteditable="true">
+<p>Violante è il nostro Bali Catsmart, varato nel 2025, pensato per vivere il mare in modo confortevole e autentico. Ogni mattina può iniziare in una caletta tranquilla, con il comfort di casa a portata di mano.</p>
+<p>La dinette si apre sul pozzetto grazie a un portellone posteriore, creando uno spazio conviviale unico. A prua, un prendisole con tavolino sostituisce la classica rete, ideale per aperitivi e relax.</p>
+<p>Grazie al dissalatore da 200 litri/ora e all'energia garantita da pannelli solari e batterie a 220V, Violante offre piena autonomia. Il tender da 6 posti con motore da 9 cavalli consente di raggiungere facilmente la costa.</p>
+<p>Senza fly bridge, la randa più ampia garantisce prestazioni a vela superiori. Navigare con Violante è silenzioso, sostenibile e in armonia con la natura.</p>
+<p>Salpa e vivi il mare con uno spirito libero e consapevole.</p>
+</div>
+</div>
+</div>
+<div class="mt-6">
+<label class="block text-sm font-medium text-gray-700 mb-2">Badge Promozionali</label>
+<div class="flex flex-wrap items-center mb-4">
+<div class="badge-preview bg-red-100 text-red-800 mr-2 mb-2">
+<span>Ultimi posti</span>
+<button class="ml-2 text-red-600 hover:text-red-800">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<div class="badge-preview bg-blue-100 text-blue-800 mr-2 mb-2">
+<span>Novità 2025</span>
+<button class="ml-2 text-blue-600 hover:text-blue-800">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<div class="badge-preview bg-green-100 text-green-800 mr-2 mb-2">
+<span>Eco-friendly</span>
+<button class="ml-2 text-green-600 hover:text-green-800">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<button class="flex items-center text-primary hover:text-primary-dark text-sm font-medium">
+<i class="ri-add-line mr-1"></i>
+Aggiungi badge
+</button>
+</div>
+<div class="flex items-center">
+<input type="text" placeholder="Testo badge" class="px-3 py-1.5 border border-gray-300 rounded-l focus:border-primary focus:ring-1 focus:ring-primary">
+<input type="color" value="#f8b400" class="color-picker border-y border-r border-gray-300 rounded-r">
+</div>
+</div>
+<div class="mt-6">
+<label class="block text-sm font-medium text-gray-700 mb-2">Località</label>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<input type="text" value="Cagliari" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<div>
+<input type="text" value="Sardegna" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+<div class="mt-6">
+<label class="block text-sm font-medium text-gray-700 mb-2">Prezzo Base</label>
+<div class="flex items-center">
+<span class="bg-gray-100 px-3 py-2 border border-r-0 border-gray-300 rounded-l">€</span>
+<input type="number" value="3499" id="admin-base-price" class="w-40 px-4 py-2 border border-gray-300 rounded-r focus:border-primary focus:ring-1 focus:ring-primary">
+<span class="ml-3 text-gray-600">per settimana</span>
+</div>
+</div>
+</section>
+<!-- Caratteristiche Tecniche -->
+<section id="caratteristiche" class="bg-white rounded-lg shadow-md p-6 mb-8">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-semibold text-gray-900">Caratteristiche Tecniche</h2>
+<button class="text-primary hover:text-primary-dark flex items-center text-sm">
+<i class="ri-question-line mr-1"></i>
+Guida
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Anno*</label>
+<input type="number" value="2025" id="admin-year" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Lunghezza*</label>
+<div class="flex">
+<input type="number" value="11.8" step="0.1" class="w-full px-4 py-2 border border-gray-300 rounded-l focus:border-primary focus:ring-1 focus:ring-primary">
+<span class="bg-gray-100 px-3 py-2 border border-l-0 border-gray-300 rounded-r">metri</span>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Cabine Ospiti*</label>
+<input type="number" value="4" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Bagni*</label>
+<input type="number" value="2" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Cabina Skipper</label>
+<div class="flex items-center">
+<label class="inline-flex items-center mr-4">
+<input type="radio" name="skipperCabin" value="yes" checked class="w-4 h-4 text-primary border-gray-300 focus:ring-primary">
+<span class="ml-2">Sì</span>
+</label>
+<label class="inline-flex items-center">
+<input type="radio" name="skipperCabin" value="no" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary">
+<span class="ml-2">No</span>
+</label>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Bagno Skipper</label>
+<div class="flex items-center">
+<label class="inline-flex items-center mr-4">
+<input type="radio" name="skipperBathroom" value="yes" checked class="w-4 h-4 text-primary border-gray-300 focus:ring-primary">
+<span class="ml-2">Sì</span>
+</label>
+<label class="inline-flex items-center">
+<input type="radio" name="skipperBathroom" value="no" class="w-4 h-4 text-primary border-gray-300 focus:ring-primary">
+<span class="ml-2">No</span>
+</label>
+</div>
+</div>
+</div>
+<div class="mt-6">
+<label class="block text-sm font-medium text-gray-700 mb-2">Capacità Massima Ospiti*</label>
+<input type="number" value="8" class="w-32 px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<div class="mt-6">
+<label class="block text-sm font-medium text-gray-700 mb-2">Caratteristiche Principali</label>
+<div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+<div class="grid grid-cols-1 gap-3" id="main-features-container">
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="4 cabine doppie per gli ospiti ed una cabina aggiuntiva per lo skipper" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Cucina attrezzata e ampia dinette con portellone apribile" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Piena autonomia: nessuna necessità di sosta per acqua, carburante ed energia elettrica" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Ampio prendisole a prua al posto della rete, con tavolino per aperitivi indimenticabili" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+</div>
+<button class="mt-3 flex items-center text-primary hover:text-primary-dark text-sm font-medium">
+<i class="ri-add-line mr-1"></i>
+Aggiungi caratteristica
+</button>
+</div>
+</div>
+<div class="mt-6">
+<label class="block text-sm font-medium text-gray-700 mb-2">Dotazioni Incluse</label>
+<div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+<div class="grid grid-cols-1 gap-3" id="equipment-container">
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Tender 8 posti con motore fuoribordo da 9hp" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Dissalatore per acqua dolce da 200 l/h" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Casse acustiche bluetooth di alta qualità" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Pannelli solari e pacco batterie" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Barbecue a gas" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+</div>
+<button class="mt-3 flex items-center text-primary hover:text-primary-dark text-sm font-medium">
+<i class="ri-add-line mr-1"></i>
+Aggiungi dotazione
+</button>
+</div>
+</div>
+<div class="mt-6">
+<label class="block text-sm font-medium text-gray-700 mb-2">Immagini Dettagli</label>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center bg-gray-50 relative">
+<img src="https://readdy.ai/api/search-image?query=catamaran%252520cabin%252520interior%252520with%252520comfortable%252520double%252520bed%25252C%252520wooden%252520finishes%25252C%252520small%252520windows%252520with%252520ocean%252520view%25252C%252520clean%252520and%252520modern%252520design%25252C%252520bright%252520lighting%25252C%252520compact%252520storage%252520solutions.%252520Luxury%252520yacht%252520bedroom%252520in%252520white%252520and%252520wood%252520tones.&width=200&height=150&seq=10003&orientation=landscape" alt="Cabina" class="w-full h-auto rounded-lg">
+<div class="absolute top-2 right-2 flex space-x-1">
+<button class="w-6 h-6 bg-white rounded-full shadow flex items-center justify-center text-gray-500 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+</div>
+<div class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center bg-gray-50 relative">
+<img src="https://readdy.ai/api/search-image?query=catamaran%252520bathroom%252520interior%252520with%252520compact%252520shower%25252C%252520toilet%252520and%252520sink%25252C%252520modern%252520fixtures%25252C%252520clean%252520white%252520surfaces%25252C%252520efficient%252520space%252520usage%25252C%252520small%252520window%252520for%252520ventilation.%252520Marine%252520bathroom%252520with%252520premium%252520finishes.&width=200&height=150&seq=10004&orientation=landscape" alt="Bagno" class="w-full h-auto rounded-lg">
+<div class="absolute top-2 right-2 flex space-x-1">
+<button class="w-6 h-6 bg-white rounded-full shadow flex items-center justify-center text-gray-500 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+</div>
+<div class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center bg-gray-50 relative">
+<img src="https://readdy.ai/api/search-image?query=catamaran%252520kitchen%252520galley%252520with%252520modern%252520appliances%25252C%252520stainless%252520steel%252520sink%25252C%252520compact%252520refrigerator%25252C%252520gas%252520stove%25252C%252520wooden%252520cabinets%252520and%252520countertops%25252C%252520efficient%252520storage%252520solutions%25252C%252520bright%252520lighting.%252520Functional%252520yacht%252520kitchen%252520with%252520premium%252520finishes.&width=200&height=150&seq=10005&orientation=landscape" alt="Cucina" class="w-full h-auto rounded-lg">
+<div class="absolute top-2 right-2 flex space-x-1">
+<button class="w-6 h-6 bg-white rounded-full shadow flex items-center justify-center text-gray-500 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+</div>
+<div class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center bg-gray-50">
+<div class="w-12 h-12 flex items-center justify-center bg-gray-200 rounded-full mb-2 text-gray-400">
+<i class="ri-add-line ri-xl"></i>
+</div>
+<p class="text-xs text-gray-500 text-center">Aggiungi</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Servizi -->
+<section id="servizi" class="bg-white rounded-lg shadow-md p-6 mb-8">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-semibold text-gray-900">Servizi</h2>
+<button class="text-primary hover:text-primary-dark flex items-center text-sm">
+<i class="ri-question-line mr-1"></i>
+Guida
+</button>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Pacchetto Charter Obbligatorio</h3>
+<div class="border border-gray-300 rounded-lg p-4">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-10 rounded-full text-primary mr-3">
+<i class="ri-ship-line"></i>
+</div>
+<div>
+<h4 class="font-medium text-gray-900">Pacchetto charter obbligatorio</h4>
+<div class="flex items-center mt-1">
+<span class="text-sm text-gray-600 mr-2">Prezzo:</span>
+<div class="flex items-center">
+<span class="bg-gray-100 px-2 py-1 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" value="400" id="admin-charter-price" class="w-24 px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+</div>
+<label class="custom-switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+<div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+<div class="grid grid-cols-1 gap-3" id="charter-package-container">
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Pulizie finali" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Tender con motore fuoribordo" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="1 bombola del gas" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+</div>
+<button class="mt-3 flex items-center text-primary hover:text-primary-dark text-sm font-medium">
+<i class="ri-add-line mr-1"></i>
+Aggiungi elemento
+</button>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Carburante No Stress</h3>
+<div class="border border-gray-300 rounded-lg p-4">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-10 rounded-full text-primary mr-3">
+<i class="ri-gas-station-line"></i>
+</div>
+<div>
+<h4 class="font-medium text-gray-900">Carburante no stress</h4>
+<div class="flex items-center mt-1">
+<span class="text-sm text-gray-600 mr-2">Prezzo:</span>
+<div class="flex items-center">
+<span class="bg-gray-100 px-2 py-1 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" value="350" id="admin-fuel-price" class="w-24 px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+</div>
+<label class="custom-switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+<div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+<div class="grid grid-cols-1 gap-3" id="fuel-package-container">
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Nessun obbligo di pieno al rientro, nessuna coda al distributore" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Goditi la vacanza fino all'ultimo secondo" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Rifornimento gratuito illimitato al distributore convenzionato in porto" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+</div>
+<button class="mt-3 flex items-center text-primary hover:text-primary-dark text-sm font-medium">
+<i class="ri-add-line mr-1"></i>
+Aggiungi elemento
+</button>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Lenzuola e Salviette</h3>
+<div class="border border-gray-300 rounded-lg p-4">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-10 rounded-full text-primary mr-3">
+<i class="ri-t-shirt-line"></i>
+</div>
+<div>
+<h4 class="font-medium text-gray-900">Lenzuola e salviette toilette</h4>
+<div class="flex items-center mt-1">
+<span class="text-sm text-gray-600 mr-2">Prezzo per ospite:</span>
+<div class="flex items-center">
+<span class="bg-gray-100 px-2 py-1 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" value="20" class="w-24 px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+</div>
+<label class="custom-switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Servizi Raccomandati</h3>
+<div class="border-2 border-primary rounded-lg p-4">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-10 rounded-full text-primary mr-3">
+<i class="ri-steering-2-line"></i>
+</div>
+<div>
+<h4 class="font-medium text-gray-900">Skipper Professionale</h4>
+<div class="flex items-center mt-1">
+<span class="text-sm text-gray-600 mr-2">Prezzo al giorno:</span>
+<div class="flex items-center">
+<span class="bg-gray-100 px-2 py-1 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" value="200" class="w-24 px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+</div>
+<label class="custom-switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Descrizione</label>
+<textarea class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary h-24">Affidati a un capitano professionista che si occuperà della navigazione e ti guiderà alla scoperta delle baie più belle e suggestive. Con il servizio skipper, la cauzione passa da €3.500 a €1.500.</textarea>
+</div>
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Testo Raccomandazione</label>
+<textarea class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary h-24">Raccomandato per chi ha poca esperienza di navigazione nelle acque della Sardegna e vuole godersi la vacanza senza preoccupazioni</textarea>
+</div>
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Impostazioni Avanzate</label>
+<div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+<div class="mb-3">
+<label class="block text-sm font-medium text-gray-700 mb-2">Riduzione Cauzione</label>
+<div class="flex items-center">
+<span class="text-sm text-gray-600 mr-2">Da:</span>
+<div class="flex items-center mr-3">
+<span class="bg-gray-100 px-2 py-1 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" value="3500" class="w-24 px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<span class="text-sm text-gray-600 mr-2">A:</span>
+<div class="flex items-center">
+<span class="bg-gray-100 px-2 py-1 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" value="1500" class="w-24 px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Servizi Aggiuntivi</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Water Sports -->
+<div class="border border-gray-300 rounded-lg p-4">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-start">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-10 rounded-full text-primary mr-3">
+<i class="ri-snorkel-line"></i>
+</div>
+<div>
+<h4 class="font-medium text-gray-900">Attrezzature Sport Acquatici</h4>
+<div class="flex items-center mt-1">
+<span class="text-sm text-gray-600 mr-2">Prezzo:</span>
+<div class="flex items-center">
+<span class="bg-gray-100 px-2 py-1 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" value="300" class="w-24 px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+</div>
+<label class="custom-switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Descrizione</label>
+<textarea class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary h-20">Set completo con due SUP, 8 set di maschere con boccaglio e pinne per snorkeling.</textarea>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<span class="ml-2 text-sm">Una tantum (non giornaliero)</span>
+</label>
+</div>
+</div>
+<!-- Wi-Fi -->
+<div class="border border-gray-300 rounded-lg p-4">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-start">
+<div class="w-10 h-10 flex items-center justify-center bg-primary bg-opacity-10 rounded-full text-primary mr-3">
+<i class="ri-wifi-line"></i>
+</div>
+<div>
+<h4 class="font-medium text-gray-900">Wi-Fi</h4>
+<div class="flex items-center mt-1">
+<span class="text-sm text-gray-600 mr-2">Prezzo:</span>
+<div class="flex items-center">
+<span class="bg-gray-100 px-2 py-1 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" value="50" class="w-24 px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+</div>
+<label class="custom-switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Descrizione</label>
+<textarea class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary h-20">Connessione internet ad alta velocità disponibile a bordo per tutta la durata del viaggio.</textarea>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<span class="ml-2 text-sm">Una tantum (non giornaliero)</span>
+</label>
+</div>
+</div>
+</div>
+<button class="mt-6 flex items-center text-primary hover:text-primary-dark font-medium">
+<i class="ri-add-line mr-1"></i>
+Aggiungi nuovo servizio
+</button>
+</div>
+<div class="mt-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Politica di Pagamento</h3>
+<div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Anticipo alla prenotazione (%)</label>
+<div class="flex items-center">
+<input type="number" value="50" min="0" max="100" class="w-24 px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+<span class="ml-2">%</span>
+</div>
+</div>
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Saldo finale (giorni prima dell'imbarco)</label>
+<input type="number" value="15" min="0" class="w-24 px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<div class="mb-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Cauzione (€)</label>
+<div class="flex items-center">
+<span class="bg-gray-100 px-3 py-2 border border-r-0 border-gray-300 rounded-l">€</span>
+<input type="number" value="3500" class="w-32 px-4 py-2 border border-gray-300 rounded-r focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Politica di Cancellazione</h3>
+<div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+<div class="grid grid-cols-1 gap-4">
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Cancellazione gratuita fino a 30 giorni prima della partenza" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="50% di rimborso fino a 15 giorni prima della partenza" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+<div class="flex items-center">
+<div class="flex-grow">
+<input type="text" value="Nessun rimborso per cancellazioni a meno di 15 giorni dalla partenza" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+</div>
+<button class="mt-3 flex items-center text-primary hover:text-primary-dark text-sm font-medium">
+<i class="ri-add-line mr-1"></i>
+Aggiungi regola
+</button>
+</div>
+</div>
+<div class="mt-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Sconto Promozionale</h3>
+<div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+<div class="flex items-center justify-between mb-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Attiva sconto</label>
+<label class="custom-switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Percentuale sconto</label>
+<div class="flex items-center">
+<input type="number" value="10" min="0" max="100" class="w-24 px-4 py-2 border border-gray-300 rounded-l focus:border-primary focus:ring-1 focus:ring-primary">
+<span class="bg-gray-100 px-3 py-2 border border-l-0 border-gray-300 rounded-r">%</span>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Etichetta sconto</label>
+<input type="text" value="Sconto Instagram -10%" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+</section>
+<!-- Calendario e Prezzi -->
+<section id="calendario-prezzi" class="bg-white rounded-lg shadow-md p-6 mb-8">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-semibold text-gray-900">Calendario e Prezzi</h2>
+<button class="text-primary hover:text-primary-dark flex items-center text-sm">
+<i class="ri-question-line mr-1"></i>
+Guida
+</button>
+</div>
+<div class="mb-6">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-lg font-medium text-gray-900">Gestione Disponibilità e Prezzi</h3>
+<div class="flex items-center space-x-4">
+<div class="flex items-center">
+<label class="block text-sm font-medium text-gray-700 mr-2">Anno:</label>
+<select class="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+<option value="2025" selected>2025</option>
+<option value="2026">2026</option>
+</select>
+</div>
+<div class="flex space-x-2">
+<button class="p-2 hover:bg-gray-100 rounded-full">
+<i class="ri-arrow-left-s-line"></i>
+</button>
+<span class="text-sm font-medium py-2">Maggio 2025</span>
+<button class="p-2 hover:bg-gray-100 rounded-full">
+<i class="ri-arrow-right-s-line"></i>
+</button>
+</div>
+</div>
+</div>
+<div class="border border-gray-200 rounded-lg overflow-hidden">
+<div class="grid grid-cols-7 text-center border-b border-gray-200 bg-gray-50">
+<div class="py-2 text-xs font-medium text-gray-500">Dom</div>
+<div class="py-2 text-xs font-medium text-gray-500">Lun</div>
+<div class="py-2 text-xs font-medium text-gray-500">Mar</div>
+<div class="py-2 text-xs font-medium text-gray-500">Mer</div>
+<div class="py-2 text-xs font-medium text-gray-500">Gio</div>
+<div class="py-2 text-xs font-medium text-gray-500">Ven</div>
+<div class="py-2 text-xs font-medium text-gray-500">Sab</div>
+</div>
+<div class="grid grid-cols-7 border-b border-gray-200">
+<div class="border-r border-gray-200 p-1 min-h-[80px]"></div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]"></div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]"></div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]"></div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">1</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.499">
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">2</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.499">
+</div>
+</div>
+</div>
+</div>
+<div class="p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-green-100 rounded">
+<span class="text-sm">3</span>
+<div class="price-tag">
+<input type="text" class="price-input bg-transparent" value="€3.499">
+</div>
+<span class="text-xs text-green-600">Check-in</span>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-7 border-b border-gray-200">
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-blue-50">
+<span class="text-sm">4</span>
+<div class="price-tag">
+<span class="text-xs text-blue-600">Prenotato</span>
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-blue-50">
+<span class="text-sm">5</span>
+<div class="price-tag">
+<span class="text-xs text-blue-600">Prenotato</span>
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-blue-50">
+<span class="text-sm">6</span>
+<div class="price-tag">
+<span class="text-xs text-blue-600">Prenotato</span>
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-blue-50">
+<span class="text-sm">7</span>
+<div class="price-tag">
+<span class="text-xs text-blue-600">Prenotato</span>
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-blue-50">
+<span class="text-sm">8</span>
+<div class="price-tag">
+<span class="text-xs text-blue-600">Prenotato</span>
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-blue-50">
+<span class="text-sm">9</span>
+<div class="price-tag">
+<span class="text-xs text-blue-600">Prenotato</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-red-100 rounded">
+<span class="text-sm">10</span>
+<div class="price-tag">
+<span class="text-xs text-red-600">Check-out</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-7 border-b border-gray-200">
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">11</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.499">
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">12</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.499">
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">13</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.499">
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">14</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.499">
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">15</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.499">
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">16</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.499">
+</div>
+</div>
+</div>
+</div>
+<div class="p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-green-100 rounded">
+<span class="text-sm">17</span>
+<div class="price-tag">
+<input type="text" class="price-input bg-transparent" value="€3.699">
+</div>
+<span class="text-xs text-green-600">Check-in</span>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-7 border-b border-gray-200">
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-blue-50">
+<span class="text-sm">18</span>
+<div class="price-tag">
+<span class="text-xs text-blue-600">Prenotato</span>
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-blue-50">
+<span class="text-sm">19</span>
+<div class="price-tag">
+<span class="text-xs text-blue-600">Prenotato</span>
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-blue-50">
+<span class="text-sm">20</span>
+<div class="price-tag">
+<span class="text-xs text-blue-600">Prenotato</span>
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-blue-50">
+<span class="text-sm">21</span>
+<div class="price-tag">
+<span class="text-xs text-blue-600">Prenotato</span>
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-blue-50">
+<span class="text-sm">22</span>
+<div class="price-tag">
+<span class="text-xs text-blue-600">Prenotato</span>
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-blue-50">
+<span class="text-sm">23</span>
+<div class="price-tag">
+<span class="text-xs text-blue-600">Prenotato</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content bg-red-100 rounded">
+<span class="text-sm">24</span>
+<div class="price-tag">
+<span class="text-xs text-red-600">Check-out</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-7">
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">25</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.899">
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">26</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.899">
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">27</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.899">
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">28</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.899">
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">29</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.899">
+</div>
+</div>
+</div>
+</div>
+<div class="border-r border-gray-200 p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">30</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.899">
+</div>
+</div>
+</div>
+</div>
+<div class="p-1 min-h-[80px]">
+<div class="calendar-day">
+<div class="calendar-day-content">
+<span class="text-sm">31</span>
+<div class="price-tag">
+<input type="text" class="price-input" value="€3.899">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="border border-gray-300 rounded-lg p-4">
+<h3 class="text-sm font-medium text-gray-700 mb-3">Legenda</h3>
+<div class="space-y-2">
+<div class="flex items-center">
+<div class="w-4 h-4 bg-green-100 rounded mr-2"></div>
+<span class="text-sm text-gray-600">Check-in</span>
+</div>
+<div class="flex items-center">
+<div class="w-4 h-4 bg-red-100 rounded mr-2"></div>
+<span class="text-sm text-gray-600">Check-out</span>
+</div>
+<div class="flex items-center">
+<div class="w-4 h-4 bg-blue-50 rounded mr-2"></div>
+<span class="text-sm text-gray-600">Prenotato</span>
+</div>
+<div class="flex items-center">
+<div class="w-4 h-4 bg-yellow-100 rounded mr-2"></div>
+<span class="text-sm text-gray-600">Bloccato</span>
+</div>
+</div>
+</div>
+<div class="border border-gray-300 rounded-lg p-4">
+<h3 class="text-sm font-medium text-gray-700 mb-3">Azioni Rapide</h3>
+<div class="space-y-3">
+<button class="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm font-medium text-gray-700 flex items-center justify-center">
+<i class="ri-price-tag-3-line mr-2"></i>
+Imposta prezzi stagionali
+</button>
+<button class="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm font-medium text-gray-700 flex items-center justify-center">
+<i class="ri-lock-line mr-2"></i>
+Blocca periodi
+</button>
+<button class="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded text-sm font-medium text-gray-700 flex items-center justify-center">
+<i class="ri-calendar-event-line mr-2"></i>
+Sincronizza con iCal
+</button>
+</div>
+</div>
+<div class="border border-gray-300 rounded-lg p-4">
+<h3 class="text-sm font-medium text-gray-700 mb-3">Impostazioni Prezzi</h3>
+<div class="space-y-3">
+<div>
+<label class="block text-xs text-gray-500 mb-1">Prezzo minimo</label>
+<div class="flex items-center">
+<span class="bg-gray-100 px-2 py-1 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" value="2999" class="w-full px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">Prezzo consigliato</label>
+<div class="flex items-center">
+<span class="bg-gray-100 px-2 py-1 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" value="3499" class="w-full px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+<div>
+<label class="block text-xs text-gray-500 mb-1">Prezzo massimo</label>
+<div class="flex items-center">
+<span class="bg-gray-100 px-2 py-1 border border-r-0 border-gray-300 rounded-l text-sm">€</span>
+<input type="number" value="4999" class="w-full px-2 py-1 border border-gray-300 rounded-r text-sm focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Stagionalità</h3>
+<div class="border border-gray-300 rounded-lg p-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+<div class="border border-gray-200 rounded p-3">
+<div class="flex justify-between items-start mb-2">
+<h4 class="text-sm font-medium">Bassa Stagione</h4>
+<label class="custom-switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-500">Periodo:</span>
+<span class="text-xs">Gen - Apr, Ott - Dic</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-500">Prezzo:</span>
+<div class="flex items-center">
+<span class="text-xs">€</span>
+<input type="number" value="2999" class="w-16 px-1 py-0.5 border border-gray-300 rounded text-xs focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-500">Colore:</span>
+<input type="color" value="#d1fae5" class="w-6 h-6 rounded">
+</div>
+</div>
+</div>
+<div class="border border-gray-200 rounded p-3">
+<div class="flex justify-between items-start mb-2">
+<h4 class="text-sm font-medium">Media Stagione</h4>
+<label class="custom-switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-500">Periodo:</span>
+<span class="text-xs">Mag, Set</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-500">Prezzo:</span>
+<div class="flex items-center">
+<span class="text-xs">€</span>
+<input type="number" value="3499" class="w-16 px-1 py-0.5 border border-gray-300 rounded text-xs focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-500">Colore:</span>
+<input type="color" value="#fef3c7" class="w-6 h-6 rounded">
+</div>
+</div>
+</div>
+<div class="border border-gray-200 rounded p-3">
+<div class="flex justify-between items-start mb-2">
+<h4 class="text-sm font-medium">Alta Stagione</h4>
+<label class="custom-switch">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+</div>
+<div class="space-y-2">
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-500">Periodo:</span>
+<span class="text-xs">Giu - Ago</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-500">Prezzo:</span>
+<div class="flex items-center">
+<span class="text-xs">€</span>
+<input type="number" value="3999" class="w-16 px-1 py-0.5 border border-gray-300 rounded text-xs focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs text-gray-500">Colore:</span>
+<input type="color" value="#fee2e2" class="w-6 h-6 rounded">
+</div>
+</div>
+</div>
+</div>
+<button class="mt-3 flex items-center text-primary hover:text-primary-dark text-sm font-medium">
+<i class="ri-add-line mr-1"></i>
+Aggiungi stagione
+</button>
+</div>
+</div>
+<div class="mt-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Impostazioni Check-in/Check-out</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Giorno di check-in</label>
+<select class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+<option value="monday">Lunedì</option>
+<option value="tuesday">Martedì</option>
+<option value="wednesday">Mercoledì</option>
+<option value="thursday">Giovedì</option>
+<option value="friday">Venerdì</option>
+<option value="saturday" selected>Sabato</option>
+<option value="sunday">Domenica</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Giorno di check-out</label>
+<select class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+<option value="monday">Lunedì</option>
+<option value="tuesday">Martedì</option>
+<option value="wednesday">Mercoledì</option>
+<option value="thursday">Giovedì</option>
+<option value="friday">Venerdì</option>
+<option value="saturday" selected>Sabato</option>
+<option value="sunday">Domenica</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Orario check-in</label>
+<input type="time" value="16:00" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Orario check-out</label>
+<input type="time" value="10:00" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+<div class="mt-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Visualizzazione Prezzi</h3>
+<div class="space-y-4">
+<div class="flex items-start">
+<input type="radio" id="show-price" name="price-display" class="mt-1 w-4 h-4 text-primary border-gray-300 focus:ring-primary" checked>
+<label for="show-price" class="ml-2">
+<span class="block text-sm font-medium text-gray-700">Mostra prezzo</span>
+<span class="block text-xs text-gray-500">I clienti vedranno il prezzo esatto e potranno prenotare direttamente</span>
+</label>
+</div>
+<div class="flex items-start">
+<input type="radio" id="hide-price" name="price-display" class="mt-1 w-4 h-4 text-primary border-gray-300 focus:ring-primary">
+<label for="hide-price" class="ml-2">
+<span class="block text-sm font-medium text-gray-700">Nascondi prezzo</span>
+<span class="block text-xs text-gray-500">I clienti vedranno "Contattaci per un preventivo" e dovranno compilare il form</span>
+</label>
+</div>
+<div class="flex items-start">
+<input type="radio" id="custom-message" name="price-display" class="mt-1 w-4 h-4 text-primary border-gray-300 focus:ring-primary">
+<label for="custom-message" class="ml-2">
+<span class="block text-sm font-medium text-gray-700">Messaggio personalizzato</span>
+<span class="block text-xs text-gray-500">Definisci un messaggio personalizzato da mostrare al posto del prezzo</span>
+</label>
+</div>
+<div class="pl-6">
+<input type="text" placeholder="Es: Prezzo su richiesta" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+</section>
+<!-- Contatti e CTA -->
+<section id="contatti-cta" class="bg-white rounded-lg shadow-md p-6 mb-8">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-semibold text-gray-900">Contatti e Call to Action</h2>
+<button class="text-primary hover:text-primary-dark flex items-center text-sm">
+<i class="ri-question-line mr-1"></i>
+Guida
+</button>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Email di Destinazione</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Email principale*</label>
+<input type="email" value="info@catamaranisardegna.it" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Email secondaria (opzionale)</label>
+<input type="email" value="booking@catamaranisardegna.it" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Testo del Pulsante</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Testo principale</label>
+<input type="text" value="Invia Richiesta di Prenotazione" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Icona</label>
+<div class="relative">
+<select class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary appearance-none pr-10">
+<option value="mail-send-line" selected>Busta con freccia</option>
+<option value="send-plane-line">Aereo di carta</option>
+<option value="calendar-check-line">Calendario con spunta</option>
+<option value="ship-line">Barca</option>
+<option value="check-line">Spunta</option>
+</select>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+<i class="ri-arrow-down-s-line text-gray-400"></i>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Colore</label>
+<div class="flex items-center space-x-2">
+<input type="color" value="#0a5c8f" class="color-picker">
+<span class="text-sm text-gray-600">#0a5c8f (Primary)</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Messaggio Predefinito Email</h3>
+<div class="border border-gray-300 rounded-lg overflow-hidden">
+<div class="editor-toolbar">
+<button type="button"><i class="ri-bold"></i></button>
+<button type="button"><i class="ri-italic"></i></button>
+<button type="button"><i class="ri-underline"></i></button>
+<button type="button"><i class="ri-list-unordered"></i></button>
+<button type="button"><i class="ri-list-ordered"></i></button>
+<button type="button"><i class="ri-link"></i></button>
+</div>
+<div class="editor-content" contenteditable="true">
+<p>Salve,</p>
+<p>sono interessato/a a prenotare il catamarano Bali Catsmart "Violante" per il periodo [DATA_INIZIO] - [DATA_FINE].</p>
+<p>Siamo un gruppo di [NUMERO_OSPITI] persone e vorremmo avere maggiori informazioni sulla disponibilità e sul prezzo finale.</p>
+<p>Grazie e cordiali saluti,</p>
+<p>[NOME_CLIENTE]</p>
+</div>
+</div>
+<div class="mt-2 text-sm text-gray-500">
+Usa [DATA_INIZIO], [DATA_FINE], [NUMERO_OSPITI], [NOME_CLIENTE] come segnaposto che verranno sostituiti automaticamente.
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Template WhatsApp</h3>
+<textarea class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary h-32">Ciao, sono interessato/a a prenotare il catamarano Bali Catsmart "Violante" per il periodo [DATA_INIZIO] - [DATA_FINE]. Siamo in [NUMERO_OSPITI] persone. Potete darmi maggiori informazioni? Grazie!</textarea>
+<div class="mt-2 text-sm text-gray-500">
+Usa [DATA_INIZIO], [DATA_FINE], [NUMERO_OSPITI] come segnaposto che verranno sostituiti automaticamente.
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Messaggio di Conferma</h3>
+<input type="text" value="Sarai ricontattato da Cagliari Sailing Charter entro 24h per confermare e procedere al pagamento dell'anticipo" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Campi del Form</h3>
+<div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<label class="custom-switch mr-3">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+<span class="text-sm font-medium">Nome</span>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center mr-4">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<span class="ml-2 text-sm">Obbligatorio</span>
+</label>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<label class="custom-switch mr-3">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+<span class="text-sm font-medium">Cognome</span>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center mr-4">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<span class="ml-2 text-sm">Obbligatorio</span>
+</label>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<label class="custom-switch mr-3">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+<span class="text-sm font-medium">Email</span>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center mr-4">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<span class="ml-2 text-sm">Obbligatorio</span>
+</label>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<label class="custom-switch mr-3">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+<span class="text-sm font-medium">Telefono</span>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center mr-4">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<span class="ml-2 text-sm">Obbligatorio</span>
+</label>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<label class="custom-switch mr-3">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+<span class="text-sm font-medium">Nazionalità</span>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center mr-4">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<span class="ml-2 text-sm">Obbligatorio</span>
+</label>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<label class="custom-switch mr-3">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+<span class="text-sm font-medium">Note speciali</span>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center mr-4">
+<input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<span class="ml-2 text-sm">Obbligatorio</span>
+</label>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center">
+<label class="custom-switch mr-3">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+<span class="text-sm font-medium">Esperienza di navigazione</span>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center mr-4">
+<input type="checkbox" class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<span class="ml-2 text-sm">Obbligatorio</span>
+</label>
+</div>
+</div>
+</div>
+<button class="mt-4 flex items-center text-primary hover:text-primary-dark text-sm font-medium">
+<i class="ri-add-line mr-1"></i>
+Aggiungi campo personalizzato
+</button>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Opzioni Newsletter</h3>
+<div class="flex items-center">
+<label class="custom-switch mr-3">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+<span class="text-sm font-medium">Mostra opzione per iscrizione newsletter</span>
+</div>
+<div class="mt-3">
+<label class="block text-sm font-medium text-gray-700 mb-2">Testo opzione newsletter</label>
+<input type="text" value="Desidero ricevere offerte speciali e aggiornamenti via email" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Metodi di Pagamento</h3>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="border border-gray-300 rounded-lg p-3 flex items-center">
+<label class="inline-flex items-center flex-grow">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<div class="ml-2 flex items-center">
+<i class="ri-visa-fill ri-lg text-gray-700 mr-2"></i>
+<span class="text-sm">Visa</span>
+</div>
+</label>
+</div>
+<div class="border border-gray-300 rounded-lg p-3 flex items-center">
+<label class="inline-flex items-center flex-grow">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<div class="ml-2 flex items-center">
+<i class="ri-mastercard-fill ri-lg text-gray-700 mr-2"></i>
+<span class="text-sm">Mastercard</span>
+</div>
+</label>
+</div>
+<div class="border border-gray-300 rounded-lg p-3 flex items-center">
+<label class="inline-flex items-center flex-grow">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<div class="ml-2 flex items-center">
+<i class="ri-paypal-fill ri-lg text-gray-700 mr-2"></i>
+<span class="text-sm">PayPal</span>
+</div>
+</label>
+</div>
+<div class="border border-gray-300 rounded-lg p-3 flex items-center">
+<label class="inline-flex items-center flex-grow">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<div class="ml-2 flex items-center">
+<i class="ri-bank-card-fill ri-lg text-gray-700 mr-2"></i>
+<span class="text-sm">Bonifico</span>
+</div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- SEO e Meta -->
+<section id="seo-meta" class="bg-white rounded-lg shadow-md p-6 mb-8">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-semibold text-gray-900">SEO e Meta Tag</h2>
+<button class="text-primary hover:text-primary-dark flex items-center text-sm">
+<i class="ri-question-line mr-1"></i>
+Guida
+</button>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Meta Title</h3>
+<input type="text" value="Prenota il tuo Catamarano - Vacanze in Sardegna" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+<div class="mt-1 flex justify-between text-xs text-gray-500">
+<span>Consigliato: 50-60 caratteri</span>
+<span>52 caratteri</span>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Meta Description</h3>
+<textarea class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary h-24">Prenota il tuo catamarano Bali Catsmart "Violante" per una vacanza indimenticabile in Sardegna. Comfort, autonomia e libertà per esplorare le baie più belle del Mediterraneo.</textarea>
+<div class="mt-1 flex justify-between text-xs text-gray-500">
+<span>Consigliato: 150-160 caratteri</span>
+<span>156 caratteri</span>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">URL Slug</h3>
+<div class="flex items-center">
+<span class="bg-gray-100 px-3 py-2 border border-r-0 border-gray-300 rounded-l text-gray-500 text-sm">https://catamaranisardegna.it/</span>
+<input type="text" value="prenota-catamarano-bali-catsmart-violante" class="flex-grow px-4 py-2 border border-gray-300 rounded-r focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Keywords</h3>
+<div class="border border-gray-300 rounded-lg p-4">
+<div class="flex flex-wrap gap-2 mb-3">
+<div class="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center">
+<span>catamarano sardegna</span>
+<button class="ml-2 text-gray-400 hover:text-gray-600">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<div class="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center">
+<span>noleggio barca cagliari</span>
+<button class="ml-2 text-gray-400 hover:text-gray-600">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<div class="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center">
+<span>vacanza in barca</span>
+<button class="ml-2 text-gray-400 hover:text-gray-600">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<div class="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center">
+<span>charter catamarano</span>
+<button class="ml-2 text-gray-400 hover:text-gray-600">
+<i class="ri-close-line"></i>
+</button>
+</div>
+<div class="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center">
+<span>bali catsmart</span>
+<button class="ml-2 text-gray-400 hover:text-gray-600">
+<i class="ri-close-line"></i>
+</button>
+</div>
+</div>
+<div class="flex">
+<input type="text" placeholder="Aggiungi keyword" class="flex-grow px-4 py-2 border border-gray-300 rounded-l focus:border-primary focus:ring-1 focus:ring-primary">
+<button class="bg-primary text-white px-4 py-2 !rounded-r-button whitespace-nowrap">
+<i class="ri-add-line"></i>
+Aggiungi
+</button>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Anteprima SERP</h3>
+<div class="border border-gray-300 rounded-lg p-4 bg-white">
+<div class="text-xl text-blue-600 font-medium mb-1">Prenota il tuo Catamarano - Vacanze in Sardegna</div>
+<div class="text-green-700 text-sm mb-1">https://catamaranisardegna.it/prenota-catamarano-bali-catsmart-violante</div>
+<div class="text-sm text-gray-600">Prenota il tuo catamarano Bali Catsmart "Violante" per una vacanza indimenticabile in Sardegna. Comfort, autonomia e libertà per esplorare le baie più belle del Mediterraneo.</div>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Impostazioni Social</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Titolo Open Graph</label>
+<input type="text" value="Vivi il mare in Sardegna con il nostro Catamarano Bali Catsmart" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Descrizione Open Graph</label>
+<input type="text" value="Prenota ora il catamarano Violante per una vacanza indimenticabile tra le calette più belle della Sardegna" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+</div>
+<div class="mt-4">
+<label class="block text-sm font-medium text-gray-700 mb-2">Immagine Open Graph</label>
+<div class="border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center bg-gray-50 relative">
+<img src="https://readdy.ai/api/search-image?query=luxury%252520catamaran%252520sailing%252520in%252520crystal%252520clear%252520turquoise%252520waters%252520near%252520Sardinia%252520coast%25252C%252520aerial%252520view.%252520White%252520catamaran%252520with%252520blue%252520accents%252520against%252520dramatic%252520coastline%252520with%252520sandy%252520beaches%252520and%252520rocky%252520cliffs.%252520Perfect%252520vacation%252520image%252520with%252520deep%252520blue%252520sky%252520and%252520emerald%252520waters.%252520Social%252520media%252520banner%252520format.&width=1200&height=630&seq=10006&orientation=landscape" alt="OG Image" class="w-full h-auto rounded-lg">
+<div class="absolute top-2 right-2 flex space-x-1">
+<button class="w-8 h-8 bg-white rounded-full shadow flex items-center justify-center text-gray-500 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+</div>
+</div>
+<div class="mt-2 text-sm text-gray-500">
+Dimensione consigliata: 1200 x 630 pixel
+</div>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Impostazioni Avanzate</h3>
+<div class="space-y-4">
+<div class="flex items-center">
+<label class="custom-switch mr-3">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+<span class="text-sm font-medium">Indicizza pagina (allow indexing)</span>
+</div>
+<div class="flex items-center">
+<label class="custom-switch mr-3">
+<input type="checkbox" checked>
+<span class="slider"></span>
+</label>
+<span class="text-sm font-medium">Segui link (follow links)</span>
+</div>
+<div class="flex items-center">
+<label class="custom-switch mr-3">
+<input type="checkbox">
+<span class="slider"></span>
+</label>
+<span class="text-sm font-medium">Canonical URL personalizzato</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Traduzioni -->
+<section id="traduzioni" class="bg-white rounded-lg shadow-md p-6 mb-8">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-semibold text-gray-900">Traduzioni</h2>
+<button class="text-primary hover:text-primary-dark flex items-center text-sm">
+<i class="ri-question-line mr-1"></i>
+Guida
+</button>
+</div>
+<div class="mb-6">
+<div class="flex border-b border-gray-200">
+<button class="px-4 py-2 text-sm font-medium text-primary border-b-2 border-primary">Italiano</button>
+<button class="px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700">English</button>
+<button class="px-4 py-2 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700">Français</button>
+<button class="ml-auto px-4 py-2 text-sm font-medium text-primary flex items-center">
+<i class="ri-add-line mr-1"></i>
+Aggiungi lingua
+</button>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Stato Traduzioni</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="border border-gray-300 rounded-lg p-4">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center">
+<span class="text-sm font-medium mr-2">Italiano</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+Principale
+</span>
+</div>
+<span class="text-sm text-green-600">100%</span>
+</div>
+<div class="w-full bg-gray-200 rounded-full h-2">
+<div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div>
+</div>
+</div>
+<div class="border border-gray-300 rounded-lg p-4">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center">
+<span class="text-sm font-medium mr-2">English</span>
+</div>
+<span class="text-sm text-yellow-600">65%</span>
+</div>
+<div class="w-full bg-gray-200 rounded-full h-2">
+<div class="bg-yellow-500 h-2 rounded-full" style="width: 65%"></div>
+</div>
+</div>
+<div class="border border-gray-300 rounded-lg p-4">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center">
+<span class="text-sm font-medium mr-2">Français</span>
+</div>
+<span class="text-sm text-red-600">30%</span>
+</div>
+<div class="w-full bg-gray-200 rounded-full h-2">
+<div class="bg-red-500 h-2 rounded-full" style="width: 30%"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-lg font-medium text-gray-900">Elementi da Tradurre</h3>
+<div class="flex items-center">
+<span class="text-sm text-gray-600 mr-2">Filtra:</span>
+<select class="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+<option value="all">Tutti gli elementi</option>
+<option value="missing">Solo mancanti</option>
+<option value="completed">Solo completati</option>
+</select>
+</div>
+</div>
+<div class="border border-gray-300 rounded-lg overflow-hidden">
+<table class="min-w-full divide-y divide-gray-200">
+<thead class="bg-gray-50">
+<tr>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Elemento</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Italiano</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">English</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Français</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-200">
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Titolo Pagina</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Prenota il tuo Catamarano</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Book your Catamaran</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Réservez votre Catamaran</td>
+</tr>
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Nome Catamarano</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Bali Catsmart - Violante</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Bali Catsmart - Violante</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Bali Catsmart - Violante</td>
+</tr>
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Descrizione Breve</td>
+<td class="px-6 py-4 text-sm text-gray-500">Violante è il nostro Bali Catsmart, varato nel 2025, pensato per vivere il mare in modo confortevole...</td>
+<td class="px-6 py-4 text-sm text-gray-500">Violante is our Bali Catsmart, launched in 2025, designed to experience the sea in a comfortable way...</td>
+<td class="px-6 py-4 text-sm text-gray-500">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+Non tradotto
+</span>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">CTA Principale</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Invia Richiesta di Prenotazione</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Send Booking Request</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+Non tradotto
+</span>
+</td>
+</tr>
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Servizio: Skipper</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Skipper Professionale</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Professional Skipper</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Skipper Professionnel</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-4 flex justify-between">
+<button class="flex items-center text-sm text-gray-600 hover:text-primary">
+<i class="ri-download-line mr-1"></i>
+Esporta traduzioni
+</button>
+<button class="flex items-center text-sm text-gray-600 hover:text-primary">
+<i class="ri-upload-line mr-1"></i>
+Importa traduzioni
+</button>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Traduzione Automatica</h3>
+<div class="border border-gray-300 rounded-lg p-4 bg-gray-50">
+<div class="flex items-center justify-between mb-4">
+<div>
+<h4 class="text-sm font-medium text-gray-700">Traduci automaticamente i contenuti mancanti</h4>
+<p class="text-xs text-gray-500 mt-1">Utilizza l'intelligenza artificiale per tradurre automaticamente i contenuti non ancora tradotti</p>
+</div>
+<button class="bg-primary text-white px-4 py-2 !rounded-button whitespace-nowrap flex items-center">
+<i class="ri-translate-2-line mr-2"></i>
+Traduci Ora
+</button>
+</div>
+<div class="flex items-center">
+<label class="inline-flex items-center mr-6">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<span class="ml-2 text-sm">English</span>
+</label>
+<label class="inline-flex items-center">
+<input type="checkbox" checked class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+<span class="ml-2 text-sm">Français</span>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Anteprima -->
+<section id="anteprima" class="bg-white rounded-lg shadow-md p-6 mb-8">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-semibold text-gray-900">Anteprima</h2>
+<div class="flex items-center space-x-3">
+<select class="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+<option value="desktop">Desktop</option>
+<option value="tablet">Tablet</option>
+<option value="mobile">Mobile</option>
+</select>
+<button class="bg-primary text-white px-4 py-2 !rounded-button whitespace-nowrap flex items-center">
+<i class="ri-external-link-line mr-2"></i>
+Apri Anteprima
+</button>
+</div>
+</div>
+<div class="border border-gray-300 rounded-lg overflow-hidden">
+<div class="bg-gray-100 px-4 py-2 flex items-center border-b border-gray-300">
+<div class="flex items-center space-x-2">
+<div class="w-3 h-3 bg-red-500 rounded-full"></div>
+<div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+<div class="w-3 h-3 bg-green-500 rounded-full"></div>
+</div>
+<div class="mx-auto flex items-center">
+<i class="ri-lock-line text-gray-400 mr-1"></i>
+<span class="text-xs text-gray-500">https://catamaranisardegna.it/prenota-catamarano-bali-catsmart-violante</span>
+</div>
+<div class="flex items-center space-x-2">
+<button class="text-gray-400 hover:text-gray-600">
+<i class="ri-refresh-line"></i>
+</button>
+</div>
+</div>
+<div class="bg-white p-4 h-96 overflow-auto">
+<div class="flex justify-center items-center h-full">
+<div class="text-center">
+<div class="w-16 h-16 mx-auto flex items-center justify-center bg-gray-100 rounded-full mb-4 text-primary">
+<i class="ri-eye-line ri-2x"></i>
+</div>
+<h3 class="text-lg font-medium text-gray-900 mb-2">Anteprima non disponibile</h3>
+<p class="text-sm text-gray-600 mb-4">Clicca sul pulsante "Apri Anteprima" per visualizzare la pagina in una nuova scheda</p>
+<button class="bg-primary text-white px-4 py-2 !rounded-button whitespace-nowrap flex items-center mx-auto">
+<i class="ri-external-link-line mr-2"></i>
+Apri Anteprima
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-6">
+<h3 class="text-lg font-medium text-gray-900 mb-3">Statistiche e Prestazioni</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="border border-gray-300 rounded-lg p-4">
+<h4 class="text-sm font-medium text-gray-700 mb-2">Visite Pagina</h4>
+<div id="visits-chart" class="h-40"></div>
+</div>
+<div class="border border-gray-300 rounded-lg p-4">
+<h4 class="text-sm font-medium text-gray-700 mb-2">Conversioni</h4>
+<div id="conversions-chart" class="h-40"></div>
+</div>
+<div class="border border-gray-300 rounded-lg p-4">
+<h4 class="text-sm font-medium text-gray-700 mb-2">Tasso di Conversione</h4>
+<div id="conversion-rate-chart" class="h-40"></div>
+</div>
+</div>
+</div>
+</section>
+<div class="flex justify-end">
+<button id="save-button-bottom" class="bg-primary text-white px-6 py-3 !rounded-button flex items-center whitespace-nowrap">
+<i class="ri-save-line mr-2"></i>
+Salva Modifiche
+</button>
+</div>
+</main>
+<script id="chart-script">
+document.addEventListener('DOMContentLoaded', function() {
+// Visits Chart
+const visitsChart = echarts.init(document.getElementById('visits-chart'));
+const visitsOption = {
+animation: false,
+tooltip: {
+trigger: 'axis',
+backgroundColor: 'rgba(255, 255, 255, 0.9)',
+borderColor: '#e2e8f0',
+textStyle: {
+color: '#1f2937'
+}
+},
+grid: {
+top: 10,
+right: 0,
+bottom: 30,
+left: 0
+},
+xAxis: {
+type: 'category',
+data: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
+axisLine: {
+lineStyle: {
+color: '#e2e8f0'
+}
+},
+axisLabel: {
+color: '#1f2937'
+}
+},
+yAxis: {
+type: 'value',
+axisLine: {
+show: false
+},
+axisLabel: {
+show: false
+},
+splitLine: {
+lineStyle: {
+color: '#f1f5f9'
+}
+}
+},
+series: [{
+data: [120, 132, 101, 134, 90, 230, 210],
+type: 'line',
+smooth: true,
+symbol: 'none',
+lineStyle: {
+color: 'rgba(87, 181, 231, 1)'
+},
+areaStyle: {
+color: {
+type: 'linear',
+x: 0,
+y: 0,
+x2: 0,
+y2: 1,
+colorStops: [{
+offset: 0,
+color: 'rgba(87, 181, 231, 0.2)'
+}, {
+offset: 1,
+color: 'rgba(87, 181, 231, 0.05)'
+}]
+}
+}
+}]
+};
+visitsChart.setOption(visitsOption);
+// Conversions Chart
+const conversionsChart = echarts.init(document.getElementById('conversions-chart'));
+const conversionsOption = {
+animation: false,
+tooltip: {
+trigger: 'axis',
+backgroundColor: 'rgba(255, 255, 255, 0.9)',
+borderColor: '#e2e8f0',
+textStyle: {
+color: '#1f2937'
+}
+},
+grid: {
+top: 10,
+right: 0,
+bottom: 30,
+left: 0
+},
+xAxis: {
+type: 'category',
+data: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
+axisLine: {
+lineStyle: {
+color: '#e2e8f0'
+}
+},
+axisLabel: {
+color: '#1f2937'
+}
+},
+yAxis: {
+type: 'value',
+axisLine: {
+show: false
+},
+axisLabel: {
+show: false
+},
+splitLine: {
+lineStyle: {
+color: '#f1f5f9'
+}
+}
+},
+series: [{
+data: [5, 7, 3, 8, 4, 12, 9],
+type: 'bar',
+barWidth: '60%',
+itemStyle: {
+color: 'rgba(141, 211, 199, 1)',
+borderRadius: 4
+}
+}]
+};
+conversionsChart.setOption(conversionsOption);
+// Conversion Rate Chart
+const conversionRateChart = echarts.init(document.getElementById('conversion-rate-chart'));
+const conversionRateOption = {
+animation: false,
+tooltip: {
+trigger: 'item',
+backgroundColor: 'rgba(255, 255, 255, 0.9)',
+borderColor: '#e2e8f0',
+textStyle: {
+color: '#1f2937'
+}
+},
+series: [{
+name: 'Tasso di Conversione',
+type: 'pie',
+radius: ['40%', '70%'],
+avoidLabelOverlap: false,
+itemStyle: {
+borderRadius: 4,
+borderColor: '#fff',
+borderWidth: 2
+},
+label: {
+show: false
+},
+emphasis: {
+label: {
+show: true,
+fontSize: '12',
+fontWeight: 'bold'
+}
+},
+labelLine: {
+show: false
+},
+data: [
+{ value: 48, name: 'Conversioni', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
+{ value: 735, name: 'Visite', itemStyle: { color: 'rgba(251, 191, 114, 1)' } }
+]
+}]
+};
+conversionRateChart.setOption(conversionRateOption);
+// Resize charts when window size changes
+window.addEventListener('resize', function() {
+visitsChart.resize();
+conversionsChart.resize();
+conversionRateChart.resize();
+});
+});
+</script>
+<script id="save-button-script">
+document.addEventListener('DOMContentLoaded', function() {
+const saveButtons = document.querySelectorAll('#save-button, #save-button-bottom');
+saveButtons.forEach(button => {
+button.addEventListener('click', function() {
+// Show saving indicator
+const originalText = button.innerHTML;
+button.innerHTML = '<i class="ri-loader-2-line animate-spin mr-2"></i> Salvataggio...';
+button.disabled = true;
+// Simulate saving process
+setTimeout(function() {
+button.innerHTML = '<i class="ri-check-line mr-2"></i> Salvato';
+// Reset button after 2 seconds
+setTimeout(function() {
+button.innerHTML = originalText;
+button.disabled = false;
+}, 2000);
+}, 1500);
+});
+});
+});
+</script>
+<script id="anchor-links-script">
+document.addEventListener('DOMContentLoaded', function() {
+const anchorLinks = document.querySelectorAll('a[href^="#"]');
+anchorLinks.forEach(link => {
+link.addEventListener('click', function(e) {
+e.preventDefault();
+const targetId = this.getAttribute('href');
+const targetElement = document.querySelector(targetId);
+if (targetElement) {
+const headerHeight = 120; // Adjust based on your header height
+const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+window.scrollTo({
+top: targetPosition,
+behavior: 'smooth'
+});
+// Update active state in navigation
+anchorLinks.forEach(link => {
+link.classList.remove('text-primary', 'border-primary');
+link.classList.add('text-gray-700', 'border-transparent');
+});
+this.classList.remove('text-gray-700', 'border-transparent');
+this.classList.add('text-primary', 'border-primary');
+}
+});
+});
+});
+</script>
+<script id="dynamic-fields-script">
+document.addEventListener('DOMContentLoaded', function() {
+// Add feature functionality
+const addFeatureBtn = document.querySelector('#main-features-container + button');
+const featuresContainer = document.getElementById('main-features-container');
+if (addFeatureBtn && featuresContainer) {
+addFeatureBtn.addEventListener('click', function() {
+const newFeature = document.createElement('div');
+newFeature.className = 'flex items-center';
+newFeature.innerHTML = `
+<div class="flex-grow">
+<input type="text" placeholder="Inserisci caratteristica" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+`;
+featuresContainer.appendChild(newFeature);
+// Add delete functionality to the new feature
+const deleteBtn = newFeature.querySelector('button');
+deleteBtn.addEventListener('click', function() {
+newFeature.remove();
+});
+});
+}
+// Add equipment functionality
+const addEquipmentBtn = document.querySelector('#equipment-container + button');
+const equipmentContainer = document.getElementById('equipment-container');
+if (addEquipmentBtn && equipmentContainer) {
+addEquipmentBtn.addEventListener('click', function() {
+const newEquipment = document.createElement('div');
+newEquipment.className = 'flex items-center';
+newEquipment.innerHTML = `
+<div class="flex-grow">
+<input type="text" placeholder="Inserisci dotazione" class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+</div>
+<button class="ml-2 text-gray-400 hover:text-red-500">
+<i class="ri-delete-bin-line"></i>
+</button>
+`;
+equipmentContainer.appendChild(newEquipment);
+// Add delete functionality to the new equipment
+const deleteBtn = newEquipment.querySelector('button');
+deleteBtn.addEventListener('click', function() {
+newEquipment.remove();
+});
+});
+}
+// Add delete functionality to existing items
+const deleteButtons = document.querySelectorAll('#main-features-container button, #equipment-container button, #charter-package-container button, #fuel-package-container button');
+deleteButtons.forEach(button => {
+button.addEventListener('click', function() {
+const parentItem = this.closest('.flex.items-center');
+if (parentItem) {
+parentItem.remove();
+}
+});
+});
+
+// ===== SISTEMA DI GESTIONE CONFIGURAZIONE =====
+
+// Carica configurazione all'avvio
+function loadConfiguration() {
+try {
+const config = CatamaranStorage.load();
+
+// Carica informazioni base usando gli ID
+const nameInput = document.getElementById('admin-catamaran-name');
+const priceInput = document.getElementById('admin-base-price');
+const yearInput = document.getElementById('admin-year');
+
+if (nameInput) nameInput.value = config.basic.name;
+if (priceInput) priceInput.value = config.basic.basePrice;
+if (yearInput) yearInput.value = config.basic.year;
+
+// Altri campi (manteniamo i selettori esistenti per ora)
+const lengthInput = document.querySelector('input[value="11,8 metri"]');
+const cabinsInput = document.querySelector('input[value="4 cabine +1 skipper"]');
+const bathroomsInput = document.querySelector('input[value="2 bagni +1 skipper"]');
+
+if (lengthInput) lengthInput.value = config.basic.length;
+if (cabinsInput) cabinsInput.value = config.basic.cabins;
+if (bathroomsInput) bathroomsInput.value = config.basic.bathrooms;
+
+// Carica descrizione
+const descTextarea = document.querySelector('textarea');
+if (descTextarea && descTextarea.placeholder.includes('Violante è il nostro')) {
+descTextarea.value = config.description;
+}
+
+// Carica sconto Instagram
+const discountCheckbox = document.querySelector('input[type="checkbox"][checked]');
+if (discountCheckbox) {
+discountCheckbox.checked = config.pricing.instagramDiscount.enabled;
+}
+const discountInput = document.querySelector('input[value="10"]');
+if (discountInput) {
+discountInput.value = config.pricing.instagramDiscount.percentage;
+}
+const discountLabel = document.querySelector('input[value="Sconto Instagram -10%"]');
+if (discountLabel) {
+discountLabel.value = config.pricing.instagramDiscount.label;
+}
+
+// Carica prezzi pacchetti usando gli ID
+const charterPriceInput = document.getElementById('admin-charter-price');
+const fuelPriceInput = document.getElementById('admin-fuel-price');
+const linensPriceInput = document.querySelector('input[value="20"]'); // Questo ID lo aggiungeremo dopo
+
+if (charterPriceInput) charterPriceInput.value = config.mandatoryPackages.charter.price;
+if (fuelPriceInput) fuelPriceInput.value = config.mandatoryPackages.fuel.price;
+if (linensPriceInput) linensPriceInput.value = config.mandatoryPackages.linens.pricePerGuest;
+
+console.log('Configurazione caricata con successo');
+} catch (error) {
+console.error('Errore nel caricare la configurazione:', error);
+showNotification('Errore nel caricare la configurazione', 'error');
+}
+}
+
+// Salva configurazione corrente
+function saveConfiguration() {
+try {
+console.log('=== INIZIO SALVATAGGIO ===');
+const config = CatamaranStorage.load();
+console.log('Configurazione caricata:', config);
+
+// Aggiorna informazioni base usando gli ID
+const nameInput = document.getElementById('admin-catamaran-name');
+const priceInput = document.getElementById('admin-base-price');
+const yearInput = document.getElementById('admin-year');
+
+console.log('Campi trovati:');
+console.log('- Nome input:', nameInput ? nameInput.value : 'NON TROVATO');
+console.log('- Prezzo input:', priceInput ? priceInput.value : 'NON TROVATO');
+console.log('- Anno input:', yearInput ? yearInput.value : 'NON TROVATO');
+
+if (nameInput && nameInput.value) {
+    console.log('Aggiornando nome da:', config.basic.name, 'a:', nameInput.value);
+    config.basic.name = nameInput.value;
+}
+if (priceInput && priceInput.value) {
+    console.log('Aggiornando prezzo da:', config.basic.basePrice, 'a:', priceInput.value);
+    config.basic.basePrice = parseInt(priceInput.value);
+    config.basic.basePriceDisplay = parseInt(priceInput.value);
+}
+if (yearInput && yearInput.value) {
+    console.log('Aggiornando anno da:', config.basic.year, 'a:', yearInput.value);
+    config.basic.year = parseInt(yearInput.value);
+}
+config.basic.length = document.querySelector('input[value*="metri"]')?.value || config.basic.length;
+config.basic.cabins = document.querySelector('input[value*="cabine"]')?.value || config.basic.cabins;
+config.basic.bathrooms = document.querySelector('input[value*="bagni"]')?.value || config.basic.bathrooms;
+
+// Aggiorna descrizione
+const descTextarea = document.querySelector('textarea');
+if (descTextarea && descTextarea.value) {
+config.description = descTextarea.value;
+}
+
+// Aggiorna sconto Instagram
+const discountCheckbox = document.querySelector('input[type="checkbox"]');
+if (discountCheckbox) {
+config.pricing.instagramDiscount.enabled = discountCheckbox.checked;
+}
+const discountInput = document.querySelector('input[type="number"][min="0"][max="100"]');
+if (discountInput) {
+config.pricing.instagramDiscount.percentage = parseInt(discountInput.value);
+}
+const discountLabel = document.querySelector('input[value*="Sconto Instagram"]');
+if (discountLabel) {
+config.pricing.instagramDiscount.label = discountLabel.value;
+}
+
+// Aggiorna prezzi pacchetti usando gli ID
+const charterPriceInput = document.getElementById('admin-charter-price');
+const fuelPriceInput = document.getElementById('admin-fuel-price');
+
+if (charterPriceInput && charterPriceInput.value) {
+    config.mandatoryPackages.charter.price = parseInt(charterPriceInput.value);
+}
+if (fuelPriceInput && fuelPriceInput.value) {
+    config.mandatoryPackages.fuel.price = parseInt(fuelPriceInput.value);
+}
+
+// Lenzuola - usiamo ancora il selettore per ora
+const linensInput = document.querySelector('input[value="20"]');
+if (linensInput && linensInput.value) {
+    config.mandatoryPackages.linens.pricePerGuest = parseInt(linensInput.value);
+}
+
+// Raccogli caratteristiche principali
+const featuresInputs = document.querySelectorAll('#main-features-container input');
+const features = Array.from(featuresInputs).map(input => input.value).filter(val => val.trim());
+if (features.length > 0) {
+config.mainFeatures = features;
+}
+
+// Raccogli dotazioni incluse
+const equipmentInputs = document.querySelectorAll('#equipment-container input');
+const equipment = Array.from(equipmentInputs).map(input => input.value).filter(val => val.trim());
+if (equipment.length > 0) {
+config.includedEquipment = equipment;
+}
+
+// Salva la configurazione
+const saved = CatamaranStorage.save(config);
+if (saved) {
+showNotification('Configurazione salvata con successo!', 'success');
+} else {
+showNotification('Errore nel salvataggio della configurazione', 'error');
+}
+
+} catch (error) {
+console.error('Errore nel salvare la configurazione:', error);
+showNotification('Errore nel salvataggio: ' + error.message, 'error');
+}
+}
+
+// Mostra notifiche
+function showNotification(message, type = 'info') {
+const notification = document.createElement('div');
+notification.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg ${
+type === 'success' ? 'bg-green-500 text-white' : 
+type === 'error' ? 'bg-red-500 text-white' : 
+'bg-blue-500 text-white'
+}`;
+notification.textContent = message;
+document.body.appendChild(notification);
+
+setTimeout(() => {
+notification.remove();
+}, 3000);
+}
+
+// Reset alla configurazione di default
+window.resetConfiguration = function() {
+    if (confirm('Sei sicuro di voler ripristinare la configurazione di default? Tutte le modifiche andranno perse.')) {
+        CatamaranStorage.reset();
+        location.reload();
+    }
+}
+
+// Inizializzazione della pagina
+window.addEventListener('load', function() {
+    console.log('Pagina caricata - inizializzazione admin');
+    
+    try {
+        // Carica configurazione all'avvio
+        loadConfiguration();
+        console.log('Configurazione caricata');
+        
+        // Collega pulsanti salva
+        const saveButton = document.getElementById('save-button');
+        const saveButtonBottom = document.getElementById('save-button-bottom');
+        
+        if (saveButton) {
+            saveButton.addEventListener('click', saveConfiguration);
+            console.log('✓ Pulsante save-button collegato');
+        } else {
+            console.warn('⚠ Pulsante save-button NON trovato');
+        }
+        
+        if (saveButtonBottom) {
+            saveButtonBottom.addEventListener('click', saveConfiguration);
+            console.log('✓ Pulsante save-button-bottom collegato');
+        } else {
+            console.warn('⚠ Pulsante save-button-bottom NON trovato');
+        }
+        
+        console.log('Inizializzazione completata');
+        
+    } catch (error) {
+        console.error('Errore nell\'inizializzazione:', error);
+    }
+});
+</script>
+</body>
+</html>

@@ -200,14 +200,8 @@ transform: translateX(26px);
 <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
 <div class="container mx-auto px-4 py-3 flex items-center justify-between">
 <div class="flex items-center">
-<a href="#" class="text-3xl font-['Pacifico'] text-primary">logo</a>
+<a href="#" id="site-logo" class="text-3xl font-['Pacifico'] text-primary">logo</a>
 <div class="flex items-center">
-<a href="https://readdy.ai/home/248f4250-56fb-462d-bb41-d611c77a9192/f46b2de4-57db-41a2-b6c0-d06d000837c7" data-readdy="true" class="text-gray-700 hover:text-primary flex items-center transition-colors">
-<span class="w-5 h-5 flex items-center justify-center mr-1">
-<i class="ri-arrow-left-line"></i>
-</span>
-Torna alle offerte
-</a>
 <div class="w-10 h-10 flex items-center justify-center md:hidden cursor-pointer">
 <i class="ri-menu-line ri-lg"></i>
 </div>
@@ -877,6 +871,53 @@ Invia Richiesta di Prenotazione
 </div>
 </div>
 </footer>
+<script id="logo-loader-script">
+// Carica e mostra il logo dalla configurazione
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        console.log('🔄 Caricamento logo per pagina prenotazione...');
+        const config = CatamaranStorage.load();
+        const logoElement = document.getElementById('site-logo');
+        
+        console.log('📂 Configurazione caricata:', config.theme);
+        console.log('🎯 Elemento logo trovato:', !!logoElement);
+        
+        if (logoElement) {
+            // Migrazione della configurazione logo (da stringa a oggetto)
+            if (typeof config.theme.logo === 'string') {
+                console.log('🔄 Migrazione configurazione logo da stringa a oggetto');
+                const oldLogoText = config.theme.logo;
+                config.theme.logo = {
+                    type: 'text',
+                    imageUrl: '',
+                    text: oldLogoText
+                };
+            }
+            
+            // Assicurati che la struttura logo esista
+            if (!config.theme.logo) {
+                config.theme.logo = { type: 'text', imageUrl: '', text: 'logo' };
+            }
+            
+            console.log('🖼️ Configurazione logo:', config.theme.logo);
+            
+            if (config.theme.logo.type === 'image' && config.theme.logo.imageUrl) {
+                console.log('✅ Mostrando immagine logo');
+                // Mostra immagine logo
+                logoElement.innerHTML = `<img src="${config.theme.logo.imageUrl}" alt="${config.theme.logo.text}" class="h-8 w-auto">`;
+                logoElement.className = 'block';
+            } else {
+                console.log('📝 Mostrando testo logo:', config.theme.logo.text);
+                // Mostra testo logo
+                logoElement.textContent = config.theme.logo.text;
+                logoElement.className = 'text-3xl font-["Pacifico"] text-primary';
+            }
+        }
+    } catch (error) {
+        console.error('❌ Errore nel caricamento del logo:', error);
+    }
+});
+</script>
 <script id="calendar-script">
 document.addEventListener('DOMContentLoaded', function() {
 let currentDate = new Date(2025, 4, 23); // 2025-05-23
