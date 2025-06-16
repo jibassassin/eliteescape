@@ -2070,10 +2070,12 @@ function saveAdditionalServices(config) {
             config.additionalServices = {};
         }
         
-        // Skipper
-        const skipperPrice = document.getElementById('admin-skipper-price');
-        const skipperName = document.getElementById('admin-skipper-name');
-        const skipperDescription = document.getElementById('admin-skipper-description');
+        // Gestisce lo skipper separatamente (ha struttura diversa)
+        const skipperPrice = document.getElementById('skipper-price');
+        const skipperName = document.getElementById('skipper-name');
+        const skipperDescription = document.getElementById('skipper-description');
+        const skipperUnit = document.getElementById('skipper-unit');
+        const skipperIcon = document.getElementById('skipper-icon-input');
         
         if (skipperPrice) {
             if (!config.additionalServices.skipper) {
@@ -2089,133 +2091,65 @@ function saveAdditionalServices(config) {
             config.additionalServices.skipper.price = parseInt(skipperPrice.value) || 200;
             if (skipperName && skipperName.value) config.additionalServices.skipper.name = skipperName.value;
             if (skipperDescription && skipperDescription.value) config.additionalServices.skipper.description = skipperDescription.value;
+            if (skipperUnit && skipperUnit.value) config.additionalServices.skipper.unit = skipperUnit.value;
+            if (skipperIcon && skipperIcon.value) config.additionalServices.skipper.icon = skipperIcon.value;
         }
         
-        // Wi-Fi
-        const wifiPrice = document.getElementById('admin-wifi-price');
-        const wifiName = document.getElementById('admin-wifi-name');
-        const wifiDescription = document.getElementById('admin-wifi-description');
+        // Gestisce tutti gli altri servizi con struttura generica
+        const serviceEditors = document.querySelectorAll('.service-editor[data-service]');
+        console.log(`📋 Trovati ${serviceEditors.length} service editors`);
         
-        if (wifiPrice) {
-            if (!config.additionalServices.wifi) {
-                config.additionalServices.wifi = {
-                    name: "Wi-Fi",
-                    price: 50,
+        serviceEditors.forEach(editor => {
+            const serviceKey = editor.dataset.service;
+            if (!serviceKey || serviceKey === 'skipper') return; // Skipper già gestito sopra
+            
+            const nameInput = editor.querySelector('.service-name');
+            const priceInput = editor.querySelector('.service-price');
+            const unitSelect = editor.querySelector('.service-unit');
+            const descriptionInput = editor.querySelector('.service-description');
+            const iconInput = editor.querySelector('.service-icon-input');
+            const enabledInput = editor.querySelector('.service-enabled');
+            
+            console.log(`🔧 Processando servizio: ${serviceKey}`);
+            
+            // Inizializza il servizio se non esiste
+            if (!config.additionalServices[serviceKey]) {
+                config.additionalServices[serviceKey] = {
+                    name: nameInput ? nameInput.value : serviceKey,
+                    price: 0,
                     unit: "tantum",
                     description: "",
                     recommended: false,
-                    icon: "ri-wifi-line"
+                    icon: "ri-service-line"
                 };
             }
-            config.additionalServices.wifi.price = parseInt(wifiPrice.value) || 50;
-            if (wifiName && wifiName.value) config.additionalServices.wifi.name = wifiName.value;
-            if (wifiDescription && wifiDescription.value) config.additionalServices.wifi.description = wifiDescription.value;
-        }
-        
-        // Attrezzature Sport Acquatici
-        const watersportsPrice = document.getElementById('admin-watersports-price');
-        const watersportsName = document.getElementById('admin-watersports-name');
-        const watersportsDescription = document.getElementById('admin-watersports-description');
-        
-        if (watersportsPrice) {
-            if (!config.additionalServices.watersports) {
-                config.additionalServices.watersports = {
-                    name: "Attrezzature Sport Acquatici",
-                    price: 300,
-                    unit: "tantum",
-                    description: "",
-                    recommended: false,
-                    icon: "ri-snorkel-line"
-                };
+            
+            // Aggiorna i valori
+            if (nameInput && nameInput.value) {
+                config.additionalServices[serviceKey].name = nameInput.value;
             }
-            config.additionalServices.watersports.price = parseInt(watersportsPrice.value) || 300;
-            if (watersportsName && watersportsName.value) config.additionalServices.watersports.name = watersportsName.value;
-            if (watersportsDescription && watersportsDescription.value) config.additionalServices.watersports.description = watersportsDescription.value;
-        }
-        
-        // Pizza
-        const pizzaPrice = document.getElementById('admin-pizza-price');
-        const pizzaName = document.getElementById('admin-pizza-name');
-        const pizzaDescription = document.getElementById('admin-pizza-description');
-        
-        if (pizzaPrice) {
-            if (!config.additionalServices.pizza) {
-                config.additionalServices.pizza = {
-                    name: "Pizza Perfetta",
-                    price: 150,
-                    unit: "tantum",
-                    description: "",
-                    recommended: false,
-                    icon: "ri-restaurant-2-line"
-                };
+            if (priceInput && priceInput.value) {
+                config.additionalServices[serviceKey].price = parseInt(priceInput.value) || 0;
             }
-            config.additionalServices.pizza.price = parseInt(pizzaPrice.value) || 150;
-            if (pizzaName && pizzaName.value) config.additionalServices.pizza.name = pizzaName.value;
-            if (pizzaDescription && pizzaDescription.value) config.additionalServices.pizza.description = pizzaDescription.value;
-        }
-        
-        // Bimby
-        const bimbyPrice = document.getElementById('admin-bimby-price');
-        const bimbyName = document.getElementById('admin-bimby-name');
-        const bimbyDescription = document.getElementById('admin-bimby-description');
-        
-        if (bimbyPrice) {
-            if (!config.additionalServices.bimby) {
-                config.additionalServices.bimby = {
-                    name: "Bimby",
-                    price: 250,
-                    unit: "tantum",
-                    description: "",
-                    recommended: false,
-                    icon: "ri-blender-line"
-                };
+            if (unitSelect && unitSelect.value) {
+                config.additionalServices[serviceKey].unit = unitSelect.value;
             }
-            config.additionalServices.bimby.price = parseInt(bimbyPrice.value) || 250;
-            if (bimbyName && bimbyName.value) config.additionalServices.bimby.name = bimbyName.value;
-            if (bimbyDescription && bimbyDescription.value) config.additionalServices.bimby.description = bimbyDescription.value;
-        }
-        
-        // Kitchen
-        const kitchenPrice = document.getElementById('admin-kitchen-price');
-        const kitchenName = document.getElementById('admin-kitchen-name');
-        const kitchenDescription = document.getElementById('admin-kitchen-description');
-        
-        if (kitchenPrice) {
-            if (!config.additionalServices.kitchen) {
-                config.additionalServices.kitchen = {
-                    name: "Pacchetto \"come la cucina di casa tua\"",
-                    price: 150,
-                    unit: "tantum",
-                    description: "",
-                    recommended: false,
-                    icon: "ri-restaurant-line"
-                };
+            if (descriptionInput && descriptionInput.value) {
+                config.additionalServices[serviceKey].description = descriptionInput.value;
             }
-            config.additionalServices.kitchen.price = parseInt(kitchenPrice.value) || 150;
-            if (kitchenName && kitchenName.value) config.additionalServices.kitchen.name = kitchenName.value;
-            if (kitchenDescription && kitchenDescription.value) config.additionalServices.kitchen.description = kitchenDescription.value;
-        }
-        
-        // Fishing
-        const fishingPrice = document.getElementById('admin-fishing-price');
-        const fishingName = document.getElementById('admin-fishing-name');
-        const fishingDescription = document.getElementById('admin-fishing-description');
-        
-        if (fishingPrice) {
-            if (!config.additionalServices.fishing) {
-                config.additionalServices.fishing = {
-                    name: "Attrezzatura per la pesca",
-                    price: 75,
-                    unit: "tantum",
-                    description: "",
-                    recommended: false,
-                    icon: "ri-fish-line"
-                };
+            if (iconInput && iconInput.value) {
+                config.additionalServices[serviceKey].icon = iconInput.value;
             }
-            config.additionalServices.fishing.price = parseInt(fishingPrice.value) || 75;
-            if (fishingName && fishingName.value) config.additionalServices.fishing.name = fishingName.value;
-            if (fishingDescription && fishingDescription.value) config.additionalServices.fishing.description = fishingDescription.value;
-        }
+            if (enabledInput !== null) {
+                config.additionalServices[serviceKey].enabled = enabledInput.checked;
+            }
+            
+            console.log(`✅ Servizio ${serviceKey} aggiornato:`, {
+                name: config.additionalServices[serviceKey].name,
+                price: config.additionalServices[serviceKey].price,
+                unit: config.additionalServices[serviceKey].unit
+            });
+        });
         
         console.log('✅ Servizi aggiuntivi salvati:', Object.keys(config.additionalServices));
         
@@ -2234,82 +2168,57 @@ function loadAdditionalServices(config) {
             config.additionalServices = {};
         }
         
-        // Skipper
+        // Gestisce lo skipper separatamente (ha struttura diversa)
         if (config.additionalServices.skipper) {
-            const skipperPrice = document.getElementById('admin-skipper-price');
-            const skipperName = document.getElementById('admin-skipper-name');
-            const skipperDescription = document.getElementById('admin-skipper-description');
+            const skipperPrice = document.getElementById('skipper-price');
+            const skipperName = document.getElementById('skipper-name');
+            const skipperDescription = document.getElementById('skipper-description');
+            const skipperUnit = document.getElementById('skipper-unit');
+            const skipperIcon = document.getElementById('skipper-icon-input');
             
             if (skipperPrice) skipperPrice.value = config.additionalServices.skipper.price || 200;
             if (skipperName) skipperName.value = config.additionalServices.skipper.name || "Skipper Professionale";
             if (skipperDescription) skipperDescription.value = config.additionalServices.skipper.description || "";
+            if (skipperUnit) skipperUnit.value = config.additionalServices.skipper.unit || "giorno";
+            if (skipperIcon) skipperIcon.value = config.additionalServices.skipper.icon || "ri-steering-2-line";
         }
         
-        // Wi-Fi
-        if (config.additionalServices.wifi) {
-            const wifiPrice = document.getElementById('admin-wifi-price');
-            const wifiName = document.getElementById('admin-wifi-name');
-            const wifiDescription = document.getElementById('admin-wifi-description');
-            
-            if (wifiPrice) wifiPrice.value = config.additionalServices.wifi.price || 50;
-            if (wifiName) wifiName.value = config.additionalServices.wifi.name || "Wi-Fi";
-            if (wifiDescription) wifiDescription.value = config.additionalServices.wifi.description || "";
-        }
+        // Gestisce tutti gli altri servizi con struttura generica
+        const serviceEditors = document.querySelectorAll('.service-editor[data-service]');
+        console.log(`📋 Caricando ${serviceEditors.length} service editors`);
         
-        // Attrezzature Sport Acquatici
-        if (config.additionalServices.watersports) {
-            const watersportsPrice = document.getElementById('admin-watersports-price');
-            const watersportsName = document.getElementById('admin-watersports-name');
-            const watersportsDescription = document.getElementById('admin-watersports-description');
+        serviceEditors.forEach(editor => {
+            const serviceKey = editor.dataset.service;
+            if (!serviceKey || serviceKey === 'skipper') return; // Skipper già gestito sopra
             
-            if (watersportsPrice) watersportsPrice.value = config.additionalServices.watersports.price || 300;
-            if (watersportsName) watersportsName.value = config.additionalServices.watersports.name || "Attrezzature Sport Acquatici";
-            if (watersportsDescription) watersportsDescription.value = config.additionalServices.watersports.description || "";
-        }
-        
-        // Pizza
-        if (config.additionalServices.pizza) {
-            const pizzaPrice = document.getElementById('admin-pizza-price');
-            const pizzaName = document.getElementById('admin-pizza-name');
-            const pizzaDescription = document.getElementById('admin-pizza-description');
+            const serviceConfig = config.additionalServices[serviceKey];
+            if (!serviceConfig) return; // Servizio non configurato
             
-            if (pizzaPrice) pizzaPrice.value = config.additionalServices.pizza.price || 150;
-            if (pizzaName) pizzaName.value = config.additionalServices.pizza.name || "Pizza Perfetta";
-            if (pizzaDescription) pizzaDescription.value = config.additionalServices.pizza.description || "";
-        }
-        
-        // Bimby
-        if (config.additionalServices.bimby) {
-            const bimbyPrice = document.getElementById('admin-bimby-price');
-            const bimbyName = document.getElementById('admin-bimby-name');
-            const bimbyDescription = document.getElementById('admin-bimby-description');
+            const nameInput = editor.querySelector('.service-name');
+            const priceInput = editor.querySelector('.service-price');
+            const unitSelect = editor.querySelector('.service-unit');
+            const descriptionInput = editor.querySelector('.service-description');
+            const iconInput = editor.querySelector('.service-icon-input');
+            const enabledInput = editor.querySelector('.service-enabled');
             
-            if (bimbyPrice) bimbyPrice.value = config.additionalServices.bimby.price || 250;
-            if (bimbyName) bimbyName.value = config.additionalServices.bimby.name || "Bimby";
-            if (bimbyDescription) bimbyDescription.value = config.additionalServices.bimby.description || "";
-        }
-        
-        // Kitchen
-        if (config.additionalServices.kitchen) {
-            const kitchenPrice = document.getElementById('admin-kitchen-price');
-            const kitchenName = document.getElementById('admin-kitchen-name');
-            const kitchenDescription = document.getElementById('admin-kitchen-description');
+            console.log(`🔧 Caricando servizio: ${serviceKey}`, serviceConfig);
             
-            if (kitchenPrice) kitchenPrice.value = config.additionalServices.kitchen.price || 150;
-            if (kitchenName) kitchenName.value = config.additionalServices.kitchen.name || "Pacchetto \"come la cucina di casa tua\"";
-            if (kitchenDescription) kitchenDescription.value = config.additionalServices.kitchen.description || "";
-        }
-        
-        // Fishing
-        if (config.additionalServices.fishing) {
-            const fishingPrice = document.getElementById('admin-fishing-price');
-            const fishingName = document.getElementById('admin-fishing-name');
-            const fishingDescription = document.getElementById('admin-fishing-description');
+            // Carica i valori negli input
+            if (nameInput) nameInput.value = serviceConfig.name || '';
+            if (priceInput) priceInput.value = serviceConfig.price || 0;
+            if (unitSelect) unitSelect.value = serviceConfig.unit || 'tantum';
+            if (descriptionInput) descriptionInput.value = serviceConfig.description || '';
+            if (iconInput) iconInput.value = serviceConfig.icon || 'ri-service-line';
+            if (enabledInput) enabledInput.checked = serviceConfig.enabled !== false;
             
-            if (fishingPrice) fishingPrice.value = config.additionalServices.fishing.price || 75;
-            if (fishingName) fishingName.value = config.additionalServices.fishing.name || "Attrezzatura per la pesca";
-            if (fishingDescription) fishingDescription.value = config.additionalServices.fishing.description || "";
-        }
+            // Aggiorna anche l'anteprima dell'icona se esiste
+            const iconPreview = editor.querySelector('.service-icon-preview');
+            if (iconPreview && serviceConfig.icon) {
+                iconPreview.className = `service-icon-preview ${serviceConfig.icon} text-lg text-primary`;
+            }
+            
+            console.log(`✅ Servizio ${serviceKey} caricato nell'interfaccia`);
+        });
         
         console.log('✅ Servizi aggiuntivi caricati');
         
@@ -2508,18 +2417,11 @@ window.addEventListener('load', function() {
         }
         
         // Collega event listeners per servizi aggiuntivi
-        const serviceInputs = [
-            'admin-skipper-price', 'admin-skipper-name', 'admin-skipper-description',
-            'admin-wifi-price', 'admin-wifi-name', 'admin-wifi-description',
-            'admin-watersports-price', 'admin-watersports-name', 'admin-watersports-description',
-            'admin-pizza-price', 'admin-pizza-name', 'admin-pizza-description',
-            'admin-bimby-price', 'admin-bimby-name', 'admin-bimby-description',
-            'admin-kitchen-price', 'admin-kitchen-name', 'admin-kitchen-description',
-            'admin-fishing-price', 'admin-fishing-name', 'admin-fishing-description'
-        ];
-        
+        // Skipper (ha ID specifici)
+        const skipperInputs = ['skipper-price', 'skipper-name', 'skipper-description', 'skipper-unit', 'skipper-icon-input'];
         let serviceInputsFound = 0;
-        serviceInputs.forEach(inputId => {
+        
+        skipperInputs.forEach(inputId => {
             const input = document.getElementById(inputId);
             if (input) {
                 input.addEventListener('input', function() {
@@ -2531,6 +2433,19 @@ window.addEventListener('load', function() {
                 serviceInputsFound++;
             }
         });
+        
+        // Altri servizi (usano classi generiche)
+        const serviceClassInputs = document.querySelectorAll('.service-name, .service-price, .service-unit, .service-description, .service-icon-input, .service-enabled');
+        serviceClassInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                // Auto-save per i servizi aggiuntivi - salva automaticamente quando si modifica un campo
+                const config = CatamaranStorage.load();
+                saveAdditionalServices(config);
+                CatamaranStorage.save(config);
+            });
+            serviceInputsFound++;
+        });
+        
         console.log(`✓ ${serviceInputsFound} campi servizi aggiuntivi collegati con auto-save`);
         
         console.log('📅 Calendario prezzi settimanali inizializzato');
