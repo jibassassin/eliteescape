@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test Fase 3 - Nuovi Campi Admin Panel</title>
+    <script src="catamaran-config.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5; }
+        .test-container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .test-section { margin-bottom: 30px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 5px; }
+        .test-success { background-color: #e8f5e8; border-color: #4caf50; }
+        .test-error { background-color: #ffeaea; border-color: #f44336; }
+        .test-warning { background-color: #fff8e1; border-color: #ff9800; }
+        .test-info { background-color: #e3f2fd; border-color: #2196f3; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 4px; font-size: 12px; overflow-x: auto; max-height: 300px; }
+        .status { font-weight: bold; margin: 10px 0; }
+        button { background: #2196F3; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #1976D2; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .field-test { display: flex; justify-content: space-between; align-items: center; padding: 8px; margin: 4px 0; background: #f5f5f5; border-radius: 4px; }
+        .field-status { padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .field-ok { background: #e8f5e8; color: #4caf50; }
+        .field-error { background: #ffeaea; color: #f44336; }
+        .field-warning { background: #fff8e1; color: #ff9800; }
+        .preview-box { border: 1px solid #ddd; border-radius: 4px; padding: 10px; background: #fafafa; margin: 10px 0; }
+        .image-preview { max-width: 200px; max-height: 120px; object-fit: cover; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="test-container">
+    <h1>🧪 Test Fase 3 - Nuovi Campi Admin Panel</h1>
+    
+    <div class="test-section test-info">
+        <h2>📋 Campi Implementati</h2>
+        <div class="grid">
+            <div>
+                <h3>🖼️ Carosello Immagini</h3>
+                <ul>
+                    <li>Immagine principale (con anteprima)</li>
+                    <li>Immagine riassunto (con anteprima)</li>
+                </ul>
+            </div>
+            <div>
+                <h3>📝 Contenuti</h3>
+                <ul>
+                    <li>Descrizione completa (con anteprima live)</li>
+                    <li>Caratteristiche principali (dinamiche)</li>
+                    <li>Dotazioni incluse (dinamiche)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div>
+            <div class="test-section" id="images-test">
+                <h2>🖼️ Test 1: Gestione Immagini</h2>
+                <button onclick="testImagesConfiguration()">Testa Immagini</button>
+                <div id="images-results" class="status"></div>
+                <div id="images-details"></div>
+            </div>
+
+            <div class="test-section" id="description-test">
+                <h2>📝 Test 2: Descrizione</h2>
+                <button onclick="testDescriptionConfiguration()">Testa Descrizione</button>
+                <div id="description-results" class="status"></div>
+                <div id="description-preview" class="preview-box"></div>
+            </div>
+
+            <div class="test-section" id="features-test">
+                <h2>🔧 Test 3: Caratteristiche</h2>
+                <button onclick="testFeaturesConfiguration()">Testa Caratteristiche</button>
+                <div id="features-results" class="status"></div>
+                <div id="features-list"></div>
+            </div>
+        </div>
+
+        <div>
+            <div class="test-section" id="equipment-test">
+                <h2>🛠️ Test 4: Dotazioni</h2>
+                <button onclick="testEquipmentConfiguration()">Testa Dotazioni</button>
+                <div id="equipment-results" class="status"></div>
+                <div id="equipment-list"></div>
+            </div>
+
+            <div class="test-section" id="integration-test">
+                <h2>🔗 Test 5: Integrazione Completa</h2>
+                <button onclick="testCompleteIntegration()">Test Integrazione</button>
+                <div id="integration-results" class="status"></div>
+                <pre id="integration-details"></pre>
+            </div>
+
+            <div class="test-section" id="save-load-test">
+                <h2>💾 Test 6: Salva/Carica</h2>
+                <button onclick="testSaveLoadCycle()">Test Save/Load</button>
+                <div id="save-load-results" class="status"></div>
+                <pre id="save-load-details"></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Riepilogo Test Fase 3</h2>
+        <div id="phase3-summary"></div>
+    </div>
+</div>
+
+<script>
+let testResults = {};
+
+function testImagesConfiguration() {
+    try {
+        console.log('🖼️ Testando configurazione immagini...');
+        
+        const config = CatamaranStorage.load();
+        
+        // Test URL immagini di esempio
+        const testImages = {
+            main: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&h=600&fit=crop',
+            summary: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=100&h=100&fit=crop'
+        };
+        
+        // Simula aggiornamento configurazione immagini
+        if (!config.images) {
+            config.images = {};
+        }
+        
+        config.images.main = testImages.main;
+        config.images.summary = testImages.summary;
+        
+        const saveResult = CatamaranStorage.save(config);
+        
+        // Verifica ricaricamento
+        const reloadedConfig = CatamaranStorage.load();
+        const imagesMatch = reloadedConfig.images.main === testImages.main && 
+                           reloadedConfig.images.summary === testImages.summary;
+        
+        testResults.images = saveResult && imagesMatch;
+        
+        if (testResults.images) {
+            document.getElementById('images-results').innerHTML = '✅ Configurazione immagini funzionante';
+            document.getElementById('images-test').className = 'test-section test-success';
+            
+            // Mostra anteprime
+            document.getElementById('images-details').innerHTML = `
+                <div class="preview-box">
+                    <h4>Anteprima Immagine Principale:</h4>
+                    <img src="${testImages.main}" alt="Test principale" class="image-preview">
+                </div>
+                <div class="preview-box">
+                    <h4>Anteprima Immagine Riassunto:</h4>
+                    <img src="${testImages.summary}" alt="Test riassunto" class="image-preview">
+                </div>
+            `;
+        } else {
+            document.getElementById('images-results').innerHTML = '❌ Problemi con configurazione immagini';
+            document.getElementById('images-test').className = 'test-section test-error';
+        }
+        
+        updateSummary();
+        
+    } catch (error) {
+        testResults.images = false;
+        document.getElementById('images-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('images-test').className = 'test-section test-error';
+        console.error('Errore test immagini:', error);
+    }
+}
+
+function testDescriptionConfiguration() {
+    try {
+        console.log('📝 Testando configurazione descrizione...');
+        
+        const config = CatamaranStorage.load();
+        
+        const testDescription = `Violante è il nostro Bali Catsmart TEST, varato nel 2025.
+Un catamarano pensato per vivere il mare in modo confortevole e autentico.
+
+Caratteristiche speciali:
+- Dinette che si apre sul pozzetto
+- Prendisole a prua con tavolino
+- Piena autonomia energetica
+- Navigazione sostenibile
+
+Test descrizione modificata: ${new Date().toLocaleTimeString()}`;
+        
+        // Simula aggiornamento descrizione
+        config.description = testDescription;
+        const saveResult = CatamaranStorage.save(config);
+        
+        // Verifica ricaricamento
+        const reloadedConfig = CatamaranStorage.load();
+        const descriptionMatch = reloadedConfig.description === testDescription;
+        
+        testResults.description = saveResult && descriptionMatch;
+        
+        if (testResults.description) {
+            document.getElementById('description-results').innerHTML = '✅ Configurazione descrizione funzionante';
+            document.getElementById('description-test').className = 'test-section test-success';
+            
+            // Mostra anteprima
+            document.getElementById('description-preview').innerHTML = `
+                <h4>Anteprima Descrizione:</h4>
+                <div style="white-space: pre-line; font-size: 14px; line-height: 1.5;">${testDescription}</div>
+            `;
+        } else {
+            document.getElementById('description-results').innerHTML = '❌ Problemi con configurazione descrizione';
+            document.getElementById('description-test').className = 'test-section test-error';
+        }
+        
+        updateSummary();
+        
+    } catch (error) {
+        testResults.description = false;
+        document.getElementById('description-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('description-test').className = 'test-section test-error';
+        console.error('Errore test descrizione:', error);
+    }
+}
+
+function testFeaturesConfiguration() {
+    try {
+        console.log('🔧 Testando configurazione caratteristiche...');
+        
+        const config = CatamaranStorage.load();
+        
+        const testFeatures = [
+            "4 cabine doppie + 1 cabina skipper TEST",
+            "Cucina attrezzata e dinette con portellone apribile",
+            "Autonomia completa: acqua, energia, carburante",
+            "Prendisole a prua con tavolino per aperitivi",
+            "Caratteristica test aggiunta: " + new Date().toLocaleTimeString()
+        ];
+        
+        // Simula aggiornamento caratteristiche
+        config.mainFeatures = testFeatures;
+        const saveResult = CatamaranStorage.save(config);
+        
+        // Verifica ricaricamento
+        const reloadedConfig = CatamaranStorage.load();
+        const featuresMatch = JSON.stringify(reloadedConfig.mainFeatures) === JSON.stringify(testFeatures);
+        
+        testResults.features = saveResult && featuresMatch && testFeatures.length >= 4;
+        
+        if (testResults.features) {
+            document.getElementById('features-results').innerHTML = `✅ ${testFeatures.length} caratteristiche salvate correttamente`;
+            document.getElementById('features-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('features-results').innerHTML = '❌ Problemi con caratteristiche';
+            document.getElementById('features-test').className = 'test-section test-error';
+        }
+        
+        // Mostra lista caratteristiche
+        const featuresList = document.getElementById('features-list');
+        featuresList.innerHTML = '<h4>Caratteristiche salvate:</h4>' + 
+            testFeatures.map((feature, index) => 
+                `<div class="field-test">
+                    <span>• ${feature}</span>
+                    <span class="field-status field-ok">✓</span>
+                </div>`
+            ).join('');
+        
+        updateSummary();
+        
+    } catch (error) {
+        testResults.features = false;
+        document.getElementById('features-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('features-test').className = 'test-section test-error';
+        console.error('Errore test caratteristiche:', error);
+    }
+}
+
+function testEquipmentConfiguration() {
+    try {
+        console.log('🛠️ Testando configurazione dotazioni...');
+        
+        const config = CatamaranStorage.load();
+        
+        const testEquipment = [
+            "Tender 8 posti con motore fuoribordo da 9hp",
+            "Dissalatore per acqua dolce da 200 l/h", 
+            "Casse acustiche bluetooth alta qualità",
+            "Pannelli solari e pacco batterie",
+            "Barbecue a gas",
+            "Dotazione test aggiunta: " + new Date().toLocaleTimeString()
+        ];
+        
+        // Simula aggiornamento dotazioni
+        config.includedEquipment = testEquipment;
+        const saveResult = CatamaranStorage.save(config);
+        
+        // Verifica ricaricamento
+        const reloadedConfig = CatamaranStorage.load();
+        const equipmentMatch = JSON.stringify(reloadedConfig.includedEquipment) === JSON.stringify(testEquipment);
+        
+        testResults.equipment = saveResult && equipmentMatch && testEquipment.length >= 5;
+        
+        if (testResults.equipment) {
+            document.getElementById('equipment-results').innerHTML = `✅ ${testEquipment.length} dotazioni salvate correttamente`;
+            document.getElementById('equipment-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('equipment-results').innerHTML = '❌ Problemi con dotazioni';
+            document.getElementById('equipment-test').className = 'test-section test-error';
+        }
+        
+        // Mostra lista dotazioni
+        const equipmentList = document.getElementById('equipment-list');
+        equipmentList.innerHTML = '<h4>Dotazioni salvate:</h4>' + 
+            testEquipment.map((equipment, index) => 
+                `<div class="field-test">
+                    <span>• ${equipment}</span>
+                    <span class="field-status field-ok">✓</span>
+                </div>`
+            ).join('');
+        
+        updateSummary();
+        
+    } catch (error) {
+        testResults.equipment = false;
+        document.getElementById('equipment-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('equipment-test').className = 'test-section test-error';
+        console.error('Errore test dotazioni:', error);
+    }
+}
+
+function testCompleteIntegration() {
+    try {
+        console.log('🔗 Testando integrazione completa...');
+        
+        const config = CatamaranStorage.load();
+        
+        // Verifica che tutti i nuovi campi siano presenti
+        const integrationChecks = {
+            hasImages: !!(config.images && config.images.main && config.images.summary),
+            hasDescription: !!(config.description && config.description.length > 50),
+            hasFeatures: !!(config.mainFeatures && config.mainFeatures.length >= 4),
+            hasEquipment: !!(config.includedEquipment && config.includedEquipment.length >= 5),
+            hasOldFields: !!(config.basic && config.additionalServices && config.email),
+            configComplete: true
+        };
+        
+        // Verifica integrità configurazione
+        const essentialFields = ['basic', 'images', 'description', 'mainFeatures', 'includedEquipment', 'additionalServices'];
+        integrationChecks.configComplete = essentialFields.every(field => !!config[field]);
+        
+        const passedChecks = Object.values(integrationChecks).filter(Boolean).length;
+        const totalChecks = Object.keys(integrationChecks).length;
+        const success = passedChecks === totalChecks;
+        
+        testResults.integration = success;
+        
+        if (success) {
+            document.getElementById('integration-results').innerHTML = `✅ Integrazione completa (${passedChecks}/${totalChecks})`;
+            document.getElementById('integration-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('integration-results').innerHTML = `⚠️ Integrazione parziale (${passedChecks}/${totalChecks})`;
+            document.getElementById('integration-test').className = 'test-section test-warning';
+        }
+        
+        document.getElementById('integration-details').textContent = JSON.stringify({
+            checks: integrationChecks,
+            configKeys: Object.keys(config),
+            totalSize: JSON.stringify(config).length
+        }, null, 2);
+        
+        updateSummary();
+        
+    } catch (error) {
+        testResults.integration = false;
+        document.getElementById('integration-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('integration-test').className = 'test-section test-error';
+        console.error('Errore test integrazione:', error);
+    }
+}
+
+function testSaveLoadCycle() {
+    try {
+        console.log('💾 Testando ciclo salvataggio/caricamento...');
+        
+        // Backup configurazione originale
+        const originalConfig = CatamaranStorage.load();
+        
+        // Crea configurazione di test
+        const testConfig = JSON.parse(JSON.stringify(originalConfig));
+        testConfig.images.main = 'https://test-image-main-' + Date.now() + '.jpg';
+        testConfig.description = 'Test description ' + Date.now();
+        testConfig.mainFeatures = ['Test feature 1', 'Test feature 2'];
+        testConfig.includedEquipment = ['Test equipment 1', 'Test equipment 2'];
+        
+        // Primo salvataggio
+        const saveResult1 = CatamaranStorage.save(testConfig);
+        
+        // Primo caricamento
+        const loadedConfig1 = CatamaranStorage.load();
+        
+        // Modifica e secondo salvataggio
+        loadedConfig1.description = 'Modified test description ' + Date.now();
+        const saveResult2 = CatamaranStorage.save(loadedConfig1);
+        
+        // Secondo caricamento
+        const loadedConfig2 = CatamaranStorage.load();
+        
+        // Verifica persistenza modifiche
+        const persistenceTest = loadedConfig2.description === loadedConfig1.description &&
+                               loadedConfig2.images.main === testConfig.images.main;
+        
+        // Ripristina configurazione originale
+        CatamaranStorage.save(originalConfig);
+        
+        const success = saveResult1 && saveResult2 && persistenceTest;
+        testResults.saveLoad = success;
+        
+        if (success) {
+            document.getElementById('save-load-results').innerHTML = '✅ Ciclo salvataggio/caricamento funzionante';
+            document.getElementById('save-load-test').className = 'test-section test-success';
+        } else {
+            document.getElementById('save-load-results').innerHTML = '❌ Problemi nel ciclo save/load';
+            document.getElementById('save-load-test').className = 'test-section test-error';
+        }
+        
+        document.getElementById('save-load-details').textContent = JSON.stringify({
+            saveResult1,
+            saveResult2,
+            persistenceTest,
+            testDescription: loadedConfig2.description
+        }, null, 2);
+        
+        updateSummary();
+        
+    } catch (error) {
+        testResults.saveLoad = false;
+        document.getElementById('save-load-results').innerHTML = '❌ Errore: ' + error.message;
+        document.getElementById('save-load-test').className = 'test-section test-error';
+        console.error('Errore test save/load:', error);
+    }
+}
+
+function updateSummary() {
+    const results = Object.values(testResults);
+    const passed = results.filter(Boolean).length;
+    const total = results.length;
+    
+    if (total === 0) return;
+    
+    const percentage = Math.round((passed / total) * 100);
+    let summaryClass = 'test-success';
+    if (percentage < 80) summaryClass = 'test-warning';
+    if (percentage < 60) summaryClass = 'test-error';
+    
+    const status = percentage >= 80 ? '✅ FASE 3 COMPLETATA' : 
+                  percentage >= 60 ? '⚠️ PROBLEMI PARZIALI' : 
+                  '❌ PROBLEMI CRITICI';
+    
+    document.getElementById('phase3-summary').innerHTML = `
+        <div class="${summaryClass}" style="padding: 15px; border-radius: 5px;">
+            <h3>📊 Risultati Test Fase 3</h3>
+            <p><strong>Test superati: ${passed}/${total} (${percentage}%)</strong></p>
+            <p><strong>Status: ${status}</strong></p>
+            <div style="margin-top: 15px;">
+                <strong>Dettagli Test:</strong><br>
+                🖼️ Immagini: ${testResults.images ? '✅' : '❌'}<br>
+                📝 Descrizione: ${testResults.description ? '✅' : '❌'}<br>
+                🔧 Caratteristiche: ${testResults.features ? '✅' : '❌'}<br>
+                🛠️ Dotazioni: ${testResults.equipment ? '✅' : '❌'}<br>
+                🔗 Integrazione: ${testResults.integration ? '✅' : '❌'}<br>
+                💾 Save/Load: ${testResults.saveLoad ? '✅' : '❌'}
+            </div>
+            ${percentage === 100 ? '<p style="margin-top: 10px; color: #4caf50; font-weight: bold;">🎉 TUTTI I CAMPI AMMINISTRATIVI IMPLEMENTATI E FUNZIONANTI!</p>' : ''}
+        </div>
+    `;
+}
+
+// Auto-test quando la pagina è caricata
+window.addEventListener('load', function() {
+    setTimeout(() => {
+        console.log('🚀 Avvio test automatico Fase 3...');
+        testImagesConfiguration();
+        setTimeout(() => testDescriptionConfiguration(), 500);
+        setTimeout(() => testFeaturesConfiguration(), 1000);
+        setTimeout(() => testEquipmentConfiguration(), 1500);
+        setTimeout(() => testCompleteIntegration(), 2000);
+        setTimeout(() => testSaveLoadCycle(), 2500);
+    }, 1000);
+});
+</script>
+
+</body>
+</html>

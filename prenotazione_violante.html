@@ -219,7 +219,7 @@ transform: translateX(26px);
 <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
 <div class="relative">
 <div class="swiper-container h-80">
-<img src="https://readdy.ai/api/search-image?query=luxury%2520catamaran%2520Fountaine%2520Pajot%252045%2520sailing%2520in%2520crystal%2520clear%2520turquoise%2520waters%2520near%2520Sardinia%2520coast%252C%2520Italy.%2520The%2520catamaran%2520is%2520white%2520with%2520elegant%2520lines%252C%2520spacious%2520deck%2520and%2520modern%2520design.%2520Beautiful%2520coastal%2520scenery%2520with%2520rocky%2520cliffs%2520and%2520sandy%2520beaches%2520visible%2520in%2520the%2520background.%2520Bright%2520sunny%2520day%2520with%2520deep%2520blue%2520sky.&width=1200&height=600&seq=10001&orientation=landscape" alt="Fountaine Pajot 45" class="w-full h-full object-cover object-top">
+<img id="catamaran-main-image" src="https://readdy.ai/api/search-image?query=luxury%2520catamaran%2520Fountaine%2520Pajot%252045%2520sailing%2520in%2520crystal%2520clear%2520turquoise%2520waters%2520near%2520Sardinia%2520coast%252C%2520Italy.%2520The%2520catamaran%2520is%2520white%2520with%2520elegant%2520lines%252C%2520spacious%2520deck%2520and%2520modern%2520design.%2520Beautiful%2520coastal%2520scenery%2520with%2520rocky%2520cliffs%2520and%2520sandy%2520beaches%2520visible%2520in%2520the%2520background.%2520Bright%2520sunny%2520day%2520with%2520deep%2520blue%2520sky.&width=1200&height=600&seq=10001&orientation=landscape" alt="Fountaine Pajot 45" class="w-full h-full object-cover object-top">
 </div>
 
 <!-- Badge Prezzo di Partenza -->
@@ -267,7 +267,7 @@ Altre foto
 </div>
 <div class="border-t border-gray-200 pt-6">
 <h3 class="text-lg font-semibold text-gray-900 mb-3">Descrizione</h3>
-<p class="text-gray-600 mb-4">Violante è il nostro Bali Catsmart, varato nel 2025, pensato per vivere il mare in modo confortevole e autentico. Ogni mattina può iniziare in una caletta tranquilla, con il comfort di casa a portata di mano.
+<p id="catamaran-description" class="text-gray-600 mb-4">Violante è il nostro Bali Catsmart, varato nel 2025, pensato per vivere il mare in modo confortevole e autentico. Ogni mattina può iniziare in una caletta tranquilla, con il comfort di casa a portata di mano.
 La dinette si apre sul pozzetto grazie a un portellone posteriore, creando uno spazio conviviale unico. A prua, un prendisole con tavolino sostituisce la classica rete, ideale per aperitivi e relax.
 Grazie al dissalatore da 200 litri/ora e all’energia garantita da pannelli solari e batterie a 220V, Violante offre piena autonomia. Il tender da 6 posti con motore da 9 cavalli consente di raggiungere facilmente la costa.
 Senza fly bridge, la randa più ampia garantisce prestazioni a vela superiori. Navigare con Violante è silenzioso, sostenibile e in armonia con la natura.
@@ -275,7 +275,7 @@ Salpa e vivi il mare con uno spirito libero e consapevole.</p>
 <div class="grid grid-cols-1 gap-4">
 <div>
 <h4 class="font-medium text-gray-900 mb-2">Caratteristiche principali:</h4>
-<ul class="space-y-1">
+<ul id="main-features-list" class="space-y-1">
 <li class="flex items-start">
 <div class="w-5 h-5 flex items-center justify-center text-primary mr-2 mt-0.5">
 <i class="ri-check-line"></i>
@@ -304,7 +304,7 @@ Salpa e vivi il mare con uno spirito libero e consapevole.</p>
 </div>
 <div>
 <h4 class="font-medium text-gray-900 mb-2">Dotazioni incluse:</h4>
-<ul class="space-y-1">
+<ul id="included-equipment-list" class="space-y-1">
 <li class="flex items-start">
 <div class="w-5 h-5 flex items-center justify-center text-primary mr-2 mt-0.5">
 <i class="ri-check-line"></i>
@@ -1750,13 +1750,43 @@ function loadCatamaranConfiguration() {
             console.log('✅ Skipper checkbox price aggiornato:', config.additionalServices.skipper.price);
         }
         
-        console.log('Configurazione catamarano caricata con successo');
+        // === FASE 3: Aggiorna contenuti dinamici ===
+        
+        // Aggiorna immagine principale del catamarano
+        if (config.images && config.images.main) {
+            const mainImage = document.getElementById('catamaran-main-image');
+            if (mainImage) {
+                mainImage.src = config.images.main;
+                console.log('✅ Immagine principale aggiornata');
+            }
+        }
+        
+        // Aggiorna descrizione del catamarano
+        if (config.description) {
+            updateElement('catamaran-description', config.description);
+        }
+        
+        // Aggiorna caratteristiche principali
+        if (config.mainFeatures && Array.isArray(config.mainFeatures)) {
+            updateMainFeaturesList(config.mainFeatures);
+        }
+        
+        // Aggiorna dotazioni incluse
+        if (config.includedEquipment && Array.isArray(config.includedEquipment)) {
+            updateIncludedEquipmentList(config.includedEquipment);
+        }
+        
+        console.log('✅ Configurazione catamarano caricata con successo (Fase 3 inclusa)');
         console.log('Dati caricati:', {
             name: config.basic.name,
             price: config.basic.basePrice,
             year: config.basic.year,
             linensPrice: config.mandatoryPackages.linens.pricePerGuest,
-            skipperPrice: config.additionalServices.skipper.price
+            skipperPrice: config.additionalServices.skipper.price,
+            hasImage: !!(config.images && config.images.main),
+            hasDescription: !!config.description,
+            featuresCount: config.mainFeatures ? config.mainFeatures.length : 0,
+            equipmentCount: config.includedEquipment ? config.includedEquipment.length : 0
         });
         
     } catch (error) {
@@ -1782,6 +1812,76 @@ function updateElement(id, content, fallbackValue = null) {
         }
     } catch (error) {
         console.error(`❌ Errore aggiornamento elemento ${id}:`, error);
+        return false;
+    }
+}
+
+// === FASE 3: Funzioni helper per aggiornamento contenuti dinamici ===
+
+// Aggiorna lista caratteristiche principali
+function updateMainFeaturesList(features) {
+    try {
+        const featuresList = document.getElementById('main-features-list');
+        if (!featuresList) {
+            console.warn('⚠️ Lista caratteristiche principali non trovata');
+            return false;
+        }
+        
+        // Svuota la lista esistente
+        featuresList.innerHTML = '';
+        
+        // Aggiungi ogni caratteristica
+        features.forEach(feature => {
+            const li = document.createElement('li');
+            li.className = 'flex items-start';
+            li.innerHTML = `
+                <div class="w-5 h-5 flex items-center justify-center text-primary mr-2 mt-0.5">
+                    <i class="ri-check-line"></i>
+                </div>
+                <span class="text-gray-700">${feature}</span>
+            `;
+            featuresList.appendChild(li);
+        });
+        
+        console.log(`✅ Aggiornate ${features.length} caratteristiche principali`);
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Errore aggiornamento caratteristiche:', error);
+        return false;
+    }
+}
+
+// Aggiorna lista dotazioni incluse
+function updateIncludedEquipmentList(equipment) {
+    try {
+        const equipmentList = document.getElementById('included-equipment-list');
+        if (!equipmentList) {
+            console.warn('⚠️ Lista dotazioni incluse non trovata');
+            return false;
+        }
+        
+        // Svuota la lista esistente
+        equipmentList.innerHTML = '';
+        
+        // Aggiungi ogni dotazione
+        equipment.forEach(item => {
+            const li = document.createElement('li');
+            li.className = 'flex items-start';
+            li.innerHTML = `
+                <div class="w-5 h-5 flex items-center justify-center text-primary mr-2 mt-0.5">
+                    <i class="ri-check-line"></i>
+                </div>
+                <span class="text-gray-700">${item}</span>
+            `;
+            equipmentList.appendChild(li);
+        });
+        
+        console.log(`✅ Aggiornate ${equipment.length} dotazioni incluse`);
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Errore aggiornamento dotazioni:', error);
         return false;
     }
 }

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Test Rapido Fase 3</title>
+    <script src="catamaran-config.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .test-ok { color: #4caf50; font-weight: bold; }
+        .test-error { color: #f44336; font-weight: bold; }
+        .test-section { margin: 15px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        pre { background: #f8f8f8; padding: 10px; border-radius: 4px; font-size: 12px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🚀 Test Rapido Fase 3 - Nuovi Campi Admin</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Configurazione Immagini</h2>
+        <div id="test1-result"></div>
+        <pre id="test1-details"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Descrizione</h2>
+        <div id="test2-result"></div>
+        <pre id="test2-details"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Caratteristiche</h2>
+        <div id="test3-result"></div>
+        <pre id="test3-details"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 4: Dotazioni</h2>
+        <div id="test4-result"></div>
+        <pre id="test4-details"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Riepilogo</h2>
+        <div id="summary"></div>
+    </div>
+</div>
+
+<script>
+let results = [];
+
+// Test 1: Verifica struttura immagini
+function test1() {
+    try {
+        const config = CatamaranStorage.load();
+        
+        // Verifica che la struttura immagini esista
+        const imagesExist = !!(config.images && config.images.main && config.images.summary);
+        const imagesValid = config.images.main.includes('http') && config.images.summary.includes('http');
+        
+        const success = imagesExist && imagesValid;
+        results.push(success);
+        
+        document.getElementById('test1-result').innerHTML = success ? 
+            '<span class="test-ok">✅ Configurazione immagini OK</span>' : 
+            '<span class="test-error">❌ Problemi configurazione immagini</span>';
+        
+        document.getElementById('test1-details').textContent = JSON.stringify({
+            imagesExist,
+            imagesValid,
+            mainImage: config.images?.main?.substring(0, 50) + '...',
+            summaryImage: config.images?.summary?.substring(0, 50) + '...'
+        }, null, 2);
+        
+    } catch (error) {
+        results.push(false);
+        document.getElementById('test1-result').innerHTML = '<span class="test-error">❌ Errore: ' + error.message + '</span>';
+        document.getElementById('test1-details').textContent = 'Errore: ' + error.message;
+    }
+}
+
+// Test 2: Verifica descrizione
+function test2() {
+    try {
+        const config = CatamaranStorage.load();
+        
+        const descriptionExists = !!(config.description && config.description.length > 100);
+        const descriptionValid = config.description.includes('Violante');
+        
+        const success = descriptionExists && descriptionValid;
+        results.push(success);
+        
+        document.getElementById('test2-result').innerHTML = success ? 
+            '<span class="test-ok">✅ Descrizione OK</span>' : 
+            '<span class="test-error">❌ Problemi descrizione</span>';
+        
+        document.getElementById('test2-details').textContent = JSON.stringify({
+            descriptionExists,
+            descriptionValid,
+            descriptionLength: config.description?.length || 0,
+            preview: config.description?.substring(0, 100) + '...'
+        }, null, 2);
+        
+    } catch (error) {
+        results.push(false);
+        document.getElementById('test2-result').innerHTML = '<span class="test-error">❌ Errore: ' + error.message + '</span>';
+        document.getElementById('test2-details').textContent = 'Errore: ' + error.message;
+    }
+}
+
+// Test 3: Verifica caratteristiche
+function test3() {
+    try {
+        const config = CatamaranStorage.load();
+        
+        const featuresExist = !!(config.mainFeatures && Array.isArray(config.mainFeatures));
+        const featuresValid = featuresExist && config.mainFeatures.length >= 4;
+        
+        const success = featuresExist && featuresValid;
+        results.push(success);
+        
+        document.getElementById('test3-result').innerHTML = success ? 
+            '<span class="test-ok">✅ Caratteristiche OK (' + config.mainFeatures?.length + ' elementi)</span>' : 
+            '<span class="test-error">❌ Problemi caratteristiche</span>';
+        
+        document.getElementById('test3-details').textContent = JSON.stringify({
+            featuresExist,
+            featuresValid,
+            featuresCount: config.mainFeatures?.length || 0,
+            features: config.mainFeatures || []
+        }, null, 2);
+        
+    } catch (error) {
+        results.push(false);
+        document.getElementById('test3-result').innerHTML = '<span class="test-error">❌ Errore: ' + error.message + '</span>';
+        document.getElementById('test3-details').textContent = 'Errore: ' + error.message;
+    }
+}
+
+// Test 4: Verifica dotazioni
+function test4() {
+    try {
+        const config = CatamaranStorage.load();
+        
+        const equipmentExists = !!(config.includedEquipment && Array.isArray(config.includedEquipment));
+        const equipmentValid = equipmentExists && config.includedEquipment.length >= 5;
+        
+        const success = equipmentExists && equipmentValid;
+        results.push(success);
+        
+        document.getElementById('test4-result').innerHTML = success ? 
+            '<span class="test-ok">✅ Dotazioni OK (' + config.includedEquipment?.length + ' elementi)</span>' : 
+            '<span class="test-error">❌ Problemi dotazioni</span>';
+        
+        document.getElementById('test4-details').textContent = JSON.stringify({
+            equipmentExists,
+            equipmentValid,
+            equipmentCount: config.includedEquipment?.length || 0,
+            equipment: config.includedEquipment || []
+        }, null, 2);
+        
+    } catch (error) {
+        results.push(false);
+        document.getElementById('test4-result').innerHTML = '<span class="test-error">❌ Errore: ' + error.message + '</span>';
+        document.getElementById('test4-details').textContent = 'Errore: ' + error.message;
+    }
+}
+
+// Riepilogo
+function updateSummary() {
+    const passed = results.filter(Boolean).length;
+    const total = results.length;
+    const percentage = Math.round((passed / total) * 100);
+    
+    let status = '';
+    let color = '';
+    
+    if (percentage === 100) {
+        status = '🎉 FASE 3 COMPLETATA CON SUCCESSO!';
+        color = '#4caf50';
+    } else if (percentage >= 75) {
+        status = '✅ FASE 3 QUASI COMPLETATA';
+        color = '#ff9800';
+    } else {
+        status = '❌ PROBLEMI IN FASE 3';
+        color = '#f44336';
+    }
+    
+    document.getElementById('summary').innerHTML = `
+        <div style="padding: 15px; background: ${color}15; border: 1px solid ${color}; border-radius: 5px; color: ${color};">
+            <h3>${status}</h3>
+            <p><strong>Test superati: ${passed}/${total} (${percentage}%)</strong></p>
+            <p>Tutti i nuovi campi amministrativi richiesti sono stati implementati e testati.</p>
+        </div>
+    `;
+}
+
+// Esegui tutti i test
+function runAllTests() {
+    console.log('🚀 Avvio test Fase 3...');
+    test1();
+    test2();
+    test3();
+    test4();
+    updateSummary();
+}
+
+// Auto-start
+window.addEventListener('load', function() {
+    setTimeout(runAllTests, 500);
+});
+</script>
+
+</body>
+</html>

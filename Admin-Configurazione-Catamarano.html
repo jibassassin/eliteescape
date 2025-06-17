@@ -246,6 +246,150 @@ class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focu
     </div>
 </div>
 
+<!-- Carosello Immagini -->
+<div class="mt-8">
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-200">
+<h2 class="text-lg font-semibold text-gray-900">Carosello Immagini</h2>
+</div>
+<div class="p-6 space-y-6">
+
+<!-- Immagine Principale -->
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Immagine Principale</label>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+<div>
+<input type="url" id="admin-main-image" 
+placeholder="https://esempio.com/immagine-principale.jpg"
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+<p class="mt-1 text-xs text-gray-500">URL dell'immagine principale del catamarano (1200x600px consigliato)</p>
+</div>
+<div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+<label class="block text-sm font-medium text-gray-700 mb-2">Anteprima</label>
+<div id="main-image-preview" class="w-full h-32 bg-gray-200 rounded-lg flex items-center justify-center">
+<span class="text-gray-500 text-sm">Inserisci URL per vedere anteprima</span>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Immagine Riassunto -->
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Immagine Riassunto</label>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+<div>
+<input type="url" id="admin-summary-image" 
+placeholder="https://esempio.com/immagine-riassunto.jpg"
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+<p class="mt-1 text-xs text-gray-500">URL dell'immagine per il riassunto (100x100px consigliato)</p>
+</div>
+<div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+<label class="block text-sm font-medium text-gray-700 mb-2">Anteprima</label>
+<div id="summary-image-preview" class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center mx-auto">
+<span class="text-gray-500 text-xs">Preview</span>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Upload Futuro -->
+<div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+<div class="flex items-center">
+<i class="ri-information-line text-blue-600 mr-2"></i>
+<div>
+<h4 class="text-sm font-medium text-blue-900">Funzione Upload</h4>
+<p class="text-sm text-blue-700">Il sistema di upload diretto delle immagini sarà implementato in una versione futura. Per ora utilizza URL esterni.</p>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- Descrizione Catamarano -->
+<div class="mt-8">
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-200">
+<h2 class="text-lg font-semibold text-gray-900">Descrizione Catamarano</h2>
+</div>
+<div class="p-6">
+
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-2">Descrizione Completa</label>
+<textarea id="admin-description" rows="8" 
+placeholder="Inserisci qui la descrizione dettagliata del catamarano..."
+class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary resize-none"></textarea>
+<p class="mt-2 text-xs text-gray-500">
+<i class="ri-lightbulb-line mr-1"></i>
+Suggerimento: Usa \n per andare a capo nella descrizione
+</p>
+</div>
+
+<!-- Anteprima Descrizione -->
+<div class="mt-6 border border-gray-200 rounded-lg p-4 bg-gray-50">
+<label class="block text-sm font-medium text-gray-700 mb-2">Anteprima Descrizione</label>
+<div id="description-preview" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+La descrizione apparirà qui mentre digiti...
+</div>
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- Caratteristiche Principali -->
+<div class="mt-8">
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-200">
+<div class="flex justify-between items-center">
+<h2 class="text-lg font-semibold text-gray-900">Caratteristiche Principali</h2>
+<button type="button" id="add-feature-btn" class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-opacity-90">
+<i class="ri-add-line mr-1"></i>Aggiungi
+</button>
+</div>
+</div>
+<div class="p-6">
+
+<div id="main-features-container" class="space-y-3">
+<!-- Le caratteristiche verranno generate dinamicamente -->
+</div>
+
+<div class="mt-4 text-xs text-gray-500">
+<i class="ri-information-line mr-1"></i>
+Le caratteristiche principali vengono mostrate come bullet point nella pagina di prenotazione
+</div>
+
+</div>
+</div>
+</div>
+
+<!-- Dotazioni Incluse -->
+<div class="mt-8">
+<div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-200">
+<div class="flex justify-between items-center">
+<h2 class="text-lg font-semibold text-gray-900">Dotazioni Incluse</h2>
+<button type="button" id="add-equipment-btn" class="bg-primary text-white px-3 py-1 rounded text-sm hover:bg-opacity-90">
+<i class="ri-add-line mr-1"></i>Aggiungi
+</button>
+</div>
+</div>
+<div class="p-6">
+
+<div id="included-equipment-container" class="space-y-3">
+<!-- Le dotazioni verranno generate dinamicamente -->
+</div>
+
+<div class="mt-4 text-xs text-gray-500">
+<i class="ri-information-line mr-1"></i>
+Le dotazioni incluse vengono mostrate come lista nella pagina di prenotazione
+</div>
+
+</div>
+</div>
+</div>
+
 <!-- Prezzi Pacchetti -->
 <div>
 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -1067,6 +1211,15 @@ window.saveConfiguration = function() {
         // Aggiorna servizi aggiuntivi
         saveAdditionalServices(config);
         
+        // Aggiorna immagini
+        saveImagesConfiguration(config);
+        
+        // Aggiorna descrizione
+        saveDescriptionConfiguration(config);
+        
+        // Aggiorna caratteristiche e dotazioni
+        saveFeaturesAndEquipmentConfiguration(config);
+        
         // Aggiorna logo
         const logoTextInput = document.getElementById('admin-logo-text');
         if (logoTextInput && logoTextInput.value) {
@@ -1224,6 +1377,15 @@ window.loadConfiguration = function() {
         
         // Carica servizi aggiuntivi
         loadAdditionalServices(config);
+        
+        // Carica immagini
+        loadImagesConfiguration(config);
+        
+        // Carica descrizione
+        loadDescriptionConfiguration(config);
+        
+        // Carica caratteristiche e dotazioni
+        loadFeaturesAndEquipmentConfiguration(config);
         
         // Carica logo
         const logoTextInput = document.getElementById('admin-logo-text');
@@ -2228,6 +2390,285 @@ function loadAdditionalServices(config) {
     }
 }
 
+// === GESTIONE IMMAGINI ===
+
+function saveImagesConfiguration(config) {
+    try {
+        console.log('🖼️ Salvando configurazione immagini...');
+        
+        // Assicurati che la struttura images esista
+        if (!config.images) {
+            config.images = {
+                main: "",
+                summary: ""
+            };
+        }
+        
+        const mainImageInput = document.getElementById('admin-main-image');
+        const summaryImageInput = document.getElementById('admin-summary-image');
+        
+        if (mainImageInput && mainImageInput.value) {
+            config.images.main = mainImageInput.value;
+            console.log('Immagine principale aggiornata:', mainImageInput.value);
+        }
+        
+        if (summaryImageInput && summaryImageInput.value) {
+            config.images.summary = summaryImageInput.value;
+            console.log('Immagine riassunto aggiornata:', summaryImageInput.value);
+        }
+        
+        console.log('✅ Configurazione immagini salvata');
+        
+    } catch (error) {
+        console.error('❌ Errore salvataggio immagini:', error);
+        throw error;
+    }
+}
+
+function loadImagesConfiguration(config) {
+    try {
+        console.log('🔄 Caricando configurazione immagini...');
+        
+        if (!config.images) return;
+        
+        const mainImageInput = document.getElementById('admin-main-image');
+        const summaryImageInput = document.getElementById('admin-summary-image');
+        const mainImagePreview = document.getElementById('main-image-preview');
+        const summaryImagePreview = document.getElementById('summary-image-preview');
+        
+        if (mainImageInput && config.images.main) {
+            mainImageInput.value = config.images.main;
+        }
+        
+        if (summaryImageInput && config.images.summary) {
+            summaryImageInput.value = config.images.summary;
+        }
+        
+        // Aggiorna anteprime
+        updateImagePreview('main', config.images.main);
+        updateImagePreview('summary', config.images.summary);
+        
+        console.log('✅ Configurazione immagini caricata');
+        
+    } catch (error) {
+        console.error('❌ Errore caricamento immagini:', error);
+    }
+}
+
+function updateImagePreview(type, imageUrl) {
+    const previewElement = document.getElementById(`${type}-image-preview`);
+    if (!previewElement || !imageUrl) return;
+    
+    if (imageUrl && imageUrl.startsWith('http')) {
+        if (type === 'main') {
+            previewElement.innerHTML = `<img src="${imageUrl}" alt="Anteprima principale" class="w-full h-full object-cover rounded-lg">`;
+        } else {
+            previewElement.innerHTML = `<img src="${imageUrl}" alt="Anteprima riassunto" class="w-full h-full object-cover rounded-lg">`;
+        }
+    } else {
+        const defaultText = type === 'main' ? 'Inserisci URL per vedere anteprima' : 'Preview';
+        previewElement.innerHTML = `<span class="text-gray-500 text-sm">${defaultText}</span>`;
+    }
+}
+
+// === GESTIONE DESCRIZIONE ===
+
+function saveDescriptionConfiguration(config) {
+    try {
+        console.log('📝 Salvando descrizione...');
+        
+        const descriptionInput = document.getElementById('admin-description');
+        
+        if (descriptionInput && descriptionInput.value) {
+            config.description = descriptionInput.value;
+            console.log('Descrizione aggiornata:', descriptionInput.value.substring(0, 100) + '...');
+        }
+        
+        console.log('✅ Descrizione salvata');
+        
+    } catch (error) {
+        console.error('❌ Errore salvataggio descrizione:', error);
+        throw error;
+    }
+}
+
+function loadDescriptionConfiguration(config) {
+    try {
+        console.log('🔄 Caricando descrizione...');
+        
+        const descriptionInput = document.getElementById('admin-description');
+        const descriptionPreview = document.getElementById('description-preview');
+        
+        if (descriptionInput && config.description) {
+            descriptionInput.value = config.description;
+        }
+        
+        if (descriptionPreview && config.description) {
+            descriptionPreview.textContent = config.description;
+        }
+        
+        console.log('✅ Descrizione caricata');
+        
+    } catch (error) {
+        console.error('❌ Errore caricamento descrizione:', error);
+    }
+}
+
+function updateDescriptionPreview() {
+    const descriptionInput = document.getElementById('admin-description');
+    const descriptionPreview = document.getElementById('description-preview');
+    
+    if (descriptionInput && descriptionPreview) {
+        descriptionPreview.textContent = descriptionInput.value || 'La descrizione apparirà qui mentre digiti...';
+    }
+}
+
+// === GESTIONE CARATTERISTICHE E DOTAZIONI ===
+
+function saveFeaturesAndEquipmentConfiguration(config) {
+    try {
+        console.log('🔧 Salvando caratteristiche e dotazioni...');
+        
+        // Salva caratteristiche principali
+        const featureInputs = document.querySelectorAll('.main-feature-input');
+        const features = [];
+        featureInputs.forEach(input => {
+            if (input.value.trim()) {
+                features.push(input.value.trim());
+            }
+        });
+        config.mainFeatures = features;
+        
+        // Salva dotazioni incluse
+        const equipmentInputs = document.querySelectorAll('.included-equipment-input');
+        const equipment = [];
+        equipmentInputs.forEach(input => {
+            if (input.value.trim()) {
+                equipment.push(input.value.trim());
+            }
+        });
+        config.includedEquipment = equipment;
+        
+        console.log(`✅ Salvate ${features.length} caratteristiche e ${equipment.length} dotazioni`);
+        
+    } catch (error) {
+        console.error('❌ Errore salvataggio caratteristiche/dotazioni:', error);
+        throw error;
+    }
+}
+
+function loadFeaturesAndEquipmentConfiguration(config) {
+    try {
+        console.log('🔄 Caricando caratteristiche e dotazioni...');
+        
+        // Carica caratteristiche principali
+        const featuresContainer = document.getElementById('main-features-container');
+        if (featuresContainer) {
+            featuresContainer.innerHTML = '';
+            if (config.mainFeatures && config.mainFeatures.length > 0) {
+                config.mainFeatures.forEach((feature, index) => {
+                    addFeatureItem(feature, index);
+                });
+            } else {
+                addFeatureItem('', 0); // Aggiungi almeno un campo vuoto
+            }
+        }
+        
+        // Carica dotazioni incluse
+        const equipmentContainer = document.getElementById('included-equipment-container');
+        if (equipmentContainer) {
+            equipmentContainer.innerHTML = '';
+            if (config.includedEquipment && config.includedEquipment.length > 0) {
+                config.includedEquipment.forEach((equipment, index) => {
+                    addEquipmentItem(equipment, index);
+                });
+            } else {
+                addEquipmentItem('', 0); // Aggiungi almeno un campo vuoto
+            }
+        }
+        
+        console.log('✅ Caratteristiche e dotazioni caricate');
+        
+    } catch (error) {
+        console.error('❌ Errore caricamento caratteristiche/dotazioni:', error);
+    }
+}
+
+function addFeatureItem(value = '', index = 0) {
+    const container = document.getElementById('main-features-container');
+    if (!container) return;
+    
+    const featureItem = document.createElement('div');
+    featureItem.className = 'flex items-center space-x-3';
+    featureItem.innerHTML = `
+        <div class="flex-1">
+            <input type="text" class="main-feature-input w-full px-3 py-2 border border-gray-300 rounded text-sm focus:border-primary" 
+                   value="${value}" placeholder="Inserisci caratteristica principale...">
+        </div>
+        <button type="button" class="remove-feature-btn text-red-600 hover:text-red-800 p-1" title="Rimuovi">
+            <i class="ri-delete-bin-line"></i>
+        </button>
+    `;
+    
+    container.appendChild(featureItem);
+    
+    // Aggiungi event listener per rimozione
+    const removeBtn = featureItem.querySelector('.remove-feature-btn');
+    removeBtn.addEventListener('click', function() {
+        featureItem.remove();
+        autoSaveConfiguration();
+    });
+    
+    // Aggiungi event listener per auto-save
+    const input = featureItem.querySelector('.main-feature-input');
+    input.addEventListener('input', autoSaveConfiguration);
+}
+
+function addEquipmentItem(value = '', index = 0) {
+    const container = document.getElementById('included-equipment-container');
+    if (!container) return;
+    
+    const equipmentItem = document.createElement('div');
+    equipmentItem.className = 'flex items-center space-x-3';
+    equipmentItem.innerHTML = `
+        <div class="flex-1">
+            <input type="text" class="included-equipment-input w-full px-3 py-2 border border-gray-300 rounded text-sm focus:border-primary" 
+                   value="${value}" placeholder="Inserisci dotazione inclusa...">
+        </div>
+        <button type="button" class="remove-equipment-btn text-red-600 hover:text-red-800 p-1" title="Rimuovi">
+            <i class="ri-delete-bin-line"></i>
+        </button>
+    `;
+    
+    container.appendChild(equipmentItem);
+    
+    // Aggiungi event listener per rimozione
+    const removeBtn = equipmentItem.querySelector('.remove-equipment-btn');
+    removeBtn.addEventListener('click', function() {
+        equipmentItem.remove();
+        autoSaveConfiguration();
+    });
+    
+    // Aggiungi event listener per auto-save
+    const input = equipmentItem.querySelector('.included-equipment-input');
+    input.addEventListener('input', autoSaveConfiguration);
+}
+
+function autoSaveConfiguration() {
+    // Salva automaticamente dopo una breve pausa
+    clearTimeout(window.autoSaveTimeout);
+    window.autoSaveTimeout = setTimeout(() => {
+        try {
+            const config = CatamaranStorage.load();
+            saveFeaturesAndEquipmentConfiguration(config);
+            CatamaranStorage.save(config);
+            console.log('🔄 Auto-save caratteristiche/dotazioni completato');
+        } catch (error) {
+            console.error('❌ Errore auto-save:', error);
+        }
+    }, 1000);
+}
+
 // Inizializzazione
 window.addEventListener('load', function() {
     console.log('🚀 Admin panel caricato');
@@ -2448,8 +2889,70 @@ window.addEventListener('load', function() {
         
         console.log(`✓ ${serviceInputsFound} campi servizi aggiuntivi collegati con auto-save`);
         
+        // Collega event listeners per nuovi campi
+        
+        // Immagini
+        const mainImageInput = document.getElementById('admin-main-image');
+        const summaryImageInput = document.getElementById('admin-summary-image');
+        
+        if (mainImageInput) {
+            mainImageInput.addEventListener('input', function() {
+                updateImagePreview('main', this.value);
+                // Auto-save
+                const config = CatamaranStorage.load();
+                saveImagesConfiguration(config);
+                CatamaranStorage.save(config);
+            });
+            console.log('✓ Input immagine principale collegato');
+        }
+        
+        if (summaryImageInput) {
+            summaryImageInput.addEventListener('input', function() {
+                updateImagePreview('summary', this.value);
+                // Auto-save
+                const config = CatamaranStorage.load();
+                saveImagesConfiguration(config);
+                CatamaranStorage.save(config);
+            });
+            console.log('✓ Input immagine riassunto collegato');
+        }
+        
+        // Descrizione
+        const descriptionInput = document.getElementById('admin-description');
+        if (descriptionInput) {
+            descriptionInput.addEventListener('input', function() {
+                updateDescriptionPreview();
+                // Auto-save con debounce
+                clearTimeout(window.descriptionSaveTimeout);
+                window.descriptionSaveTimeout = setTimeout(() => {
+                    const config = CatamaranStorage.load();
+                    saveDescriptionConfiguration(config);
+                    CatamaranStorage.save(config);
+                }, 1000);
+            });
+            console.log('✓ Input descrizione collegato');
+        }
+        
+        // Pulsanti aggiungi caratteristiche e dotazioni
+        const addFeatureBtn = document.getElementById('add-feature-btn');
+        const addEquipmentBtn = document.getElementById('add-equipment-btn');
+        
+        if (addFeatureBtn) {
+            addFeatureBtn.addEventListener('click', function() {
+                addFeatureItem();
+            });
+            console.log('✓ Pulsante aggiungi caratteristica collegato');
+        }
+        
+        if (addEquipmentBtn) {
+            addEquipmentBtn.addEventListener('click', function() {
+                addEquipmentItem();
+            });
+            console.log('✓ Pulsante aggiungi dotazione collegato');
+        }
+        
         console.log('📅 Calendario prezzi settimanali inizializzato');
-        console.log('✅ Inizializzazione completata');
+        console.log('✅ Inizializzazione completata con nuovi campi');
         
     } catch (error) {
         console.error('❌ Errore inizializzazione:', error);
