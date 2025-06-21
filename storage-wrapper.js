@@ -37,6 +37,9 @@ if (typeof CatamaranStorage !== 'undefined') {
           }
         } else {
           console.warn('⚠️ Errore sincronizzazione Supabase:', response.error);
+          if (response.needsRLSSetup) {
+            console.warn('🔧 CONFIGURAZIONE RICHIESTA: Vai su Dashboard Supabase per configurare le policy RLS');
+          }
         }
         
         SYNC_IN_PROGRESS = false;
@@ -77,6 +80,9 @@ if (typeof CatamaranStorage !== 'undefined') {
         }
       }).catch(error => {
         console.warn('⚠️ Errore caricamento Supabase:', error);
+        if (error.message?.includes('40') || error.message?.includes('RLS')) {
+          console.warn('🔧 POSSIBILE PROBLEMA RLS: Controlla policy nel Dashboard Supabase');
+        }
       });
     } else if (SYNC_IN_PROGRESS) {
       console.log('⏸️ Sync automatica sospesa - salvataggio in corso');
@@ -148,6 +154,51 @@ if (typeof CatamaranStorage !== 'undefined') {
   CatamaranStorage.setSupabaseEnabled = function(enabled) {
     SUPABASE_ENABLED = !!enabled;
     console.log(`📡 Supabase ${SUPABASE_ENABLED ? 'abilitato' : 'disabilitato'}`);
+  };
+  
+  // Funzione per forzare refresh da Supabase
+  CatamaranStorage.forceRefresh = function() {
+    return new Promise((resolve) => {
+      console.log('🔄 CatamaranStorage.forceRefresh() chiamato');
+      console.log('📊 SUPABASE_ENABLED:', SUPABASE_ENABLED);
+      console.log('📊 window.SupabaseManager:', !!window.SupabaseManager);
+      
+      if (!SUPABASE_ENABLED || !window.SupabaseManager) {
+        console.warn('❌ Supabase non disponibile per refresh');
+        resolve({ success: false, error: 'Supabase non disponibile' });
+        return;
+      }
+      
+      console.log('📡 Chiamando SupabaseManager.refresh()...');
+      window.SupabaseManager.refresh().then(response => {
+        console.log('📥 Risposta SupabaseManager.refresh():', response);
+        
+        if (response.success && response.config) {
+          const currentConfig = originalLoad.call(CatamaranStorage);
+          console.log('🔍 Confronto configurazioni...');
+          console.log('📄 Config corrente locale:', !!currentConfig);
+          console.log('📄 Config da Supabase:', !!response.config);
+          
+          // Salva sempre la nuova config
+          originalSave.call(CatamaranStorage, response.config);
+          console.log('💾 Configurazione salvata localmente');
+          
+          // Notifica che la configurazione è stata aggiornata
+          if (typeof window.onConfigUpdated === 'function') {
+            console.log('📢 Notificando aggiornamento configurazione');
+            window.onConfigUpdated(response.config);
+          }
+          
+          resolve({ success: true, config: response.config, refreshed: true });
+        } else {
+          console.warn('⚠️ Refresh fallito o nessuna config:', response.error);
+          resolve({ success: false, error: response.error || 'Refresh fallito' });
+        }
+      }).catch(error => {
+        console.error('❌ Errore SupabaseManager.refresh():', error);
+        resolve({ success: false, error: error.message });
+      });
+    });
   };
   
   console.log('🔗 Storage wrapper inizializzato - localStorage + Supabase');

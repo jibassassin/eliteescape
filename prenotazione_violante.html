@@ -1511,7 +1511,15 @@ const fuelPackage = 350;
 const linensElement = document.getElementById('linens-detail-price');
 const cleaningFee = linensElement ? parseInt(linensElement.textContent) : 120;
 const partialTotal = basePrice + charterPackage + fuelPackage + cleaningFee;
-document.getElementById('partial-total').textContent = `€${partialTotal}`;
+
+// Fix: controlla se l'elemento esiste prima di aggiornarlo
+const partialTotalElement = document.getElementById('partial-total');
+if (partialTotalElement) {
+    partialTotalElement.textContent = `€${partialTotal}`;
+    console.log(`💰 Partial total aggiornato: €${partialTotal}`);
+} else {
+    console.warn('⚠️ Elemento partial-total non trovato nell HTML');
+}
 }
 function updateTotalPrice() {
 const basePrice = 3500;
@@ -2170,6 +2178,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         } else {
                             console.log('ℹ️ Sincronizzazione Supabase: nessun aggiornamento disponibile');
                         }
+                        
+                        // 🔄 FORCE REFRESH SEMPRE (non solo incognito)
+                        if (typeof CatamaranStorage.forceRefresh === 'function') {
+                            console.log('🔄 Force refresh da Supabase...');
+                            const refreshResult = await CatamaranStorage.forceRefresh();
+                            if (refreshResult.success) {
+                                console.log('✅ Force refresh completato - dati aggiornati da Supabase');
+                            } else {
+                                console.warn('⚠️ Force refresh fallito:', refreshResult.error);
+                            }
+                        }
                     } catch (error) {
                         console.warn('⚠️ Sincronizzazione Supabase fallita, uso localStorage:', error);
                     }
@@ -2255,6 +2274,28 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 300);
     }
+    
+    // 🔄 REFRESH PERIODICO per tutti i browser
+    setInterval(async () => {
+        try {
+            console.log('⏰ Refresh periodico da Supabase...');
+            
+            if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.forceRefresh) {
+                const refreshResult = await CatamaranStorage.forceRefresh();
+                if (refreshResult.success) {
+                    console.log('🔄 Configurazione aggiornata automaticamente da Supabase');
+                    // Ricarica i componenti principali
+                    loadCatamaranConfiguration();
+                    renderAdditionalServices();
+                    updateSkipperService();
+                } else {
+                    console.log('📋 Nessun aggiornamento disponibile');
+                }
+            }
+        } catch (error) {
+            console.warn('⚠️ Errore refresh periodico:', error);
+        }
+    }, 15000); // Ogni 15 secondi per test più rapido
 });
 
 // === GESTIONE LOADING SCREEN ===

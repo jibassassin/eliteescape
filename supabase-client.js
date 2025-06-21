@@ -65,6 +65,16 @@ function saveConfigToSupabase(config) {
         return;
       }
 
+      // 🔐 CONTROLLO AUTENTICAZIONE RLS
+      const { data: { session } } = await client.auth.getSession();
+      if (!session?.user) {
+        console.warn('🚫 Tentativo di salvataggio senza autenticazione');
+        resolve({ success: false, error: 'Autenticazione richiesta per salvare le configurazioni' });
+        return;
+      }
+
+      console.log('🔑 Utente autenticato per salvataggio:', session.user.email);
+
       // Controlla dimensione config per debug
       const configSize = JSON.stringify(config).length;
       console.log(`📊 Dimensione configurazione: ${(configSize / 1024).toFixed(1)}KB`);
@@ -98,15 +108,21 @@ function saveConfigToSupabase(config) {
         result = await client
           .from('configurations')
           .insert([{ 
-            config_data: config
+            config_data: config,
+            created_by: session.user.id
           }]);
       }
 
       if (result.error) {
         console.error('❌ Errore dettagliato Supabase:', result.error);
-        resolve({ success: false, error: result.error.message, details: result.error });
+        if (result.error.code === '42501') {
+          console.error('🚫 ERRORE RLS: Policy non configurata. Vai su Dashboard Supabase → SQL Editor e esegui:');
+          console.error('CREATE POLICY "Lettura pubblica configurazioni" ON public.configurations FOR SELECT USING (true);');
+          console.error('CREATE POLICY "Scrittura solo admin autenticati" ON public.configurations FOR ALL USING (EXISTS (SELECT 1 FROM public.admin_profiles WHERE id = auth.uid()));');
+        }
+        resolve({ success: false, error: result.error.message, details: result.error, needsRLSSetup: result.error.code === '42501' });
       } else {
-        console.log('✅ Salvataggio Supabase completato');
+        console.log('✅ Salvataggio Supabase completato con RLS');
         resolve({ success: true, data: result.data });
       }
     } catch (err) {
@@ -125,18 +141,69 @@ function loadConfigFromSupabase() {
         return;
       }
 
+      // 🔐 CONTROLLO AUTENTICAZIONE RLS (per accesso admin)
+      const { data: { session } } = await client.auth.getSession();
+      if (!session?.user) {
+        console.log('📖 Caricamento pubblico configurazione (modalità guest)');
+      } else {
+        console.log('🔑 Utente autenticato per caricamento:', session.user.email);
+      }
+
       const { data, error } = await client
         .from('configurations')
-        .select('config_data')
+        .select('config_data, id')
+        .order('id', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        console.warn('⚠️ Errore caricamento Supabase (potrebbero mancare policy RLS):', error.message);
+        resolve({ success: false, error: error.message, needsRLSSetup: true });
+      } else if (data && data.length > 0) {
+        console.log('📥 Configurazione caricata da Supabase con RLS');
+        resolve({ 
+          success: true, 
+          config: data[0].config_data,
+          configId: data[0].id
+        });
+      } else {
+        resolve({ success: true, config: null }); // Nessuna configurazione trovata
+      }
+    } catch (err) {
+      resolve({ success: false, error: err.message });
+    }
+  });
+}
+
+// Funzione per forzare il refresh della configurazione
+function forceRefreshConfig() {
+  return new Promise(async (resolve) => {
+    try {
+      const client = initializeSupabase();
+      if (!client) {
+        resolve({ success: false, error: 'Client non inizializzato' });
+        return;
+      }
+
+      console.log('🔄 Refresh forzato configurazione da Supabase...');
+
+      const { data, error } = await client
+        .from('configurations')
+        .select('config_data, id')
         .order('id', { ascending: false })
         .limit(1);
 
       if (error) {
         resolve({ success: false, error: error.message });
       } else if (data && data.length > 0) {
-        resolve({ success: true, config: data[0].config_data });
+        console.log('✅ Refresh completato - configurazione aggiornata');
+        resolve({ 
+          success: true, 
+          config: data[0].config_data,
+          configId: data[0].id,
+          refreshed: true
+        });
       } else {
-        resolve({ success: true, config: null }); // Nessuna configurazione trovata
+        resolve({ success: true, config: null });
       }
     } catch (err) {
       resolve({ success: false, error: err.message });
@@ -149,6 +216,7 @@ window.SupabaseManager = {
   test: testSupabaseConnection,
   save: saveConfigToSupabase,
   load: loadConfigFromSupabase,
+  refresh: forceRefreshConfig,
   isReady: () => {
     const client = initializeSupabase();
     return client !== null;
