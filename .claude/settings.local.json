@@ -12,7 +12,8 @@
       "Bash(cp:*)",
       "Bash(mv:*)",
       "Bash(git tag:*)",
-      "Bash(git switch:*)"
+      "Bash(git switch:*)",
+      "Bash(rm:*)"
     ],
     "deny": []
   }

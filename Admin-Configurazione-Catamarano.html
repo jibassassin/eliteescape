@@ -11,7 +11,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="catamaran-config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="storage-wrapper.js"></script>
 <style>
 :where([class^="ri-"])::before { content: "\f3c2"; }
 body {
@@ -2194,14 +2197,17 @@ function handleLogoUpload(file) {
         config.theme.logo.type = 'image';
         config.theme.logo.imageUrl = e.target.result;
         
+        console.log('🖼️ UPLOAD IMMAGINE: Dimensione Data URL:', e.target.result.length, 'caratteri');
         console.log('💾 Configurazione logo aggiornata:', config.theme.logo.type);
+        console.log('🔍 Anteprima imageUrl:', config.theme.logo.imageUrl.substring(0, 100) + '...');
         
         // Aggiorna anteprima
         updateLogoPreview(config.theme.logo);
         
         // Salva automaticamente
+        console.log('📤 Avvio salvataggio logo...');
         const saved = CatamaranStorage.save(config);
-        console.log('💾 Salvataggio:', saved ? 'Successo' : 'Fallito');
+        console.log('💾 Salvataggio localStorage:', saved ? 'Successo' : 'Fallito');
         
         showNotification('✓ Logo caricato con successo!', 'success');
     };

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Supabase - Passo 1: Connessione</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<style>
+body { font-family: system-ui, -apple-system, sans-serif; }
+.test-result { padding: 1rem; margin: 0.5rem 0; border-radius: 8px; }
+.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+pre { background: #f8f9fa; padding: 1rem; border-radius: 4px; overflow-x: auto; }
+</style>
+</head>
+<body class="bg-gray-50 p-8">
+
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">🧪 Test Supabase - Passo 1</h1>
+    
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">📋 Checklist Prerequisiti</h2>
+        <div id="prereq-checklist">
+            <div id="check-supabase-js" class="test-result info">⏳ Verificando caricamento Supabase JS...</div>
+            <div id="check-client-init" class="test-result info">⏳ Verificando inizializzazione client...</div>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">🔧 Test Connessione</h2>
+        <button id="test-connection" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-4">
+            Test Connessione Database
+        </button>
+        <div id="connection-result" class="hidden"></div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">💾 Test Salvataggio</h2>
+        <button id="test-save" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4" disabled>
+            Test Salvataggio Config
+        </button>
+        <div id="save-result" class="hidden"></div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibent mb-4">📥 Test Caricamento</h2>
+        <button id="test-load" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 mb-4" disabled>
+            Test Caricamento Config
+        </button>
+        <div id="load-result" class="hidden"></div>
+    </div>
+</div>
+
+<!-- Caricamento controllato delle dipendenze -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+
+<script>
+let testResults = {
+    connection: false,
+    save: false,
+    load: false
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Inizializzazione test...');
+    setTimeout(checkPrerequisites, 500); // Attendi caricamento librerie
+});
+
+function checkPrerequisites() {
+    console.log('📋 Verificando prerequisiti...');
+    
+    // Check 1: Supabase JS caricato
+    const supabaseCheck = document.getElementById('check-supabase-js');
+    if (typeof window.supabase !== 'undefined') {
+        supabaseCheck.textContent = '✅ Supabase JS caricato correttamente';
+        supabaseCheck.className = 'test-result success';
+    } else {
+        supabaseCheck.textContent = '❌ Supabase JS NON caricato';
+        supabaseCheck.className = 'test-result error';
+        return; // Stop qui se non abbiamo Supabase
+    }
+    
+    // Check 2: Client inizializzato
+    const clientCheck = document.getElementById('check-client-init');
+    if (typeof window.SupabaseManager !== 'undefined') {
+        clientCheck.textContent = '✅ Supabase Manager disponibile';
+        clientCheck.className = 'test-result success';
+        
+        // Abilita i pulsanti di test
+        enableTestButtons();
+    } else {
+        clientCheck.textContent = '❌ Supabase Manager NON disponibile';
+        clientCheck.className = 'test-result error';
+    }
+}
+
+function enableTestButtons() {
+    document.getElementById('test-connection').addEventListener('click', testConnection);
+    document.getElementById('test-save').addEventListener('click', testSave);
+    document.getElementById('test-load').addEventListener('click', testLoad);
+}
+
+async function testConnection() {
+    console.log('🔍 Testing connessione...');
+    const button = document.getElementById('test-connection');
+    const result = document.getElementById('connection-result');
+    
+    button.disabled = true;
+    button.textContent = 'Testing...';
+    result.className = 'test-result info';
+    result.textContent = '⏳ Testando connessione al database...';
+    result.classList.remove('hidden');
+    
+    try {
+        const response = await window.SupabaseManager.test();
+        
+        if (response.success) {
+            result.className = 'test-result success';
+            result.innerHTML = `✅ Connessione OK<br><pre>${JSON.stringify(response, null, 2)}</pre>`;
+            testResults.connection = true;
+            
+            // Abilita test successivi
+            document.getElementById('test-save').disabled = false;
+        } else {
+            result.className = 'test-result error';
+            result.innerHTML = `❌ Connessione FAILED<br><pre>Error: ${response.error}</pre>`;
+        }
+    } catch (error) {
+        result.className = 'test-result error';
+        result.innerHTML = `❌ Errore test connessione<br><pre>${error.message}</pre>`;
+    }
+    
+    button.disabled = false;
+    button.textContent = 'Test Connessione Database';
+}
+
+async function testSave() {
+    console.log('💾 Testing salvataggio...');
+    const button = document.getElementById('test-save');
+    const result = document.getElementById('save-result');
+    
+    button.disabled = true;
+    button.textContent = 'Salvando...';
+    result.className = 'test-result info';
+    result.textContent = '⏳ Salvando configurazione test...';
+    result.classList.remove('hidden');
+    
+    const testConfig = {
+        test: true,
+        timestamp: new Date().toISOString(),
+        message: 'Test di salvataggio Supabase',
+        data: { foo: 'bar', number: 42 }
+    };
+    
+    try {
+        const response = await window.SupabaseManager.save(testConfig);
+        
+        if (response.success) {
+            result.className = 'test-result success';
+            result.innerHTML = `✅ Salvataggio OK<br><pre>${JSON.stringify(response, null, 2)}</pre>`;
+            testResults.save = true;
+            
+            // Abilita test caricamento
+            document.getElementById('test-load').disabled = false;
+        } else {
+            result.className = 'test-result error';
+            result.innerHTML = `❌ Salvataggio FAILED<br><pre>Error: ${response.error}</pre>`;
+        }
+    } catch (error) {
+        result.className = 'test-result error';
+        result.innerHTML = `❌ Errore test salvataggio<br><pre>${error.message}</pre>`;
+    }
+    
+    button.disabled = false;
+    button.textContent = 'Test Salvataggio Config';
+}
+
+async function testLoad() {
+    console.log('📥 Testing caricamento...');
+    const button = document.getElementById('test-load');
+    const result = document.getElementById('load-result');
+    
+    button.disabled = true;
+    button.textContent = 'Caricando...';
+    result.className = 'test-result info';
+    result.textContent = '⏳ Caricando configurazione...';
+    result.classList.remove('hidden');
+    
+    try {
+        const response = await window.SupabaseManager.load();
+        
+        if (response.success) {
+            result.className = 'test-result success';
+            if (response.config) {
+                result.innerHTML = `✅ Caricamento OK<br><pre>${JSON.stringify(response.config, null, 2)}</pre>`;
+            } else {
+                result.innerHTML = `✅ Caricamento OK - Nessuna configurazione trovata<br><pre>${JSON.stringify(response, null, 2)}</pre>`;
+            }
+            testResults.load = true;
+            
+            showFinalResults();
+        } else {
+            result.className = 'test-result error';
+            result.innerHTML = `❌ Caricamento FAILED<br><pre>Error: ${response.error}</pre>`;
+        }
+    } catch (error) {
+        result.className = 'test-result error';
+        result.innerHTML = `❌ Errore test caricamento<br><pre>${error.message}</pre>`;
+    }
+    
+    button.disabled = false;
+    button.textContent = 'Test Caricamento Config';
+}
+
+function showFinalResults() {
+    if (testResults.connection && testResults.save && testResults.load) {
+        const finalResult = document.createElement('div');
+        finalResult.className = 'test-result success mt-6';
+        finalResult.innerHTML = `
+            <h3 class="font-bold text-lg mb-2">🎉 TUTTI I TEST SUPERATI!</h3>
+            <p>Supabase è configurato correttamente e pronto per l'integrazione.</p>
+            <p class="mt-2"><strong>Prossimo passo:</strong> Integrare nell'admin panel esistente.</p>
+        `;
+        document.body.appendChild(finalResult);
+    }
+}
+</script>
+
+</body>
+</html>

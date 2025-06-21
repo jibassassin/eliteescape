@@ -11,7 +11,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="catamaran-config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="storage-wrapper.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
 :where([class^="ri-"])::before { content: "\f3c2"; }
@@ -2058,23 +2061,62 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (domHealthy) {
         console.log('✅ DOM verificato, procedo con caricamento configurazione');
-        loadCatamaranConfiguration();
         
-        // Renderizza servizi dinamici dopo caricamento configurazione
-        setTimeout(() => {
+        // Carica configurazione con sincronizzazione Supabase
+        setTimeout(async () => {
+            // Prima sincronizza da Supabase (per aggiornamenti)
+            if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.syncFromSupabase) {
+                try {
+                    console.log('📡 Avvio sincronizzazione Supabase...');
+                    const result = await CatamaranStorage.syncFromSupabase();
+                    if (result.success) {
+                        console.log('✅ Sincronizzazione Supabase completata - configurazione aggiornata');
+                    } else {
+                        console.log('ℹ️ Sincronizzazione Supabase: nessun aggiornamento disponibile');
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Sincronizzazione Supabase fallita, uso localStorage:', error);
+                }
+            } else {
+                console.log('📱 Uso configurazione localStorage (Supabase non disponibile)');
+            }
+            
+            // Attendi un momento per essere sicuri che la sync sia completata
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // Poi carica la configurazione (ora aggiornata)
+            console.log('⚡ Caricamento configurazione finale...');
+            loadCatamaranConfiguration();
             renderAdditionalServices();
             updateSkipperService();
-        }, 100);
+        }, 300); // Aumento il timeout per attendere l'init completo
         
     } else {
         console.warn('⚠️ DOM con elementi mancanti, caricamento potrebbe avere problemi');
         // Carica comunque ma con avviso
-        loadCatamaranConfiguration();
-        
-        setTimeout(() => {
+        setTimeout(async () => {
+            // Prima sincronizza da Supabase
+            if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.syncFromSupabase) {
+                try {
+                    console.log('📡 Avvio sincronizzazione Supabase (DOM parziale)...');
+                    const result = await CatamaranStorage.syncFromSupabase();
+                    if (result.success) {
+                        console.log('✅ Sincronizzazione Supabase completata - configurazione aggiornata');
+                    } else {
+                        console.log('ℹ️ Sincronizzazione Supabase: nessun aggiornamento disponibile');
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Sincronizzazione Supabase fallita, uso localStorage:', error);
+                }
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            console.log('⚡ Caricamento configurazione finale (DOM parziale)...');
+            loadCatamaranConfiguration();
             renderAdditionalServices();
             updateSkipperService();
-        }, 100);
+        }, 300);
     }
 });
 </script>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test Supabase - Passo 2: Integrazione</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<style>
+body { font-family: system-ui, -apple-system, sans-serif; }
+.test-result { padding: 1rem; margin: 0.5rem 0; border-radius: 8px; }
+.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+pre { background: #f8f9fa; padding: 1rem; border-radius: 4px; overflow-x: auto; font-size: 12px; }
+</style>
+</head>
+<body class="bg-gray-50 p-8">
+
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">🧪 Test Supabase - Passo 2: Wrapper</h1>
+    
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">📋 Status Sistema</h2>
+        <div id="system-status"></div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">🔧 Test Wrapper</h2>
+        <div class="space-x-2 mb-4">
+            <button id="test-save-wrapper" class="bg-blue-500 text-white px-3 py-2 rounded text-sm">
+                Test Save (Wrapper)
+            </button>
+            <button id="test-load-wrapper" class="bg-green-500 text-white px-3 py-2 rounded text-sm">
+                Test Load (Wrapper)
+            </button>
+            <button id="test-sync-to" class="bg-purple-500 text-white px-3 py-2 rounded text-sm">
+                Sync → Supabase
+            </button>
+            <button id="test-sync-from" class="bg-orange-500 text-white px-3 py-2 rounded text-sm">
+                Sync ← Supabase
+            </button>
+        </div>
+        <div id="wrapper-results"></div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-4">🎛️ Controlli</h2>
+        <div class="space-x-2 mb-4">
+            <button id="toggle-supabase" class="bg-gray-500 text-white px-3 py-2 rounded text-sm">
+                Disabilita Supabase
+            </button>
+            <button id="show-configs" class="bg-indigo-500 text-white px-3 py-2 rounded text-sm">
+                Mostra Configurazioni
+            </button>
+        </div>
+        <div id="controls-results"></div>
+    </div>
+</div>
+
+<!-- Caricamento dipendenze in ordine -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="catamaran-config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="storage-wrapper.js"></script>
+
+<script>
+let supabaseEnabled = true;
+
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initTest, 1000); // Attendi caricamento completo
+});
+
+function initTest() {
+    showSystemStatus();
+    setupEventListeners();
+}
+
+function showSystemStatus() {
+    const status = document.getElementById('system-status');
+    
+    const checks = [
+        { name: 'CatamaranStorage', check: () => typeof CatamaranStorage !== 'undefined' },
+        { name: 'Supabase JS', check: () => typeof window.supabase !== 'undefined' },
+        { name: 'SupabaseManager', check: () => typeof window.SupabaseManager !== 'undefined' },
+        { name: 'Storage Wrapper', check: () => typeof CatamaranStorage.syncFromSupabase !== 'undefined' },
+        { name: 'Default Config', check: () => typeof DEFAULT_CATAMARAN_CONFIG !== 'undefined' }
+    ];
+    
+    let html = '<div class="space-y-2">';
+    checks.forEach(check => {
+        const result = check.check();
+        html += `<div class="flex items-center space-x-2">
+            <span class="${result ? 'text-green-600' : 'text-red-600'}">${result ? '✅' : '❌'}</span>
+            <span>${check.name}</span>
+        </div>`;
+    });
+    
+    // Status Supabase
+    if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.getSupabaseStatus) {
+        const supabaseStatus = CatamaranStorage.getSupabaseStatus();
+        html += `<div class="mt-4 p-3 bg-gray-100 rounded">
+            <strong>Supabase Status:</strong><br>
+            Enabled: ${supabaseStatus.enabled ? '✅' : '❌'}<br>
+            Available: ${supabaseStatus.available ? '✅' : '❌'}<br>
+            Connected: ${supabaseStatus.connected ? '✅' : '❌'}
+        </div>`;
+    }
+    
+    html += '</div>';
+    status.innerHTML = html;
+}
+
+function setupEventListeners() {
+    document.getElementById('test-save-wrapper').addEventListener('click', testSaveWrapper);
+    document.getElementById('test-load-wrapper').addEventListener('click', testLoadWrapper);
+    document.getElementById('test-sync-to').addEventListener('click', testSyncTo);
+    document.getElementById('test-sync-from').addEventListener('click', testSyncFrom);
+    document.getElementById('toggle-supabase').addEventListener('click', toggleSupabase);
+    document.getElementById('show-configs').addEventListener('click', showConfigs);
+}
+
+function testSaveWrapper() {
+    log('wrapper-results', '💾 Test salvataggio con wrapper...', 'info');
+    
+    const testConfig = {
+        ...DEFAULT_CATAMARAN_CONFIG,
+        test: {
+            type: 'wrapper-save',
+            timestamp: new Date().toISOString(),
+            message: 'Test salvataggio via wrapper'
+        }
+    };
+    
+    try {
+        const result = CatamaranStorage.save(testConfig);
+        if (result) {
+            log('wrapper-results', '✅ Salvataggio wrapper OK', 'success');
+            log('wrapper-results', 'Il wrapper ha salvato in localStorage e avviato sync Supabase in background', 'info');
+        } else {
+            log('wrapper-results', '❌ Salvataggio wrapper FAILED', 'error');
+        }
+    } catch (error) {
+        log('wrapper-results', `❌ Errore wrapper: ${error.message}`, 'error');
+    }
+}
+
+function testLoadWrapper() {
+    log('wrapper-results', '📥 Test caricamento con wrapper...', 'info');
+    
+    try {
+        const config = CatamaranStorage.load();
+        if (config) {
+            log('wrapper-results', '✅ Caricamento wrapper OK', 'success');
+            if (config.test) {
+                log('wrapper-results', `Ultimo test: ${config.test.type} - ${config.test.timestamp}`, 'info');
+            }
+        } else {
+            log('wrapper-results', '⚠️ Nessuna configurazione trovata', 'warning');
+        }
+    } catch (error) {
+        log('wrapper-results', `❌ Errore caricamento: ${error.message}`, 'error');
+    }
+}
+
+async function testSyncTo() {
+    log('wrapper-results', '☁️ Test sincronizzazione → Supabase...', 'info');
+    
+    try {
+        const result = await CatamaranStorage.syncToSupabase();
+        if (result.success) {
+            log('wrapper-results', '✅ Sincronizzazione → Supabase OK', 'success');
+        } else {
+            log('wrapper-results', `❌ Sync → Supabase FAILED: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        log('wrapper-results', `❌ Errore sync: ${error.message}`, 'error');
+    }
+}
+
+async function testSyncFrom() {
+    log('wrapper-results', '📥 Test sincronizzazione ← Supabase...', 'info');
+    
+    try {
+        const result = await CatamaranStorage.syncFromSupabase();
+        if (result.success) {
+            log('wrapper-results', '✅ Sincronizzazione ← Supabase OK', 'success');
+            if (result.config && result.config.test) {
+                log('wrapper-results', `Config caricata: ${result.config.test.type}`, 'info');
+            }
+        } else {
+            log('wrapper-results', `❌ Sync ← Supabase FAILED: ${result.error}`, 'error');
+        }
+    } catch (error) {
+        log('wrapper-results', `❌ Errore sync: ${error.message}`, 'error');
+    }
+}
+
+function toggleSupabase() {
+    supabaseEnabled = !supabaseEnabled;
+    CatamaranStorage.setSupabaseEnabled(supabaseEnabled);
+    
+    const button = document.getElementById('toggle-supabase');
+    button.textContent = supabaseEnabled ? 'Disabilita Supabase' : 'Abilita Supabase';
+    button.className = supabaseEnabled ? 
+        'bg-red-500 text-white px-3 py-2 rounded text-sm' :
+        'bg-green-500 text-white px-3 py-2 rounded text-sm';
+    
+    log('controls-results', `📡 Supabase ${supabaseEnabled ? 'abilitato' : 'disabilitato'}`, 'info');
+    
+    // Aggiorna status
+    showSystemStatus();
+}
+
+function showConfigs() {
+    const localConfig = CatamaranStorage.load();
+    
+    let html = '<div class="space-y-4">';
+    html += `<div><h4 class="font-bold">localStorage:</h4><pre>${JSON.stringify(localConfig.test || {}, null, 2)}</pre></div>`;
+    
+    // Carica da Supabase
+    if (window.SupabaseManager) {
+        window.SupabaseManager.load().then(response => {
+            if (response.success && response.config) {
+                html += `<div><h4 class="font-bold">Supabase:</h4><pre>${JSON.stringify(response.config.test || {}, null, 2)}</pre></div>`;
+            } else {
+                html += `<div><h4 class="font-bold">Supabase:</h4><pre>Nessuna config trovata</pre></div>`;
+            }
+            html += '</div>';
+            document.getElementById('controls-results').innerHTML = html;
+        });
+    } else {
+        html += `<div><h4 class="font-bold">Supabase:</h4><pre>Non disponibile</pre></div>`;
+        html += '</div>';
+        document.getElementById('controls-results').innerHTML = html;
+    }
+}
+
+function log(containerId, message, type = 'info') {
+    const container = document.getElementById(containerId);
+    const entry = document.createElement('div');
+    entry.className = `test-result ${type}`;
+    entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+    container.appendChild(entry);
+    console.log(`[${type.toUpperCase()}] ${message}`);
+}
+
+// Callback per aggiornamenti configurazione
+window.onConfigUpdated = function(newConfig) {
+    log('wrapper-results', '🔄 Configurazione aggiornata automaticamente da Supabase!', 'success');
+};
+</script>
+
+</body>
+</html>
