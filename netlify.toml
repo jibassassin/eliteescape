@@ -1,0 +1,42 @@
+[build]
+  # No build command needed for static site
+  publish = "."
+
+[build.environment]
+  # Environment for build process
+  NODE_VERSION = "18"
+
+[[redirects]]
+  # Redirect www to non-www
+  from = "https://www.eliteescape.netlify.app/*"
+  to = "https://eliteescape.netlify.app/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  # SPA fallback for any 404s
+  from = "/*"
+  to = "/prenotazione_violante.html"
+  status = 200
+  conditions = {Role = ["admin"]}
+
+[[headers]]
+  # Security headers
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  # Cache static assets
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  # Don't cache HTML files
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache"
