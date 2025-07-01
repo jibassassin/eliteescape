@@ -94,13 +94,23 @@ function saveConfigToSupabase(config) {
         return;
       }
 
+      // Genera timestamp versione per cache busting
+      const version = Date.now();
+      const versionedConfig = {
+        version: version,
+        data: config,
+        updated_at: new Date().toISOString()
+      };
+
+      console.log(`🔄 Salvando configurazione con versione: ${version}`);
+
       let result;
       if (existing && existing.length > 0) {
         // Aggiorna configurazione esistente
         result = await client
           .from('configurations')
           .update({ 
-            config_data: config
+            config_data: versionedConfig
           })
           .eq('id', existing[0].id);
       } else {
@@ -108,7 +118,7 @@ function saveConfigToSupabase(config) {
         result = await client
           .from('configurations')
           .insert([{ 
-            config_data: config,
+            config_data: versionedConfig,
             created_by: session.user.id
           }]);
       }
@@ -159,12 +169,28 @@ function loadConfigFromSupabase() {
         console.warn('⚠️ Errore caricamento Supabase (potrebbero mancare policy RLS):', error.message);
         resolve({ success: false, error: error.message, needsRLSSetup: true });
       } else if (data && data.length > 0) {
-        console.log('📥 Configurazione caricata da Supabase con RLS');
-        resolve({ 
-          success: true, 
-          config: data[0].config_data,
-          configId: data[0].id
-        });
+        const configData = data[0].config_data;
+        
+        // Gestisce nuovo formato con versioning
+        if (configData.version && configData.data) {
+          console.log(`📥 Configurazione caricata da Supabase (versione: ${configData.version})`);
+          resolve({ 
+            success: true, 
+            config: configData.data,
+            version: configData.version,
+            updated_at: configData.updated_at,
+            configId: data[0].id
+          });
+        } else {
+          // Compatibilità con formato precedente
+          console.log('📥 Configurazione caricata da Supabase (formato legacy)');
+          resolve({ 
+            success: true, 
+            config: configData,
+            version: 0,
+            configId: data[0].id
+          });
+        }
       } else {
         resolve({ success: true, config: null }); // Nessuna configurazione trovata
       }
@@ -211,12 +237,51 @@ function forceRefreshConfig() {
   });
 }
 
+// Funzione per check versione leggero (solo version e timestamp)
+function checkConfigVersion() {
+  return new Promise(async (resolve) => {
+    try {
+      const client = initializeSupabase();
+      if (!client) {
+        resolve({ success: false, error: 'Client non inizializzato' });
+        return;
+      }
+
+      // Query leggera: solo version e updated_at
+      const { data, error } = await client
+        .from('configurations')
+        .select(`config_data->version, config_data->updated_at`)
+        .order('id', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        resolve({ success: false, error: error.message });
+      } else if (data && data.length > 0) {
+        const version = data[0].config_data?.version || 0;
+        const updated_at = data[0].config_data?.updated_at;
+        
+        console.log(`📡 Version check: ${version} (${updated_at})`);
+        resolve({ 
+          success: true, 
+          version: version,
+          updated_at: updated_at
+        });
+      } else {
+        resolve({ success: true, version: 0 });
+      }
+    } catch (err) {
+      resolve({ success: false, error: err.message });
+    }
+  });
+}
+
 // Oggetto pubblico per l'accesso alle funzioni
 window.SupabaseManager = {
   test: testSupabaseConnection,
   save: saveConfigToSupabase,
   load: loadConfigFromSupabase,
   refresh: forceRefreshConfig,
+  checkVersion: checkConfigVersion,
   isReady: () => {
     const client = initializeSupabase();
     return client !== null;
