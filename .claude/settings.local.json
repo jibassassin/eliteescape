@@ -15,6 +15,9 @@
       "Bash(git switch:*)",
       "Bash(rm:*)",
       "Bash(rg:*)",
+      "Bash(git push:*)",
+      "Bash(ls:*)",
+      "Bash(rg:*)",
       "Bash(git push:*)"
     ],
     "deny": []
