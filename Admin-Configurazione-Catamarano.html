@@ -1215,9 +1215,116 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Auto-carica la configurazione al caricamento della pagina
+// === GESTIONE AUTENTICAZIONE ===
 document.addEventListener('DOMContentLoaded', function() {
+    // Auto-carica la configurazione al caricamento della pagina
     setTimeout(window.loadConfiguration, 500); // Aspetta che tutto sia inizializzato
+    
+    // Event listener per il form di login
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+    const loginErrorText = document.getElementById('login-error-text');
+    const loginButton = document.getElementById('login-submit');
+    const loginButtonText = document.getElementById('login-button-text');
+    
+    // Gestione sottomissione form login
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showLoginError('Inserisci email e password');
+                return;
+            }
+            
+            // Stato loading
+            if (loginButton) {
+                loginButton.disabled = true;
+                if (loginButtonText) loginButtonText.textContent = 'Accesso in corso...';
+            }
+            
+            // Nascondi errori precedenti
+            hideLoginError();
+            
+            try {
+                console.log('🔐 Tentativo login per:', email);
+                
+                // Attende che AuthManager sia disponibile
+                if (typeof window.authManager === 'undefined') {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+                
+                if (typeof window.authManager !== 'undefined') {
+                    const result = await window.authManager.signIn(email, password);
+                    
+                    if (result.success) {
+                        console.log('✅ Login completato con successo');
+                        hideLoginError();
+                        // L'AuthManager gestirà automaticamente l'aggiornamento UI
+                    } else {
+                        console.error('❌ Errore login:', result.error);
+                        showLoginError(result.error || 'Errore durante il login');
+                    }
+                } else {
+                    showLoginError('Sistema di autenticazione non disponibile');
+                }
+            } catch (error) {
+                console.error('❌ Errore login:', error);
+                showLoginError('Errore di connessione');
+            } finally {
+                // Ripristina stato button
+                if (loginButton) {
+                    loginButton.disabled = false;
+                    if (loginButtonText) loginButtonText.textContent = 'Accedi';
+                }
+            }
+        });
+    }
+    
+    // Event listener per bottone login header
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', function() {
+            // Il form è già visibile, focus su email
+            const emailInput = document.getElementById('email');
+            if (emailInput) emailInput.focus();
+        });
+    }
+    
+    // Event listener per bottone logout header
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async function() {
+            try {
+                if (typeof window.authManager !== 'undefined') {
+                    const result = await window.authManager.signOut();
+                    if (result.success) {
+                        console.log('✅ Logout completato');
+                        // L'AuthManager gestirà automaticamente l'aggiornamento UI
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Errore logout:', error);
+            }
+        });
+    }
+    
+    // Funzioni helper per gestire errori login
+    function showLoginError(message) {
+        if (loginError && loginErrorText) {
+            loginErrorText.textContent = message;
+            loginError.classList.remove('hidden');
+        }
+    }
+    
+    function hideLoginError() {
+        if (loginError) {
+            loginError.classList.add('hidden');
+        }
+    }
 });
 </script>
 
