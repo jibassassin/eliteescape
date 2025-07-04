@@ -2179,8 +2179,8 @@ async function loadCatamaranConfiguration() {
             return; // Esce dalla funzione se ha trovato BOX 1-2
         }
         
-        // 📦 Fallback: carica dalla vecchia struttura se BOX 1-2 non esiste
-        console.log('📄 BOX 1-2 non trovato, carico dalla vecchia struttura...');
+        // 📦 Prova a caricare dal formato pubblico unificato 'data'
+        console.log('📄 BOX 1-2 non trovato, carico dalla struttura data...');
         const config = CatamaranStorage.load();
         
         if (!config) {
@@ -2188,12 +2188,51 @@ async function loadCatamaranConfiguration() {
             return;
         }
         
-        // Aggiorna nome catamarano (vecchia struttura)
-        updateElement('catamaran-name', config.basic.name);
-        
-        // Aggiorna prezzo base (inizializza currentBasePrice con il valore dalla configurazione)
-        currentBasePrice = config.basic.basePrice || 3499;
-        console.log('🚀 Inizializzazione currentBasePrice:', currentBasePrice);
+        // 🔄 Controllo nuovo formato unificato
+        if (config.data && Object.keys(config.data).length > 0) {
+            console.log('📦 Caricando dalla struttura unificata DATA:', config.data);
+            
+            // Aggiorna dal formato unificato
+            updateElement('site-logo', config.data.logo?.text || 'Elite Escape');
+            updateElement('page-main-title', config.data.page?.title || 'Prenota il tuo Catamarano');
+            updateElement('catamaran-main-image', config.data.images?.main || null);
+            updateElement('badge-text', config.data.badge?.text || 'A partire da');
+            updateElement('badge-price', config.data.badge?.price || '€2.999');
+            updateElement('catamaran-name', config.data.boat?.name || 'Violante');
+            
+            // Prezzo base dal formato unificato
+            const priceText = config.data.badge?.price || '€3.499';
+            const priceNumber = parseInt(priceText.replace(/[€.,]/g, '')) || 3499;
+            currentBasePrice = priceNumber;
+            updateElement('base-price', `€ ${currentBasePrice.toLocaleString()}`);
+            
+            // Dati tecnici
+            updateElement('catamaran-year', config.data.technical?.year || 'Anno 2025');
+            updateElement('catamaran-length', config.data.technical?.length || '11.8 m');
+            updateElement('catamaran-cabins', config.data.technical?.cabins || '4 cabine +1 skipper');
+            updateElement('catamaran-bathrooms', config.data.technical?.bathrooms || '4 bagni +1 skipper');
+            updateElement('catamaran-engine', config.data.technical?.engine || '60 HP');
+            updateElement('catamaran-width', config.data.technical?.width || '7.32 m larghezza');
+            updateElement('catamaran-draft', config.data.technical?.draft || '1.15 m pescaggio');
+            updateElement('catamaran-displacement', config.data.technical?.displacement || '11.2 t dislocamento');
+            updateElement('catamaran-water-tank', config.data.technical?.waterTank || '400 L acqua');
+            updateElement('catamaran-fuel-tank', config.data.technical?.fuelTank || '150 L gasolio');
+            
+            console.log('✅ Configurazione DATA caricata con successo');
+            console.log('🚀 Inizializzazione currentBasePrice:', currentBasePrice);
+            
+        } else if (config.basic) {
+            // Fallback per vecchia struttura
+            console.log('📄 Fallback: caricando dalla vecchia struttura BASIC');
+            updateElement('catamaran-name', config.basic.name);
+            
+            // Aggiorna prezzo base (inizializza currentBasePrice con il valore dalla configurazione)
+            currentBasePrice = config.basic.basePrice || 3499;
+            console.log('🚀 Inizializzazione currentBasePrice:', currentBasePrice);
+            updateElement('base-price', `€ ${currentBasePrice.toLocaleString()}`);
+        } else {
+            console.error('❌ Nessun formato di configurazione riconosciuto');
+        }
         console.log('🔧 Config all\'inizializzazione:', config);
         updateElement('base-price', `€ ${currentBasePrice.toLocaleString()}`);
         

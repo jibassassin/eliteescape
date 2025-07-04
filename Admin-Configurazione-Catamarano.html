@@ -850,9 +850,26 @@ window.saveConfiguration = function() {
                 const existingConfig = CatamaranStorage.load() || {};
                 console.log('📄 Configurazione esistente:', existingConfig);
                 
-                // Aggiorna con i nuovi dati BOX 1-3
+                // Aggiorna con i nuovi dati BOX 1-3 (formato admin)
                 existingConfig.box1_2 = configData;
-                console.log('📦 Configurazione aggiornata con BOX 1-3:', existingConfig);
+                
+                // 🔄 UNIFICAZIONE FORMATO: Salva anche nel formato pubblico 'data'
+                if (!existingConfig.data) {
+                    existingConfig.data = {};
+                }
+                
+                // Copia i dati BOX 1-2 nel formato pubblico
+                existingConfig.data.logo = configData.box1?.logo || {};
+                existingConfig.data.page = configData.box1?.page || {};
+                existingConfig.data.footer = configData.box1?.footer || {};
+                existingConfig.data.images = configData.box2?.images || {};
+                existingConfig.data.badge = configData.box2?.badge || {};
+                existingConfig.data.boat = configData.box2?.boat || {};
+                existingConfig.data.technical = configData.box2?.technical || {};
+                existingConfig.data.services = configData.box3?.services || [];
+                existingConfig.data.skipper = configData.box3?.skipper || {};
+                
+                console.log('📦 Configurazione unificata (admin + pubblico):', existingConfig);
                 
                 // Salva su Supabase (asincrono)
                 if (typeof CatamaranStorage.save === 'function') {
