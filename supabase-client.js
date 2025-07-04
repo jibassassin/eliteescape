@@ -247,18 +247,19 @@ function checkConfigVersion() {
         return;
       }
 
-      // Query leggera: solo version e updated_at
+      // Query leggera: solo config_data per estrarre version e updated_at
       const { data, error } = await client
         .from('configurations')
-        .select(`config_data->version, config_data->updated_at`)
+        .select('config_data')
         .order('id', { ascending: false })
         .limit(1);
 
       if (error) {
         resolve({ success: false, error: error.message });
       } else if (data && data.length > 0) {
-        const version = data[0].config_data?.version || 0;
-        const updated_at = data[0].config_data?.updated_at;
+        const configData = data[0].config_data;
+        const version = configData?.version || 0;
+        const updated_at = configData?.updated_at;
         
         console.log(`📡 Version check: ${version} (${updated_at})`);
         resolve({ 
