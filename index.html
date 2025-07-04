@@ -2962,18 +2962,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // 🔄 CACHE BUSTING - Check versione leggero invece di polling pesante
     let currentVersion = 0;
     
-    // Carica versione iniziale
-    if (typeof window.SupabaseManager !== 'undefined' && window.SupabaseManager.checkVersion) {
-        try {
-            const versionResult = await window.SupabaseManager.checkVersion();
-            if (versionResult.success) {
-                currentVersion = versionResult.version || 0;
-                console.log(`🏷️ Versione iniziale: ${currentVersion}`);
+    // Funzione async per inizializzare cache busting
+    async function initializeCacheBusting() {
+        // Carica versione iniziale
+        if (typeof window.SupabaseManager !== 'undefined' && window.SupabaseManager.checkVersion) {
+            try {
+                const versionResult = await window.SupabaseManager.checkVersion();
+                if (versionResult.success) {
+                    currentVersion = versionResult.version || 0;
+                    console.log(`🏷️ Versione iniziale: ${currentVersion}`);
+                }
+            } catch (error) {
+                console.warn('⚠️ Errore caricamento versione iniziale:', error);
             }
-        } catch (error) {
-            console.warn('⚠️ Errore caricamento versione iniziale:', error);
         }
     }
+    
+    // Inizializza cache busting
+    initializeCacheBusting();
     
     // Check versione ogni 30 secondi (invece di 15)
     setInterval(async () => {
