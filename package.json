@@ -1,0 +1,26 @@
+{
+  "name": "elite-escape-ssg",
+  "version": "1.0.0",
+  "description": "Elite Escape - Static Site Generator for catamaran booking",
+  "main": "index.html",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "vite --host",
+    "preview": "vite preview",
+    "deploy": "npm run build && netlify deploy --prod"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "dotenv": "^16.3.1"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": ["ssg", "catamaran", "booking", "sardegna", "elite-escape"],
+  "author": "Elite Escape S.r.l",
+  "license": "ISC"
+}

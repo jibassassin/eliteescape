@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Configurazione Catamarano</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#0a5c8f',secondary:'#f8b400'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="catamaran-config.js"></script>
+<script src="supabase-client.js"></script>
+<script src="storage-wrapper.js"></script>
+<script src="auth-manager.js"></script>
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Raleway', sans-serif;
+background-color: #f9fafb;
+}
+h1, h2, h3, h4, h5, h6 {
+font-family: 'Playfair Display', serif;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+</style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Header -->
+<header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between items-center h-16">
+<div class="flex items-center space-x-4">
+<div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+<i class="ri-ship-line text-white"></i>
+</div>
+<h1 class="text-xl font-semibold text-gray-900">Admin Panel</h1>
+</div>
+<div class="flex items-center space-x-2">
+<!-- User Info (hidden by default) -->
+<div id="user-info" class="hidden items-center space-x-3 text-sm">
+<div class="text-right">
+<div id="user-name" class="font-medium text-gray-900">Admin</div>
+<div id="user-email" class="text-gray-500 text-xs"></div>
+</div>
+<div class="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+<i class="ri-user-line text-white"></i>
+</div>
+</div>
+
+<!-- Login Button (visible by default) -->
+<button id="login-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center">
+<i class="ri-login-circle-line mr-2"></i>
+<span class="hidden md:inline">Login</span>
+</button>
+
+<!-- Logout Button (hidden by default) -->
+<button id="logout-btn" class="hidden bg-red-600 text-white px-4 py-2 rounded-lg flex items-center">
+<i class="ri-logout-circle-line mr-2"></i>
+<span class="hidden md:inline">Logout</span>
+</button>
+
+<!-- Save Button (only visible when authenticated) -->
+<button id="save-button" class="hidden bg-primary text-white px-4 py-2 rounded-lg flex items-center whitespace-nowrap" onclick="window.saveConfiguration()">
+<i class="ri-save-line mr-2"></i>
+<span class="hidden md:inline">Salva Modifiche</span>
+<span class="md:hidden">Salva</span>
+</button>
+</div>
+</div>
+</div>
+</header>
+
+<!-- Login Form -->
+<div id="auth-required" class="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
+<div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+<div class="text-center mb-6">
+<div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+<i class="ri-shield-user-line text-primary text-2xl"></i>
+</div>
+<h2 class="text-2xl font-bold text-gray-900 mb-2">Admin Panel</h2>
+<p class="text-gray-600">Accedi per gestire la configurazione</p>
+</div>
+
+<form id="login-form" class="space-y-4">
+<div>
+<label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+<input 
+    type="email" 
+    id="email" 
+    name="email"
+    autocomplete="username"
+    required
+    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+    placeholder="admin@example.com"
+>
+</div>
+
+<div>
+<label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+<input 
+    type="password" 
+    id="password" 
+    name="password"
+    autocomplete="current-password"
+    required
+    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+    placeholder="••••••••"
+>
+</div>
+
+<div class="flex items-center justify-between">
+<label class="flex items-center">
+<input type="checkbox" id="remember-me" class="rounded border-gray-300 text-primary focus:ring-primary">
+<span class="ml-2 text-sm text-gray-600">Ricordami</span>
+</label>
+</div>
+
+<button 
+    type="submit" 
+    id="login-submit"
+    class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 flex items-center justify-center"
+>
+<i class="ri-login-circle-line mr-2"></i>
+<span id="login-button-text">Accedi</span>
+</button>
+
+<div id="login-error" class="hidden mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+<div class="flex">
+<i class="ri-error-warning-line text-red-400 mt-0.5 mr-2"></i>
+<div class="text-sm text-red-700" id="login-error-text"></div>
+</div>
+</div>
+</form>
+</div>
+</div>
+
+<!-- Main Content (Protected) -->
+<main id="admin-content" class="hidden max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+<!-- 📦 BOX 1: CARATTERISTICHE DELLA PAGINA -->
+<div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                <i class="ri-settings-3-line text-white text-lg"></i>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">📦 BOX 1: Caratteristiche della Pagina</h2>
+                <p class="text-sm text-gray-600">Configurazioni generali della pagina web</p>
+            </div>
+        </div>
+    </div>
+    <div class="p-6 space-y-8">
+
+        <!-- Logo Aziendale -->
+        <div class="border border-gray-200 rounded-lg p-6 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="ri-image-line mr-2 text-blue-500"></i>
+                Logo Aziendale
+            </h3>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Tipo Logo -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tipo Logo</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="logo-type" value="text" id="logo-type-text" checked class="mr-2">
+                            <span class="text-sm">Solo Testo</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="logo-type" value="image" id="logo-type-image" class="mr-2">
+                            <span class="text-sm">Immagine</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="logo-type" value="both" id="logo-type-both" class="mr-2">
+                            <span class="text-sm">Testo + Immagine</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Testo Logo -->
+                <div id="logo-text-section">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Testo Logo</label>
+                    <input type="text" id="admin-logo-text" value="Elite Escape" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                    <p class="mt-1 text-xs text-gray-500">Nome che appare nel logo della pagina</p>
+                </div>
+
+                <!-- Upload Immagine -->
+                <div id="logo-image-section" class="hidden">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Immagine Logo</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                        <input type="file" id="admin-logo-upload" accept="image/*" class="hidden">
+                        <button type="button" onclick="document.getElementById('admin-logo-upload').click()" 
+                            class="bg-primary text-white px-4 py-2 rounded hover:bg-opacity-90">
+                            <i class="ri-upload-line mr-2"></i>Carica Logo
+                        </button>
+                        <p class="mt-2 text-xs text-gray-500">Formati supportati: PNG, JPG, SVG</p>
+                    </div>
+                </div>
+
+                <!-- Anteprima Logo -->
+                <div class="lg:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Anteprima</label>
+                    <div class="bg-white border border-gray-200 rounded-lg p-4 flex justify-center">
+                        <div id="logo-preview" class="text-2xl font-bold text-primary">Elite Escape</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nome della Pagina -->
+        <div class="border border-gray-200 rounded-lg p-6 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="ri-file-text-line mr-2 text-green-500"></i>
+                Nome della Pagina
+            </h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Titolo Principale</label>
+                    <input type="text" id="admin-page-title" value="Prenota il tuo Catamarano" 
+                        placeholder="es. Prenota il tuo Catamarano, Vacanze in Sardegna..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                    <p class="mt-1 text-xs text-gray-500">Titolo principale che appare nella pagina di prenotazione</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Meta Title (SEO)</label>
+                    <input type="text" id="admin-meta-title" value="Prenota Catamarano Violante - Vacanze in Sardegna" 
+                        placeholder="Titolo per motori di ricerca"
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                    <p class="mt-1 text-xs text-gray-500">Titolo che appare nei risultati dei motori di ricerca</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informazioni Piè di Pagina -->
+        <div class="border border-gray-200 rounded-lg p-6 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="ri-information-line mr-2 text-orange-500"></i>
+                Informazioni Piè di Pagina
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nome Azienda</label>
+                    <input type="text" id="admin-company-name" value="Elite Escape S.r.l." 
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Telefono</label>
+                    <input type="tel" id="admin-company-phone" value="+39 123 456 7890" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="admin-company-email" value="info@eliteescape.it" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Indirizzo</label>
+                    <input type="text" id="admin-company-address" value="Via Marina, 123 - 07020 Porto Rotondo (SS)" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Note Legali / Copyright</label>
+                    <textarea id="admin-footer-legal" rows="3" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary"
+                        placeholder="es. © 2025 Elite Escape S.r.l. - Tutti i diritti riservati. P.IVA: 12345678901">© 2025 Elite Escape S.r.l. - Tutti i diritti riservati. P.IVA: 12345678901</textarea>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 📦 BOX 2: CARATTERISTICHE DELL'IMBARCAZIONE -->
+<div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                <i class="ri-ship-line text-white text-lg"></i>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">📦 BOX 2: Caratteristiche dell'Imbarcazione</h2>
+                <p class="text-sm text-gray-600">Informazioni dettagliate del catamarano</p>
+            </div>
+        </div>
+    </div>
+    <div class="p-6 space-y-8">
+
+        <!-- Immagini Carosello -->
+        <div class="border border-gray-200 rounded-lg p-6 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="ri-image-2-line mr-2 text-green-500"></i>
+                Immagini Carosello
+            </h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">URL Immagine Principale</label>
+                    <input type="url" id="admin-main-image" 
+                        value="https://readdy.ai/api/search-image?query=luxury%2520catamaran%2520Fountaine%2520Pajot%252045%2520sailing%2520in%2520crystal%2520clear%2520turquoise%2520waters%2520near%2520Sardinia%2520coast%252C%2520Italy.%2520The%2520catamaran%2520is%2520white%2520with%2520elegant%2520lines%252C%2520spacious%2520deck%2520and%2520modern%2520design.%2520Beautiful%2520coastal%2520scenery%2520with%2520rocky%2520cliffs%2520and%2520sandy%2520beaches%2520visible%2520in%2520the%2520background.%2520Bright%2520sunny%2520day%2520with%2520deep%2520blue%2520sky.&width=1200&height=600&seq=10001&orientation=landscape"
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">URL Immagine Riassunto</label>
+                    <input type="url" id="admin-summary-image" 
+                        value="https://readdy.ai/api/search-image?query=luxury%2520catamaran%2520Fountaine%2520Pajot%252045%2520sailing%2520in%2520crystal%2520clear%2520turquoise%2520waters%252C%2520close-up%2520view%2520of%2520the%2520elegant%2520white%2520hull%2520and%2520modern%2520design.%2520Professional%2520product%2520photography%2520with%2520clean%2520background.&width=100&height=100&seq=20001&orientation=squarish"
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                </div>
+            </div>
+        </div>
+
+        <!-- Badge "A partire da" -->
+        <div class="border border-gray-200 rounded-lg p-6 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="ri-price-tag-3-line mr-2 text-yellow-500"></i>
+                Badge "A partire da"
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Prezzo di Partenza</label>
+                    <div class="flex items-center">
+                        <span class="bg-gray-100 px-4 py-2 border border-r-0 border-gray-300 rounded-l text-gray-600">€</span>
+                        <input type="number" id="admin-starting-price" value="2999" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-r focus:border-primary focus:ring-1 focus:ring-primary">
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">Prezzo mostrato nel badge (marketing)</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Testo del Badge</label>
+                    <input type="text" id="admin-badge-text" value="A partire da" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                    <p class="mt-1 text-xs text-gray-500">Testo sopra il prezzo</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Colore Badge</label>
+                    <div class="flex items-center space-x-2">
+                        <input type="color" id="admin-badge-color" value="#f8b400" 
+                            class="w-12 h-10 border border-gray-300 rounded cursor-pointer">
+                        <input type="text" id="admin-badge-color-text" value="#f8b400" 
+                            class="flex-1 px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                    </div>
+                </div>
+
+                <!-- Anteprima Badge -->
+                <div class="md:col-span-2 lg:col-span-3">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Anteprima Badge</label>
+                    <div class="flex justify-center p-4 bg-gray-200 rounded-lg">
+                        <div id="badge-preview" class="px-4 py-2 rounded-full text-sm font-semibold shadow-lg flex flex-col items-center min-w-[120px]" 
+                             style="background-color: #f8b400; color: #ffffff;">
+                            <span class="text-xs mb-1">A partire da</span>
+                            <span class="text-lg font-bold">€2.999</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nome Barca -->
+        <div class="border border-gray-200 rounded-lg p-6 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="ri-anchor-line mr-2 text-blue-500"></i>
+                Nome Barca
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nome Completo</label>
+                    <input type="text" id="admin-catamaran-name" value="Violante" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                    <p class="mt-1 text-xs text-gray-500">Nome principale della barca</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Prezzo Base Settimana</label>
+                    <div class="flex items-center">
+                        <span class="bg-gray-100 px-4 py-2 border border-r-0 border-gray-300 rounded-l text-gray-600">€</span>
+                        <input type="number" id="admin-base-price" value="3499" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-r focus:border-primary focus:ring-1 focus:ring-primary">
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">Prezzo base per calcoli</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔧 SOTTOBOX: Caratteristiche Tecniche -->
+        <div class="border-2 border-blue-300 rounded-lg p-6 bg-blue-50">
+            <h3 class="text-lg font-semibold text-blue-900 mb-6 flex items-center">
+                <i class="ri-tools-line mr-2 text-blue-600"></i>
+                🔧 Caratteristiche Tecniche della Barca
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Anno di Varo -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Anno di Varo</label>
+                    <input type="number" id="admin-year" value="2025" min="1950" max="2030"
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                </div>
+
+                <!-- Numero Cabine -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Numero Cabine</label>
+                    <input type="number" id="admin-cabins" value="4" min="1" max="12"
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                </div>
+
+                <!-- Numero Bagni -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Numero Bagni</label>
+                    <input type="number" id="admin-bathrooms" value="4" min="1" max="12"
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                </div>
+
+                <!-- Potenza Motori -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Potenza Motori</label>
+                    <div class="flex items-center">
+                        <input type="number" id="admin-engine-power" value="60" min="0" max="1000"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-l focus:border-primary focus:ring-1 focus:ring-primary">
+                        <span class="bg-gray-100 px-4 py-2 border border-l-0 border-gray-300 rounded-r text-gray-600">HP</span>
+                    </div>
+                </div>
+
+                <!-- Lunghezza -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Lunghezza</label>
+                    <div class="flex items-center">
+                        <input type="number" id="admin-length" value="13.61" step="0.01" min="0" max="100"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-l focus:border-primary focus:ring-1 focus:ring-primary">
+                        <span class="bg-gray-100 px-4 py-2 border border-l-0 border-gray-300 rounded-r text-gray-600">m</span>
+                    </div>
+                </div>
+
+                <!-- 🆕 LARGHEZZA (NUOVO) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Larghezza <span class="text-green-600">(NUOVO)</span></label>
+                    <div class="flex items-center">
+                        <input type="number" id="admin-width" value="7.32" step="0.01" min="0" max="50"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-l focus:border-primary focus:ring-1 focus:ring-primary">
+                        <span class="bg-gray-100 px-4 py-2 border border-l-0 border-gray-300 rounded-r text-gray-600">m</span>
+                    </div>
+                </div>
+
+                <!-- 🆕 PESCAGGIO (NUOVO) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Pescaggio <span class="text-green-600">(NUOVO)</span></label>
+                    <div class="flex items-center">
+                        <input type="number" id="admin-draft" value="1.15" step="0.01" min="0" max="10"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-l focus:border-primary focus:ring-1 focus:ring-primary">
+                        <span class="bg-gray-100 px-4 py-2 border border-l-0 border-gray-300 rounded-r text-gray-600">m</span>
+                    </div>
+                </div>
+
+                <!-- 🆕 DISLOCAMENTO (NUOVO) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Dislocamento <span class="text-green-600">(NUOVO)</span></label>
+                    <div class="flex items-center">
+                        <input type="number" id="admin-displacement" value="11.2" step="0.1" min="0" max="100"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-l focus:border-primary focus:ring-1 focus:ring-primary">
+                        <span class="bg-gray-100 px-4 py-2 border border-l-0 border-gray-300 rounded-r text-gray-600">t</span>
+                    </div>
+                </div>
+
+                <!-- 🆕 CAPACITÀ SERBATOIO ACQUA (NUOVO) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Serbatoio Acqua <span class="text-green-600">(NUOVO)</span></label>
+                    <div class="flex items-center">
+                        <input type="number" id="admin-water-tank" value="400" min="0" max="2000"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-l focus:border-primary focus:ring-1 focus:ring-primary">
+                        <span class="bg-gray-100 px-4 py-2 border border-l-0 border-gray-300 rounded-r text-gray-600">L</span>
+                    </div>
+                </div>
+
+                <!-- 🆕 CAPACITÀ SERBATOIO GASOLIO (NUOVO) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Serbatoio Gasolio <span class="text-green-600">(NUOVO)</span></label>
+                    <div class="flex items-center">
+                        <input type="number" id="admin-fuel-tank" value="150" min="0" max="1000"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-l focus:border-primary focus:ring-1 focus:ring-primary">
+                        <span class="bg-gray-100 px-4 py-2 border border-l-0 border-gray-300 rounded-r text-gray-600">L</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- 📦 BOX 3: SERVIZI AGGIUNTIVI DINAMICI -->
+<div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-violet-50">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                <i class="ri-service-line text-white text-lg"></i>
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-gray-900">Servizi Aggiuntivi Dinamici</h2>
+                <p class="text-sm text-gray-600">Configura servizi aggiuntivi con prezzi e opzioni personalizzabili</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-6 space-y-6">
+        
+        <!-- Servizio Skipper Speciale -->
+        <div class="border-2 border-primary/20 rounded-lg p-6 bg-gradient-to-r from-blue-50 to-primary/5">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="ri-steering-2-line mr-2 text-primary"></i>
+                Skipper Professionale (Servizio Speciale)
+            </h3>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Prezzo Skipper -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Prezzo Skipper</label>
+                    <div class="flex items-center">
+                        <span class="bg-gray-100 px-3 py-2 border border-r-0 border-gray-300 rounded-l text-gray-600">€</span>
+                        <input type="number" id="skipper-price-admin" min="0" step="1" value="200"
+                            class="w-24 px-3 py-2 border border-gray-300 focus:border-primary focus:ring-1 focus:ring-primary">
+                        <span class="bg-gray-100 px-3 py-2 border border-l-0 border-gray-300 rounded-r text-gray-600">/giorno</span>
+                    </div>
+                </div>
+
+                <!-- Stato Skipper -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Stato Servizio</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="skipper-active" checked 
+                                class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                            <span class="ml-2 text-sm text-gray-700">Servizio Attivo</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="skipper-recommended" checked 
+                                class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                            <span class="ml-2 text-sm text-gray-700">Servizio Raccomandato (sezione evidenziata)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Descrizione Skipper -->
+                <div class="lg:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descrizione Servizio</label>
+                    <textarea id="skipper-description" rows="3" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary"
+                        placeholder="Descrizione del servizio skipper...">Affidati a un capitano professionista che si occuperà della navigazione e ti guiderà alla scoperta delle baie più belle e suggestive. Con il servizio skipper, la cauzione passa da €3.500 a €1.500.</textarea>
+                </div>
+
+                <!-- Testo Raccomandazione -->
+                <div class="lg:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Testo Raccomandazione</label>
+                    <input type="text" id="skipper-recommendation-text" 
+                        value="Raccomandato per chi ha poca esperienza di navigazione nelle acque della Sardegna e vuole godersi la vacanza senza preoccupazioni"
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lista Servizi Esistenti -->
+        <div id="services-list" class="space-y-4">
+            <!-- I servizi verranno aggiunti dinamicamente qui -->
+        </div>
+
+        <!-- Aggiungi Nuovo Servizio -->
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="ri-add-circle-line mr-2 text-purple-500"></i>
+                Aggiungi Nuovo Servizio
+            </h3>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Nome Servizio -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nome Servizio</label>
+                    <input type="text" id="new-service-name" 
+                        placeholder="es. Pulizia finale, Skipper, Carburante..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                </div>
+
+                <!-- Prezzo e Frequenza -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Prezzo</label>
+                    <div class="flex">
+                        <div class="flex items-center">
+                            <span class="bg-gray-100 px-3 py-2 border border-r-0 border-gray-300 rounded-l text-gray-600">€</span>
+                            <input type="number" id="new-service-price" min="0" step="0.01"
+                                placeholder="100.00"
+                                class="w-24 px-3 py-2 border border-gray-300 focus:border-primary focus:ring-1 focus:ring-primary">
+                        </div>
+                        <select id="new-service-frequency" 
+                            class="flex-1 ml-2 px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="once">Una tantum</option>
+                            <option value="daily">Al giorno</option>
+                            <option value="weekly">A settimana</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Descrizione -->
+                <div class="lg:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Descrizione</label>
+                    <textarea id="new-service-description" rows="3" 
+                        placeholder="Descrizione dettagliata del servizio..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary"></textarea>
+                </div>
+
+                <!-- Icona -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Icona</label>
+                    <div class="flex items-center space-x-3">
+                        <input type="text" id="new-service-icon" value="ri-service-line"
+                            placeholder="ri-star-line"
+                            class="flex-1 px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                        <div id="new-service-icon-preview" class="w-10 h-10 bg-gray-100 rounded flex items-center justify-center">
+                            <i class="ri-service-line text-xl text-gray-600"></i>
+                        </div>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">Usa icone RemixIcon (es. ri-star-line, ri-shield-check-line)</p>
+                </div>
+
+                <!-- Opzioni -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Opzioni</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="new-service-active" checked 
+                                class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                            <span class="ml-2 text-sm text-gray-700">Servizio Attivo</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="new-service-mandatory" 
+                                class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                            <span class="ml-2 text-sm text-gray-700">Servizio Obbligatorio</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="new-service-recommended" 
+                                class="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary">
+                            <span class="ml-2 text-sm text-gray-700">Servizio Raccomandato</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Ordine di Visualizzazione -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ordine di Visualizzazione</label>
+                    <input type="number" id="new-service-order" min="1" max="100" value="10"
+                        class="w-full px-4 py-2 border border-gray-300 rounded focus:border-primary focus:ring-1 focus:ring-primary">
+                    <p class="mt-1 text-xs text-gray-500">Numero più basso = visualizzato prima (entro la stessa categoria)</p>
+                </div>
+            </div>
+
+            <!-- Bottone Aggiungi -->
+            <div class="mt-6 flex justify-end">
+                <button onclick="addNewService()" 
+                    class="bg-purple-500 text-white px-6 py-2 rounded-lg hover:bg-purple-600 flex items-center">
+                    <i class="ri-add-line mr-2"></i>
+                    Aggiungi Servizio
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Save Button Bottom -->
+<div class="flex justify-center mb-8 space-x-4">
+    <button id="save-button-bottom" class="hidden bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-opacity-90 shadow-lg" onclick="window.saveConfiguration()">
+        <i class="ri-save-line mr-2"></i>
+        Salva Tutte le Modifiche
+    </button>
+    
+    <!-- 🧪 TEST BUTTON (always visible for testing) -->
+    <button id="test-save-button" class="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 shadow-lg" onclick="window.saveConfiguration()">
+        <i class="ri-test-tube-line mr-2"></i>
+        TEST SALVA (Temporaneo)
+    </button>
+</div>
+
+</main>
+
+<script>
+// 📦 BOX 1: Caratteristiche della Pagina - JavaScript handlers
+document.addEventListener('DOMContentLoaded', function() {
+    // Logo type radio handlers
+    const logoTypeRadios = document.querySelectorAll('input[name="logo-type"]');
+    const logoTextSection = document.getElementById('logo-text-section');
+    const logoImageSection = document.getElementById('logo-image-section');
+    const logoPreview = document.getElementById('logo-preview');
+
+    logoTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            switch(this.value) {
+                case 'text':
+                    logoTextSection.classList.remove('hidden');
+                    logoImageSection.classList.add('hidden');
+                    logoPreview.innerHTML = document.getElementById('admin-logo-text').value;
+                    break;
+                case 'image':
+                    logoTextSection.classList.add('hidden');
+                    logoImageSection.classList.remove('hidden');
+                    logoPreview.innerHTML = '<i class="ri-image-line text-4xl text-gray-400"></i>';
+                    break;
+                case 'both':
+                    logoTextSection.classList.remove('hidden');
+                    logoImageSection.classList.remove('hidden');
+                    logoPreview.innerHTML = '<i class="ri-image-line mr-2"></i>' + document.getElementById('admin-logo-text').value;
+                    break;
+            }
+        });
+    });
+
+    // Logo text input handler
+    document.getElementById('admin-logo-text').addEventListener('input', function() {
+        logoPreview.textContent = this.value || 'Elite Escape';
+    });
+
+    // Badge preview handlers
+    const updateBadgePreview = () => {
+        const text = document.getElementById('admin-badge-text').value;
+        const price = document.getElementById('admin-starting-price').value;
+        const color = document.getElementById('admin-badge-color').value;
+        const preview = document.getElementById('badge-preview');
+        
+        preview.style.backgroundColor = color;
+        preview.innerHTML = `
+            <span class="text-xs mb-1">${text}</span>
+            <span class="text-lg font-bold">€${parseInt(price).toLocaleString()}</span>
+        `;
+    };
+
+    document.getElementById('admin-badge-text').addEventListener('input', updateBadgePreview);
+    document.getElementById('admin-starting-price').addEventListener('input', updateBadgePreview);
+    document.getElementById('admin-badge-color').addEventListener('input', function() {
+        document.getElementById('admin-badge-color-text').value = this.value;
+        updateBadgePreview();
+    });
+    document.getElementById('admin-badge-color-text').addEventListener('input', function() {
+        document.getElementById('admin-badge-color').value = this.value;
+        updateBadgePreview();
+    });
+});
+
+// Temporary simplified save function for testing
+window.saveConfiguration = function() {
+    console.log('✅ BOX 1-2 Save function called');
+    
+    try {
+        // Raccolta dati BOX 1: Caratteristiche della Pagina
+        const box1Data = {
+            logo: {
+                type: document.querySelector('input[name="logo-type"]:checked').value,
+                text: document.getElementById('admin-logo-text').value,
+            },
+            page: {
+                title: document.getElementById('admin-page-title').value,
+                metaTitle: document.getElementById('admin-meta-title').value,
+            },
+            footer: {
+                companyName: document.getElementById('admin-company-name').value,
+                phone: document.getElementById('admin-company-phone').value,
+                email: document.getElementById('admin-company-email').value,
+                address: document.getElementById('admin-company-address').value,
+                legal: document.getElementById('admin-footer-legal').value,
+            }
+        };
+
+        // Raccolta dati BOX 2: Caratteristiche dell'Imbarcazione
+        const box2Data = {
+            images: {
+                main: document.getElementById('admin-main-image').value,
+                summary: document.getElementById('admin-summary-image').value,
+            },
+            badge: {
+                startingPrice: document.getElementById('admin-starting-price').value,
+                text: document.getElementById('admin-badge-text').value,
+                color: document.getElementById('admin-badge-color').value,
+            },
+            boat: {
+                name: document.getElementById('admin-catamaran-name').value,
+                basePrice: document.getElementById('admin-base-price').value,
+            },
+            technical: {
+                year: document.getElementById('admin-year').value,
+                cabins: document.getElementById('admin-cabins').value,
+                bathrooms: document.getElementById('admin-bathrooms').value,
+                enginePower: document.getElementById('admin-engine-power').value,
+                length: document.getElementById('admin-length').value,
+                width: document.getElementById('admin-width').value, // NUOVO
+                draft: document.getElementById('admin-draft').value, // NUOVO
+                displacement: document.getElementById('admin-displacement').value, // NUOVO
+                waterTank: document.getElementById('admin-water-tank').value, // NUOVO
+                fuelTank: document.getElementById('admin-fuel-tank').value, // NUOVO
+            }
+        };
+
+        // Raccolta dati BOX 3: Servizi Aggiuntivi + Skipper
+        const skipperData = {
+            name: "Skipper Professionale",
+            price: parseInt(document.getElementById('skipper-price-admin').value) || 200,
+            frequency: "daily",
+            description: document.getElementById('skipper-description').value,
+            icon: "ri-steering-2-line",
+            active: document.getElementById('skipper-active').checked,
+            recommended: document.getElementById('skipper-recommended').checked,
+            mandatory: false,
+            recommendationText: document.getElementById('skipper-recommendation-text').value,
+            order: 1, // Skipper sempre primo tra i raccomandati
+            isSkipper: true // Flag speciale per identificarlo
+        };
+
+        const box3Data = {
+            services: window.additionalServices || [],
+            skipper: skipperData
+        };
+
+        console.log('📦 BOX 1 Data:', box1Data);
+        console.log('📦 BOX 2 Data:', box2Data);
+        console.log('📦 BOX 3 Data:', box3Data);
+
+        // Salva sia in localStorage che su Supabase - AGGIORNATO per includere BOX 3
+        const configData = { box1: box1Data, box2: box2Data, box3: box3Data };
+        localStorage.setItem('eliteEscape_config_box1_2', JSON.stringify(configData));
+
+        // 📡 Salva anche su Supabase per browser incognito
+        if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.save) {
+            console.log('📡 Salvando anche su Supabase...');
+            try {
+                // Carica la configurazione esistente
+                const existingConfig = CatamaranStorage.load() || {};
+                console.log('📄 Configurazione esistente:', existingConfig);
+                
+                // Aggiorna con i nuovi dati BOX 1-3 (formato admin)
+                existingConfig.box1_2 = configData;
+                
+                // 🔄 UNIFICAZIONE FORMATO: Salva anche nel formato pubblico 'data'
+                if (!existingConfig.data) {
+                    existingConfig.data = {};
+                }
+                
+                // 🔄 AGGIORNAMENTO FORMATO PUBBLICO: Copia i dati correnti BOX 1-3
+                console.log('🔄 Aggiornando formato pubblico con dati correnti...');
+                console.log('📦 configData.box1:', configData.box1);
+                console.log('📦 configData.box2:', configData.box2);
+                console.log('📦 configData.box3:', configData.box3);
+                
+                // Mappa i dati correnti BOX nel formato pubblico DATA
+                existingConfig.data.logo = configData.box1?.logo || {};
+                existingConfig.data.page = configData.box1?.page || {};
+                existingConfig.data.footer = configData.box1?.footer || {};
+                existingConfig.data.images = configData.box2?.images || {};
+                existingConfig.data.badge = configData.box2?.badge || {};
+                existingConfig.data.boat = configData.box2?.boat || {};
+                existingConfig.data.technical = configData.box2?.technical || {};
+                existingConfig.data.services = configData.box3?.services || [];
+                existingConfig.data.skipper = configData.box3?.skipper || {};
+                
+                console.log('✅ Formato pubblico DATA aggiornato:', existingConfig.data);
+                
+                console.log('📦 Configurazione unificata (admin + pubblico):', existingConfig);
+                
+                // Salva su Supabase (asincrono)
+                if (typeof CatamaranStorage.save === 'function') {
+                    const saveResult = CatamaranStorage.save(existingConfig);
+                    console.log('📡 Comando salvataggio Supabase inviato');
+                    
+                    // 🧪 TEST: Verifica dopo un delay più lungo per dare tempo a Supabase
+                    setTimeout(async () => {
+                        console.log('🧪 Test verifica salvataggio (delay 5s)...');
+                        try {
+                            if (typeof CatamaranStorage.forceRefresh === 'function') {
+                                const testResult = await CatamaranStorage.forceRefresh();
+                                console.log('🧪 Risultato refresh test:', testResult);
+                                
+                                if (testResult.success) {
+                                    const testConfig = CatamaranStorage.load();
+                                    console.log('🧪 Configurazione dopo refresh:', testConfig);
+                                    
+                                    if (testConfig && testConfig.box1_2) {
+                                        console.log('✅ Verifica OK: BOX 1-3 presenti su Supabase');
+                                        if (testConfig.box1_2.box3) {
+                                            console.log('✅ BOX 3 verificato:', testConfig.box1_2.box3.services?.length || 0, 'servizi');
+                                        }
+                                    } else {
+                                        console.warn('⚠️ Verifica: BOX 1-3 non trovati, ma potrebbero essere nella vecchia struttura');
+                                        console.log('🔍 Chiavi disponibili:', Object.keys(testConfig || {}));
+                                    }
+                                } else {
+                                    console.warn('⚠️ Refresh test fallito:', testResult.error);
+                                }
+                            }
+                        } catch (error) {
+                            console.error('❌ Errore durante verifica:', error);
+                        }
+                    }, 5000); // Aumentato a 5 secondi
+                } else {
+                    console.error('❌ CatamaranStorage.save non è una funzione');
+                }
+                
+            } catch (error) {
+                console.error('❌ Errore salvataggio Supabase:', error);
+            }
+        }
+
+
+        alert('✅ BOX 1-3 salvati con successo!\n\n' + 
+              '📦 BOX 1: Logo, Pagina, Footer\n' + 
+              '📦 BOX 2: Immagini, Badge, Barca, Caratteristiche Tecniche\n' +
+              '📦 BOX 3: ' + box3Data.services.length + ' servizi aggiuntivi configurati\n\n' +
+              '🆕 Nuove caratteristiche tecniche incluse:\n' +
+              '• Larghezza: ' + box2Data.technical.width + 'm\n' +
+              '• Pescaggio: ' + box2Data.technical.draft + 'm\n' +
+              '• Dislocamento: ' + box2Data.technical.displacement + 't\n' +
+              '• Serbatoio acqua: ' + box2Data.technical.waterTank + 'L\n' +
+              '• Serbatoio gasolio: ' + box2Data.technical.fuelTank + 'L\n\n' +
+              '🧪 Test browser incognito:\n' +
+              'Apri la pagina prenotazione in incognito per verificare la sincronizzazione!');
+
+    } catch (error) {
+        console.error('❌ Errore durante il salvataggio:', error);
+        alert('❌ Errore durante il salvataggio: ' + error.message);
+    }
+};
+
+// Temporary load function
+window.loadConfiguration = function() {
+    console.log('📥 BOX 1-2 Load function called');
+    
+    try {
+        const saved = localStorage.getItem('eliteEscape_config_box1_2');
+        if (!saved) {
+            console.log('📝 Nessuna configurazione salvata trovata');
+            return;
+        }
+
+        const configData = JSON.parse(saved);
+        console.log('📦 Caricando configurazione salvata:', configData);
+
+        // Carica BOX 1: Caratteristiche della Pagina
+        if (configData.box1) {
+            const box1 = configData.box1;
+            
+            // Logo
+            if (box1.logo) {
+                document.querySelector(`input[name="logo-type"][value="${box1.logo.type}"]`).checked = true;
+                document.getElementById('admin-logo-text').value = box1.logo.text;
+            }
+            
+            // Pagina
+            if (box1.page) {
+                document.getElementById('admin-page-title').value = box1.page.title;
+                document.getElementById('admin-meta-title').value = box1.page.metaTitle;
+            }
+            
+            // Footer
+            if (box1.footer) {
+                document.getElementById('admin-company-name').value = box1.footer.companyName;
+                document.getElementById('admin-company-phone').value = box1.footer.phone;
+                document.getElementById('admin-company-email').value = box1.footer.email;
+                document.getElementById('admin-company-address').value = box1.footer.address;
+                document.getElementById('admin-footer-legal').value = box1.footer.legal;
+            }
+        }
+
+        // Carica BOX 2: Caratteristiche dell'Imbarcazione
+        if (configData.box2) {
+            const box2 = configData.box2;
+            
+            // Immagini
+            if (box2.images) {
+                document.getElementById('admin-main-image').value = box2.images.main;
+                document.getElementById('admin-summary-image').value = box2.images.summary;
+            }
+            
+            // Badge
+            if (box2.badge) {
+                document.getElementById('admin-starting-price').value = box2.badge.startingPrice;
+                document.getElementById('admin-badge-text').value = box2.badge.text;
+                document.getElementById('admin-badge-color').value = box2.badge.color;
+                document.getElementById('admin-badge-color-text').value = box2.badge.color;
+            }
+            
+            // Barca
+            if (box2.boat) {
+                document.getElementById('admin-catamaran-name').value = box2.boat.name;
+                document.getElementById('admin-base-price').value = box2.boat.basePrice;
+            }
+            
+            // Caratteristiche tecniche
+            if (box2.technical) {
+                document.getElementById('admin-year').value = box2.technical.year;
+                document.getElementById('admin-cabins').value = box2.technical.cabins;
+                document.getElementById('admin-bathrooms').value = box2.technical.bathrooms;
+                document.getElementById('admin-engine-power').value = box2.technical.enginePower;
+                document.getElementById('admin-length').value = box2.technical.length;
+                document.getElementById('admin-width').value = box2.technical.width; // NUOVO
+                document.getElementById('admin-draft').value = box2.technical.draft; // NUOVO
+                document.getElementById('admin-displacement').value = box2.technical.displacement; // NUOVO
+                document.getElementById('admin-water-tank').value = box2.technical.waterTank; // NUOVO
+                document.getElementById('admin-fuel-tank').value = box2.technical.fuelTank; // NUOVO
+            }
+        }
+
+        // Aggiorna anteprime
+        const logoPreview = document.getElementById('logo-preview');
+        logoPreview.textContent = document.getElementById('admin-logo-text').value;
+        
+        // Trigger badge preview update
+        const updateBadgePreview = () => {
+            const text = document.getElementById('admin-badge-text').value;
+            const price = document.getElementById('admin-starting-price').value;
+            const color = document.getElementById('admin-badge-color').value;
+            const preview = document.getElementById('badge-preview');
+            
+            preview.style.backgroundColor = color;
+            preview.innerHTML = `
+                <span class="text-xs mb-1">${text}</span>
+                <span class="text-lg font-bold">€${parseInt(price).toLocaleString()}</span>
+            `;
+        };
+        updateBadgePreview();
+
+        // Carica BOX 3: Servizi Aggiuntivi + Skipper
+        if (configData.box3) {
+            // Carica servizi aggiuntivi
+            if (configData.box3.services) {
+                window.additionalServices = configData.box3.services;
+                renderServicesList();
+                console.log('📦 BOX 3: Caricati ' + window.additionalServices.length + ' servizi aggiuntivi');
+            }
+            
+            // Carica configurazione Skipper
+            if (configData.box3.skipper) {
+                const skipper = configData.box3.skipper;
+                document.getElementById('skipper-price-admin').value = skipper.price || 200;
+                document.getElementById('skipper-active').checked = skipper.active !== false;
+                document.getElementById('skipper-recommended').checked = skipper.recommended !== false;
+                document.getElementById('skipper-description').value = skipper.description || '';
+                document.getElementById('skipper-recommendation-text').value = skipper.recommendationText || '';
+                console.log('⚓ Skipper: Configurazione caricata - Prezzo: €' + skipper.price + ', Attivo: ' + skipper.active);
+            }
+        }
+
+        console.log('✅ Configurazione caricata con successo');
+
+    } catch (error) {
+        console.error('❌ Errore durante il caricamento:', error);
+        alert('❌ Errore durante il caricamento: ' + error.message);
+    }
+};
+
+// 📦 BOX 3: SERVIZI AGGIUNTIVI - JavaScript functions
+window.additionalServices = [];
+
+// Funzione per aggiungere un nuovo servizio
+window.addNewService = function() {
+    const name = document.getElementById('new-service-name').value.trim();
+    const price = parseFloat(document.getElementById('new-service-price').value) || 0;
+    const frequency = document.getElementById('new-service-frequency').value;
+    const description = document.getElementById('new-service-description').value.trim();
+    const icon = document.getElementById('new-service-icon').value.trim() || 'ri-service-line';
+    const active = document.getElementById('new-service-active').checked;
+    const mandatory = document.getElementById('new-service-mandatory').checked;
+    const recommended = document.getElementById('new-service-recommended').checked;
+    const order = parseInt(document.getElementById('new-service-order').value) || 10;
+
+    if (!name) {
+        alert('❌ Il nome del servizio è obbligatorio');
+        return;
+    }
+
+    if (price <= 0) {
+        alert('❌ Il prezzo deve essere maggiore di 0');
+        return;
+    }
+
+    const newService = {
+        id: Date.now().toString(),
+        name,
+        price,
+        frequency,
+        description,
+        icon,
+        active,
+        mandatory,
+        recommended,
+        order,
+        createdAt: new Date().toISOString()
+    };
+
+    window.additionalServices.push(newService);
+    
+    // Pulisci il form
+    document.getElementById('new-service-name').value = '';
+    document.getElementById('new-service-price').value = '';
+    document.getElementById('new-service-frequency').value = 'once';
+    document.getElementById('new-service-description').value = '';
+    document.getElementById('new-service-icon').value = 'ri-service-line';
+    document.getElementById('new-service-active').checked = true;
+    document.getElementById('new-service-mandatory').checked = false;
+    document.getElementById('new-service-recommended').checked = false;
+    document.getElementById('new-service-order').value = '10';
+    
+    // Aggiorna preview icona
+    document.getElementById('new-service-icon-preview').innerHTML = '<i class="ri-service-line text-xl text-gray-600"></i>';
+
+    renderServicesList();
+    
+    console.log('✅ Servizio aggiunto:', newService);
+};
+
+// Funzione per rimuovere un servizio
+window.removeService = function(serviceId) {
+    if (confirm('🗑️ Sei sicuro di voler rimuovere questo servizio?')) {
+        window.additionalServices = window.additionalServices.filter(s => s.id !== serviceId);
+        renderServicesList();
+        console.log('🗑️ Servizio rimosso:', serviceId);
+    }
+};
+
+// Funzione per modificare un servizio
+window.editService = function(serviceId) {
+    const service = window.additionalServices.find(s => s.id === serviceId);
+    if (!service) return;
+    
+    // Popola il form con i dati del servizio
+    document.getElementById('new-service-name').value = service.name;
+    document.getElementById('new-service-price').value = service.price;
+    document.getElementById('new-service-frequency').value = service.frequency;
+    document.getElementById('new-service-description').value = service.description;
+    document.getElementById('new-service-icon').value = service.icon;
+    document.getElementById('new-service-active').checked = service.active;
+    document.getElementById('new-service-mandatory').checked = service.mandatory;
+    document.getElementById('new-service-recommended').checked = service.recommended;
+    document.getElementById('new-service-order').value = service.order || 10;
+    
+    // Aggiorna preview icona
+    document.getElementById('new-service-icon-preview').innerHTML = `<i class="${service.icon} text-xl text-gray-600"></i>`;
+    
+    // Rimuovi il servizio (sarà ri-aggiunto quando l'utente clicca "Aggiungi")
+    window.additionalServices = window.additionalServices.filter(s => s.id !== serviceId);
+    renderServicesList();
+    
+    console.log('✏️ Servizio in modifica:', service);
+};
+
+// Funzione per renderizzare la lista dei servizi
+function renderServicesList() {
+    const container = document.getElementById('services-list');
+    
+    if (window.additionalServices.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <i class="ri-service-line text-4xl mb-4"></i>
+                <p>Nessun servizio aggiuntivo configurato</p>
+                <p class="text-sm">Usa il form sottostante per aggiungere il primo servizio</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = window.additionalServices.map(service => {
+        const frequencyText = {
+            'once': 'Una tantum',
+            'daily': 'Al giorno', 
+            'weekly': 'A settimana'
+        }[service.frequency] || service.frequency;
+
+        const statusBadges = [];
+        if (service.active) statusBadges.push('<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">Attivo</span>');
+        if (service.mandatory) statusBadges.push('<span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded">Obbligatorio</span>');
+        if (service.recommended) statusBadges.push('<span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">Raccomandato</span>');
+        if (!service.active) statusBadges.push('<span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">Inattivo</span>');
+
+        return `
+            <div class="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center space-x-4 flex-1">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="${service.icon} text-xl text-purple-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <h4 class="font-semibold text-gray-900">${service.name}</h4>
+                                <span class="text-lg font-bold text-purple-600">€${service.price.toLocaleString()} ${frequencyText}</span>
+                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">#${service.order || 10}</span>
+                            </div>
+                            ${service.description ? `<p class="text-sm text-gray-600 mb-2">${service.description}</p>` : ''}
+                            <div class="flex flex-wrap gap-1">
+                                ${statusBadges.join('')}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 ml-4">
+                        <button onclick="editService('${service.id}')" 
+                            class="text-blue-600 hover:text-blue-800 p-2" title="Modifica">
+                            <i class="ri-edit-line"></i>
+                        </button>
+                        <button onclick="removeService('${service.id}')" 
+                            class="text-red-600 hover:text-red-800 p-2" title="Rimuovi">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Event listener per preview dell'icona
+document.addEventListener('DOMContentLoaded', function() {
+    const iconInput = document.getElementById('new-service-icon');
+    const iconPreview = document.getElementById('new-service-icon-preview');
+    
+    if (iconInput && iconPreview) {
+        iconInput.addEventListener('input', function() {
+            const iconClass = this.value.trim() || 'ri-service-line';
+            iconPreview.innerHTML = `<i class="${iconClass} text-xl text-gray-600"></i>`;
+        });
+    }
+});
+
+// === GESTIONE AUTENTICAZIONE ===
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-carica la configurazione al caricamento della pagina
+    setTimeout(window.loadConfiguration, 500); // Aspetta che tutto sia inizializzato
+    
+    // Event listener per il form di login
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+    const loginErrorText = document.getElementById('login-error-text');
+    const loginButton = document.getElementById('login-submit');
+    const loginButtonText = document.getElementById('login-button-text');
+    
+    // Gestione sottomissione form login
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showLoginError('Inserisci email e password');
+                return;
+            }
+            
+            // Stato loading
+            if (loginButton) {
+                loginButton.disabled = true;
+                if (loginButtonText) loginButtonText.textContent = 'Accesso in corso...';
+            }
+            
+            // Nascondi errori precedenti
+            hideLoginError();
+            
+            try {
+                console.log('🔐 Tentativo login per:', email);
+                
+                // Attende che AuthManager sia disponibile
+                if (typeof window.authManager === 'undefined') {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+                
+                if (typeof window.authManager !== 'undefined') {
+                    const result = await window.authManager.signIn(email, password);
+                    
+                    if (result.success) {
+                        console.log('✅ Login completato con successo');
+                        hideLoginError();
+                        // L'AuthManager gestirà automaticamente l'aggiornamento UI
+                    } else {
+                        console.error('❌ Errore login:', result.error);
+                        showLoginError(result.error || 'Errore durante il login');
+                    }
+                } else {
+                    showLoginError('Sistema di autenticazione non disponibile');
+                }
+            } catch (error) {
+                console.error('❌ Errore login:', error);
+                showLoginError('Errore di connessione');
+            } finally {
+                // Ripristina stato button
+                if (loginButton) {
+                    loginButton.disabled = false;
+                    if (loginButtonText) loginButtonText.textContent = 'Accedi';
+                }
+            }
+        });
+    }
+    
+    // Event listener per bottone login header
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', function() {
+            // Il form è già visibile, focus su email
+            const emailInput = document.getElementById('email');
+            if (emailInput) emailInput.focus();
+        });
+    }
+    
+    // Event listener per bottone logout header
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async function() {
+            try {
+                if (typeof window.authManager !== 'undefined') {
+                    const result = await window.authManager.signOut();
+                    if (result.success) {
+                        console.log('✅ Logout completato');
+                        // L'AuthManager gestirà automaticamente l'aggiornamento UI
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Errore logout:', error);
+            }
+        });
+    }
+    
+    // Funzioni helper per gestire errori login
+    function showLoginError(message) {
+        if (loginError && loginErrorText) {
+            loginErrorText.textContent = message;
+            loginError.classList.remove('hidden');
+        }
+    }
+    
+    function hideLoginError() {
+        if (loginError) {
+            loginError.classList.add('hidden');
+        }
+    }
+});
+</script>
+
+</body>
+</html>
