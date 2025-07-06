@@ -858,7 +858,13 @@ window.saveConfiguration = function() {
                     existingConfig.data = {};
                 }
                 
-                // Copia i dati BOX 1-2 nel formato pubblico
+                // 🔄 AGGIORNAMENTO FORMATO PUBBLICO: Copia i dati correnti BOX 1-3
+                console.log('🔄 Aggiornando formato pubblico con dati correnti...');
+                console.log('📦 configData.box1:', configData.box1);
+                console.log('📦 configData.box2:', configData.box2);
+                console.log('📦 configData.box3:', configData.box3);
+                
+                // Mappa i dati correnti BOX nel formato pubblico DATA
                 existingConfig.data.logo = configData.box1?.logo || {};
                 existingConfig.data.page = configData.box1?.page || {};
                 existingConfig.data.footer = configData.box1?.footer || {};
@@ -868,6 +874,8 @@ window.saveConfiguration = function() {
                 existingConfig.data.technical = configData.box2?.technical || {};
                 existingConfig.data.services = configData.box3?.services || [];
                 existingConfig.data.skipper = configData.box3?.skipper || {};
+                
+                console.log('✅ Formato pubblico DATA aggiornato:', existingConfig.data);
                 
                 console.log('📦 Configurazione unificata (admin + pubblico):', existingConfig);
                 
