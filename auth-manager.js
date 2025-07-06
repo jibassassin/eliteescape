@@ -22,7 +22,6 @@ class AuthManager {
         // Ascolta cambiamenti di stato auth
         this.setupAuthListener();
         
-        console.log('🔐 AuthManager inizializzato');
     }
 
     async waitForSupabase() {
@@ -30,7 +29,6 @@ class AuthManager {
         while (attempts < 30) {
             // Controlla se Supabase JS è disponibile
             if (typeof window.supabase !== 'undefined') {
-                console.log('✅ Supabase JS disponibile');
                 return;
             }
             await new Promise(resolve => setTimeout(resolve, 200));
@@ -55,18 +53,14 @@ class AuthManager {
 
             if (session?.user) {
                 await this.setUser(session.user);
-                console.log('✅ Sessione esistente trovata per:', session.user.email);
-            } else {
-                console.log('📱 Nessuna sessione attiva');
             }
         } catch (error) {
-            console.error('❌ Errore controllo sessione:', error);
+            console.error('Errore controllo sessione:', error);
         }
     }
 
     setupAuthListener() {
         // Implementazione semplificata - sarà completata nel passo successivo
-        console.log('👂 Auth listener configurato');
     }
 
     async setUser(user) {
@@ -101,14 +95,13 @@ class AuthManager {
                 .single();
 
             if (error) {
-                console.warn('⚠️ Errore caricamento profilo:', error);
+                console.warn('Errore caricamento profilo:', error);
                 return;
             }
 
             this.profile = profile;
-            console.log('👤 Profilo admin caricato:', profile.email);
         } catch (error) {
-            console.error('❌ Errore caricamento profilo:', error);
+            console.error('Errore caricamento profilo:', error);
         }
     }
 
@@ -120,24 +113,21 @@ class AuthManager {
                 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhcXFreHJodGd4eGZlZXhicGdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1MTY5NDcsImV4cCI6MjA2NjA5Mjk0N30.5fLV8_EmkbdSx0vCUd8HXMP1SDsOG1p0fyYMqdVmUAQ'
             );
 
-            console.log('🔐 Tentativo login per:', email);
-
             const { data, error } = await client.auth.signInWithPassword({
                 email: email,
                 password: password
             });
 
             if (error) {
-                console.error('❌ Errore login:', error.message);
+                console.error('Errore login:', error.message);
                 return { success: false, error: error.message };
             }
 
             await this.setUser(data.user);
-            console.log('✅ Login completato per:', email);
             
             return { success: true, user: data.user };
         } catch (error) {
-            console.error('❌ Errore login:', error);
+            console.error('Errore login:', error);
             return { success: false, error: error.message };
         }
     }
@@ -148,8 +138,6 @@ class AuthManager {
                 'https://aaqqkxrhtgxxfeexbpgs.supabase.co',
                 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhcXFreHJodGd4eGZlZXhicGdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1MTY5NDcsImV4cCI6MjA2NjA5Mjk0N30.5fLV8_EmkbdSx0vCUd8HXMP1SDsOG1p0fyYMqdVmUAQ'
             );
-
-            console.log('📝 Tentativo registrazione per:', email);
 
             const { data, error } = await client.auth.signUp({
                 email: email,
@@ -162,14 +150,12 @@ class AuthManager {
             });
 
             if (error) {
-                console.error('❌ Errore registrazione:', error.message);
+                console.error('Errore registrazione:', error.message);
                 return { success: false, error: error.message };
             }
-
-            console.log('✅ Registrazione completata per:', email);
             return { success: true, user: data.user, needsConfirmation: !data.session };
         } catch (error) {
-            console.error('❌ Errore registrazione:', error);
+            console.error('Errore registrazione:', error);
             return { success: false, error: error.message };
         }
     }
@@ -181,21 +167,18 @@ class AuthManager {
                 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhcXFreHJodGd4eGZlZXhicGdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1MTY5NDcsImV4cCI6MjA2NjA5Mjk0N30.5fLV8_EmkbdSx0vCUd8HXMP1SDsOG1p0fyYMqdVmUAQ'
             );
 
-            console.log('👋 Logout in corso...');
-
             const { error } = await client.auth.signOut();
             
             if (error) {
-                console.error('❌ Errore logout:', error);
+                console.error('Errore logout:', error);
                 return { success: false, error: error.message };
             }
 
             await this.setUser(null);
-            console.log('✅ Logout completato');
             
             return { success: true };
         } catch (error) {
-            console.error('❌ Errore logout:', error);
+            console.error('Errore logout:', error);
             return { success: false, error: error.message };
         }
     }
@@ -302,4 +285,3 @@ class AuthManager {
 // Inizializza il gestore auth globalmente
 window.authManager = new AuthManager();
 
-console.log('🔑 Auth Manager caricato');

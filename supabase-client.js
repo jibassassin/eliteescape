@@ -14,16 +14,15 @@ function initializeSupabase() {
   if (supabaseClient) return supabaseClient;
   
   if (typeof window.supabase === 'undefined') {
-    console.error('❌ Supabase JS non caricato');
+    console.error('Supabase JS non caricato');
     return null;
   }
   
   try {
     supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-    console.log('✓ Supabase client inizializzato');
     return supabaseClient;
   } catch (error) {
-    console.error('❌ Errore inizializzazione Supabase:', error);
+    console.error('Errore inizializzazione Supabase:', error);
     return null;
   }
 }
@@ -65,22 +64,17 @@ function saveConfigToSupabase(config) {
         return;
       }
 
-      // 🔐 CONTROLLO AUTENTICAZIONE RLS
+      // CONTROLLO AUTENTICAZIONE RLS
       const { data: { session } } = await client.auth.getSession();
       if (!session?.user) {
-        console.warn('🚫 Tentativo di salvataggio senza autenticazione');
         resolve({ success: false, error: 'Autenticazione richiesta per salvare le configurazioni' });
         return;
       }
 
-      console.log('🔑 Utente autenticato per salvataggio:', session.user.email);
-
       // Controlla dimensione config per debug
       const configSize = JSON.stringify(config).length;
-      console.log(`📊 Dimensione configurazione: ${(configSize / 1024).toFixed(1)}KB`);
-      
       if (configSize > 1000000) { // >1MB
-        console.warn('⚠️ Configurazione molto grande, potrebbe fallire');
+        console.warn('Configurazione molto grande, potrebbe fallire');
       }
 
       // Verifica se esiste già una configurazione
@@ -102,8 +96,6 @@ function saveConfigToSupabase(config) {
         updated_at: new Date().toISOString()
       };
 
-      console.log(`🔄 Salvando configurazione con versione: ${version}`);
-
       let result;
       if (existing && existing.length > 0) {
         // Aggiorna configurazione esistente
@@ -124,15 +116,14 @@ function saveConfigToSupabase(config) {
       }
 
       if (result.error) {
-        console.error('❌ Errore dettagliato Supabase:', result.error);
+        console.error('Errore Supabase:', result.error);
         if (result.error.code === '42501') {
-          console.error('🚫 ERRORE RLS: Policy non configurata. Vai su Dashboard Supabase → SQL Editor e esegui:');
+          console.error('ERRORE RLS: Policy non configurata. Vai su Dashboard Supabase → SQL Editor e esegui:');
           console.error('CREATE POLICY "Lettura pubblica configurazioni" ON public.configurations FOR SELECT USING (true);');
           console.error('CREATE POLICY "Scrittura solo admin autenticati" ON public.configurations FOR ALL USING (EXISTS (SELECT 1 FROM public.admin_profiles WHERE id = auth.uid()));');
         }
         resolve({ success: false, error: result.error.message, details: result.error, needsRLSSetup: result.error.code === '42501' });
       } else {
-        console.log('✅ Salvataggio Supabase completato con RLS');
         resolve({ success: true, data: result.data });
       }
     } catch (err) {
@@ -151,13 +142,8 @@ function loadConfigFromSupabase() {
         return;
       }
 
-      // 🔐 CONTROLLO AUTENTICAZIONE RLS (per accesso admin)
+      // CONTROLLO AUTENTICAZIONE RLS (per accesso admin)
       const { data: { session } } = await client.auth.getSession();
-      if (!session?.user) {
-        console.log('📖 Caricamento pubblico configurazione (modalità guest)');
-      } else {
-        console.log('🔑 Utente autenticato per caricamento:', session.user.email);
-      }
 
       const { data, error } = await client
         .from('configurations')
@@ -166,14 +152,13 @@ function loadConfigFromSupabase() {
         .limit(1);
 
       if (error) {
-        console.warn('⚠️ Errore caricamento Supabase (potrebbero mancare policy RLS):', error.message);
+        console.warn('Errore caricamento Supabase (potrebbero mancare policy RLS):', error.message);
         resolve({ success: false, error: error.message, needsRLSSetup: true });
       } else if (data && data.length > 0) {
         const configData = data[0].config_data;
         
         // Gestisce nuovo formato con versioning
         if (configData.version && configData.data) {
-          console.log(`📥 Configurazione caricata da Supabase (versione: ${configData.version})`);
           resolve({ 
             success: true, 
             config: configData.data,
@@ -183,7 +168,6 @@ function loadConfigFromSupabase() {
           });
         } else {
           // Compatibilità con formato precedente
-          console.log('📥 Configurazione caricata da Supabase (formato legacy)');
           resolve({ 
             success: true, 
             config: configData,
@@ -210,8 +194,6 @@ function forceRefreshConfig() {
         return;
       }
 
-      console.log('🔄 Refresh forzato configurazione da Supabase...');
-
       const { data, error } = await client
         .from('configurations')
         .select('config_data, id')
@@ -221,7 +203,6 @@ function forceRefreshConfig() {
       if (error) {
         resolve({ success: false, error: error.message });
       } else if (data && data.length > 0) {
-        console.log('✅ Refresh completato - configurazione aggiornata');
         resolve({ 
           success: true, 
           config: data[0].config_data,
@@ -261,7 +242,6 @@ function checkConfigVersion() {
         const version = configData?.version || 0;
         const updated_at = configData?.updated_at;
         
-        console.log(`📡 Version check: ${version} (${updated_at})`);
         resolve({ 
           success: true, 
           version: version,
@@ -289,4 +269,3 @@ window.SupabaseManager = {
   }
 };
 
-console.log('📦 Supabase client module caricato');

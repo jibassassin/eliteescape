@@ -20,13 +20,11 @@
 <!-- 🚨 SOLUZIONE IMMEDIATA LOADING SCREEN - BYPASS TOTALE -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.warn('🚨 ATTIVANDO BYPASS LOADING SCREEN');
     
     // Timeout di emergenza di 1 secondo - rimuove loading screen indipendentemente da tutto
     setTimeout(() => {
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) {
-            console.warn('🔥 RIMOZIONE FORZATA LOADING SCREEN');
             loadingScreen.style.display = 'none !important';
             loadingScreen.style.visibility = 'hidden !important';
             loadingScreen.style.opacity = '0 !important';
@@ -51,12 +49,10 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         const loadingScreen = document.getElementById('loading-screen');
         if (loadingScreen) {
-            console.warn('⚡ RIMOZIONE ULTRA-RAPIDA LOADING SCREEN');
             loadingScreen.remove();
         }
         
-        // 🚨 FORZA VISUALIZZAZIONE DI TUTTO
-        console.warn('🔥 FORZANDO VISUALIZZAZIONE COMPLETA PAGINA');
+        // Force page visibility
         
         // Rimuovi content-hidden da tutti gli elementi
         document.querySelectorAll('.content-hidden').forEach(el => {
@@ -443,8 +439,8 @@ transform: translateX(26px);
 </style>
 
 <!-- SSG Build Info -->
-<meta name="ssg-build-time" content="2025-07-06T10:44:50.120Z">
-<meta name="ssg-config-version" content="1751793614329">
+<meta name="ssg-build-time" content="2025-07-06T11:36:01.839Z">
+<meta name="ssg-config-version" content="1751798837484">
 <meta name="ssg-generator" content="Elite Escape SSG v1.0">
 
 <!-- Enhanced SEO with dynamic content -->
@@ -899,7 +895,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initializeEmailSystem() {
     try {
-        console.log('🚀 Inizializzando sistema email...');
         
         // Carica configurazione
         const config = CatamaranStorage.load();
@@ -910,16 +905,14 @@ function initializeEmailSystem() {
         // Inizializza EmailJS se configurato
         if (config.email && config.email.enabled && config.email.emailjs.publicKey) {
             emailjs.init(config.email.emailjs.publicKey);
-            console.log('✓ EmailJS inizializzato');
         }
         
         // Setup controlli form
         setupFormControls();
         
-        console.log('✅ Sistema email inizializzato con successo');
         
     } catch (error) {
-        console.error('❌ Errore inizializzazione sistema email:', error);
+        console.error('Errore inizializzazione sistema email:', error);
     }
 }
 
@@ -935,7 +928,6 @@ function updateCTATexts(config) {
         subtext.textContent = config.ui.bookingSubtext;
     }
     
-    console.log('🔄 Testi CTA aggiornati dalla configurazione');
 }
 
 function setupFormControls() {
@@ -943,7 +935,7 @@ function setupFormControls() {
     const submitButton = document.getElementById('submit-booking');
     
     if (!termsCheckbox || !submitButton) {
-        console.error('❌ Elementi form non trovati');
+        console.error('Elementi form non trovati');
         return;
     }
     
@@ -970,7 +962,6 @@ function setupFormControls() {
         handleBookingSubmit();
     });
     
-    console.log('✓ Controlli form configurati');
 }
 
 async function handleBookingSubmit() {
@@ -1005,7 +996,7 @@ async function handleBookingSubmit() {
         // resetForm();
         
     } catch (error) {
-        console.error('❌ Errore invio prenotazione:', error);
+        console.error('Errore invio prenotazione:', error);
         showSubmitLoading(false);
         showNotification(config.email.notifications.errorMessage || 'Errore nell\'invio. Riprova.', 'error');
     }
@@ -1013,7 +1004,6 @@ async function handleBookingSubmit() {
 
 function collectBookingData() {
     try {
-        console.log('📋 Raccogliendo dati prenotazione...');
         
         // Dati personali
         const personalData = {
@@ -1113,18 +1103,16 @@ function collectBookingData() {
             source: 'Sito Web Elite Escape'
         };
         
-        console.log('✓ Dati raccolti:', bookingData);
         return bookingData;
         
     } catch (error) {
-        console.error('❌ Errore raccolta dati:', error);
+        console.error('Errore raccolta dati:', error);
         showNotification('Errore nella raccolta dei dati. Controlla i campi inseriti.', 'error');
         return null;
     }
 }
 
 async function sendBookingEmail(bookingData, config) {
-    console.log('📧 Inviando email prenotazione...');
     
     // Verifica configurazione EmailJS
     if (!config.email.emailjs.serviceId || !config.email.emailjs.templateId) {
@@ -1176,7 +1164,6 @@ async function sendBookingEmail(bookingData, config) {
         to_email: config.email.template.adminEmail
     };
     
-    console.log('📧 Parametri template preparati');
     
     // Invia email tramite EmailJS
     const response = await emailjs.send(
@@ -1185,7 +1172,6 @@ async function sendBookingEmail(bookingData, config) {
         templateParams
     );
     
-    console.log('✅ Email inviata con successo:', response);
     return response;
 }
 
@@ -1449,17 +1435,13 @@ function showNotification(message, type = 'info') {
 // Carica e mostra il logo dalla configurazione
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        console.log('🔄 Caricamento logo per pagina prenotazione...');
         const config = CatamaranStorage.load();
         const logoElement = document.getElementById('site-logo');
         
-        console.log('📂 Configurazione caricata:', config.theme);
-        console.log('🎯 Elemento logo trovato:', !!logoElement);
         
         if (logoElement) {
             // Migrazione della configurazione logo (da stringa a oggetto)
             if (typeof config.theme.logo === 'string') {
-                console.log('🔄 Migrazione configurazione logo da stringa a oggetto');
                 const oldLogoText = config.theme.logo;
                 config.theme.logo = {
                     type: 'text',
@@ -1473,15 +1455,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 config.theme.logo = { type: 'text', imageUrl: '', text: 'logo' };
             }
             
-            console.log('🖼️ Configurazione logo:', config.theme.logo);
             
             if (config.theme.logo.type === 'image' && config.theme.logo.imageUrl) {
-                console.log('✅ Mostrando immagine logo');
                 // Mostra immagine logo
                 logoElement.innerHTML = `<img src="${config.theme.logo.imageUrl}" alt="${config.theme.logo.text}" class="h-8 w-auto">`;
                 logoElement.className = 'block';
             } else {
-                console.log('📝 Mostrando testo logo:', config.theme.logo.text);
                 // Mostra testo logo
                 logoElement.textContent = config.theme.logo.text;
                 logoElement.className = 'text-3xl font-["Pacifico"] text-primary';
@@ -1491,7 +1470,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Carica titolo principale
         const titleElement = document.getElementById('page-main-title');
         if (titleElement && config.ui && config.ui.mainHeading) {
-            console.log('📝 Aggiornando titolo principale:', config.ui.mainHeading);
             titleElement.textContent = config.ui.mainHeading;
         }
         
@@ -1511,8 +1489,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (priceBadge && badgeText && badgePrice && config.priceBadge.enabled) {
-            console.log('🏷️ Aggiornando badge prezzo:', config.priceBadge);
-            
+                
             // Aggiorna il testo del badge
             badgeText.textContent = config.priceBadge.text || 'A partire da';
             
@@ -1537,7 +1514,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const summaryBasePriceElement = document.getElementById('summary-base-price');
         
         if (basePriceElement && config.basic && config.basic.basePrice) {
-            console.log('💰 Aggiornando prezzo base:', config.basic.basePrice);
             basePriceElement.textContent = `€ ${config.basic.basePrice.toLocaleString()}`;
         }
         
@@ -1546,7 +1522,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
     } catch (error) {
-        console.error('❌ Errore nel caricamento del logo:', error);
+        console.error('Errore nel caricamento del logo:', error);
     }
 });
 </script>
@@ -1639,13 +1615,6 @@ weekEnd.setDate(weekStart.getDate() + 6);
 // Per il calcolo prezzi: usa lunedì ISO (compatibile con admin)
 const mondayISO = getMondayISO(new Date(clickedDate));
 
-console.log('📅 Click calendario:', {
-    clickedDate: clickedDate.toISOString().slice(0,10),
-    weekStart_domenica: weekStart.toISOString().slice(0,10),
-    mondayISO: mondayISO.toISOString().slice(0,10),
-    weekNumber_domenica: getWeekNumber(weekStart),
-    weekNumber_mondayISO: getWeekNumber(mondayISO)
-});
 
 selectedStartDate = weekStart;
 selectedEndDate = weekEnd;
@@ -1726,9 +1695,8 @@ function updateCleaningFee(guests) {
 const cleaningFee = guests * 20;
 if (linensDetailElement) {
     linensDetailElement.textContent = cleaningFee;
-    console.log(`💰 Aggiornato prezzo lenzuola: €${cleaningFee} per ${guests} ospiti`);
 } else {
-    console.error('❌ Elemento linens-detail-price non trovato');
+    console.error('Elemento linens-detail-price non trovato');
 }
 updatePartialTotal();
 updateTotalPrice();
@@ -1745,9 +1713,8 @@ const partialTotal = basePrice + charterPackage + fuelPackage + cleaningFee;
 const partialTotalElement = document.getElementById('partial-total');
 if (partialTotalElement) {
     partialTotalElement.textContent = `€${partialTotal}`;
-    console.log(`💰 Partial total aggiornato: €${partialTotal}`);
 } else {
-    console.warn('⚠️ Elemento partial-total non trovato nell HTML');
+    console.warn('Elemento partial-total non trovato nell HTML');
 }
 }
 function updateTotalPrice() {
@@ -1760,9 +1727,8 @@ const total = basePrice + charterPackage + cleaningFee + servicesTotal;
 const totalElement = document.getElementById('total-price');
 if (totalElement) {
     totalElement.textContent = `€${total}`;
-    console.log(`💰 Prezzo totale aggiornato: €${total}`);
 } else {
-    console.warn('⚠️ Elemento total-price non trovato');
+    console.warn('Elemento total-price non trovato');
 }
 }
 decreaseBtn.addEventListener('click', function() {
@@ -1813,11 +1779,8 @@ function getWeekNumber(date) {
 function getWeeklyPrice(date) {
     const config = CatamaranStorage.load();
     
-    console.log('🔍 getWeeklyPrice chiamata per data:', date.toISOString().slice(0,10));
-    console.log('📊 Config weeklyPricing:', config.weeklyPricing);
     
     if (!config.weeklyPricing || !config.weeklyPricing.enabled) {
-        console.log('⚠️ Prezzi settimanali disabilitati, uso basePrice:', config.basic.basePrice);
         return config.basic.basePrice || 3499;
     }
     
@@ -1825,29 +1788,23 @@ function getWeeklyPrice(date) {
     const year = date.getFullYear();
     const weekKey = `${year}-W${weekNumber.toString().padStart(2, '0')}`;
     
-    console.log(`📅 Settimana calcolata: ${weekKey} (numero ${weekNumber})`);
-    console.log('💰 Settimane configurate:', config.weeklyPricing.weeks);
     
     // Controlla se esiste un prezzo specifico per questa settimana
     if (config.weeklyPricing.weeks && config.weeklyPricing.weeks[weekKey]) {
         const price = config.weeklyPricing.weeks[weekKey].price;
-        console.log(`✅ Prezzo specifico trovato per ${weekKey}: €${price}`);
         return price;
     }
     
     // Altrimenti usa il prezzo default del calendario
     const defaultPrice = config.weeklyPricing.defaultPrice || config.basic.basePrice || 3499;
-    console.log(`📋 Uso prezzo default: €${defaultPrice}`);
     return defaultPrice;
 }
 
 // Funzione per aggiornare il prezzo base quando viene selezionata una settimana
 function updateBasePriceForWeek(startDate) {
     if (startDate) {
-        console.log('💰 updateBasePriceForWeek chiamata per:', startDate.toISOString().slice(0,10));
         const config = CatamaranStorage.load();
         currentBasePrice = getWeeklyPrice(startDate);
-        console.log('📊 Nuovo currentBasePrice:', currentBasePrice);
         
         // Ottieni informazioni sulla settimana
         const weekNumber = getWeekNumber(startDate);
@@ -1905,7 +1862,7 @@ function updateInstagramDiscountDisplay(discountConfig, discountAmount) {
     const discountAmountElement = document.getElementById('discount-amount');
     
     if (!discountSection || !discountLabel || !discountAmountElement) {
-        console.error('❌ Elementi sconto Instagram non trovati');
+        console.error('Elementi sconto Instagram non trovati');
         return;
     }
     
@@ -1914,42 +1871,34 @@ function updateInstagramDiscountDisplay(discountConfig, discountAmount) {
         discountSection.style.display = 'flex';
         discountLabel.textContent = discountConfig.label || 'Sconto Instagram';
         discountAmountElement.textContent = `-€ ${discountAmount.toFixed(2).replace('.', ',')}`;
-        console.log('💰 Sconto Instagram aggiornato:', {
-            label: discountConfig.label,
-            amount: discountAmount,
-            percentage: discountConfig.percentage
-        });
     } else {
         // Nascondi il sconto se disabilitato
         discountSection.style.display = 'none';
-        console.log('💰 Sconto Instagram disabilitato');
     }
 }
 
 // Rende updateTotals globale per il sistema di prezzi dinamici
 window.updateTotals = function() {
-console.log('🔄 updateTotals chiamata');
 
 // Verifica esistenza elementi DOM
 if (!servicesTotalContainer) {
-    console.error('❌ servicesTotalContainer non trovato');
+    console.error('servicesTotalContainer non trovato');
     return;
 }
 if (!servicesTotalElement) {
-    console.error('❌ servicesTotalElement non trovato');
+    console.error('servicesTotalElement non trovato');
     return;
 }
 if (!selectedServicesList) {
-    console.error('❌ selectedServicesList non trovato');
+    console.error('selectedServicesList non trovato');
     return;
 }
 if (!totalPriceElement) {
-    console.error('❌ totalPriceElement non trovato');
+    console.error('totalPriceElement non trovato');
     return;
 }
 
 const selectedServices = Array.from(serviceCheckboxes).filter(checkbox => checkbox.checked);
-console.log('📋 Servizi selezionati:', selectedServices.length);
 
 if (selectedServices.length === 0) {
 servicesTotalContainer.style.display = 'none';
@@ -2010,9 +1959,8 @@ if (servicesTotalElement && totalPriceElement) {
     // Aggiorna display sconto Instagram
     updateInstagramDiscountDisplay(discountConfig, instagramDiscount);
     
-    console.log('📊 Calcolo totale completato:', {currentBasePrice, instagramDiscount, servicesTotal, cleaningFee, finalTotal});
 } else {
-    console.error('❌ Impossibile aggiornare totali: elementi mancanti', {
+    console.error('Impossibile aggiornare totali: elementi mancanti', {
         servicesTotalElement: !!servicesTotalElement,
         totalPriceElement: !!totalPriceElement
     });
@@ -2050,23 +1998,21 @@ function updateElement(elementId, content, attribute = null, value = null) {
     try {
         const element = document.getElementById(elementId);
         if (!element) {
-            console.warn(`⚠️ Elemento con ID '${elementId}' non trovato`);
+            console.warn(`Elemento con ID '${elementId}' non trovato`);
             return false;
         }
         
         if (attribute && value !== null) {
             // Aggiorna un attributo (es. src, href)
             element.setAttribute(attribute, value);
-            console.log(`✅ Aggiornato ${elementId}.${attribute}: ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}`);
         } else if (content !== null) {
             // Aggiorna il contenuto testuale
             element.textContent = content;
-            console.log(`✅ Aggiornato ${elementId}: ${content}`);
         }
         
         return true;
     } catch (error) {
-        console.error(`❌ Errore aggiornamento ${elementId}:`, error);
+        console.error(`Errore aggiornamento ${elementId}:`, error);
         return false;
     }
 }
@@ -2074,40 +2020,33 @@ function updateElement(elementId, content, attribute = null, value = null) {
 // Caricamento configurazione dinamica
 async function loadCatamaranConfiguration() {
     try {
-        console.log('📖 Caricamento configurazione catamarano...');
         
         // 🔄 Prima prova a caricare da Supabase (per browser incognito)
         let newConfig = null;
         
         // Tentativo 1: Carica da Supabase e cerca box1_2
         if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.forceRefresh) {
-            console.log('📡 Tentativo caricamento da Supabase...');
             try {
                 const supabaseResult = await CatamaranStorage.forceRefresh();
-                console.log('📡 Risultato Supabase refresh:', supabaseResult);
                 
                 if (supabaseResult.success) {
-                    console.log('✅ Configurazione base caricata da Supabase');
                     
                     // Carica la configurazione completa da CatamaranStorage
                     const fullConfig = CatamaranStorage.load();
-                    console.log('📄 Configurazione completa da CatamaranStorage:', fullConfig);
                     
                     if (fullConfig && fullConfig.box1_2) {
                         newConfig = fullConfig.box1_2;
-                        console.log('📦 Trovati dati BOX 1-2 in Supabase:', newConfig);
                     } else {
-                        console.warn('⚠️ BOX 1-2 non trovati nella configurazione Supabase');
-                        console.log('🔍 Struttura configurazione:', Object.keys(fullConfig || {}));
+                        console.warn('BOX 1-2 non trovati nella configurazione Supabase');
                     }
                 } else {
-                    console.warn('⚠️ Supabase refresh fallito:', supabaseResult.error);
+                    console.warn('Supabase refresh fallito:', supabaseResult.error);
                 }
             } catch (error) {
-                console.error('❌ Errore caricamento Supabase:', error);
+                console.error('Errore caricamento Supabase:', error);
             }
         } else {
-            console.warn('⚠️ CatamaranStorage o forceRefresh non disponibili');
+            console.warn('CatamaranStorage o forceRefresh non disponibili');
         }
         
         // Tentativo 2: Se non trovato su Supabase, prova localStorage
@@ -2115,7 +2054,6 @@ async function loadCatamaranConfiguration() {
             const box1_2_config = localStorage.getItem('eliteEscape_config_box1_2');
             if (box1_2_config) {
                 newConfig = JSON.parse(box1_2_config);
-                console.log('📦 Caricando dalla struttura BOX 1-2 localStorage:', newConfig);
             }
         }
         
@@ -2181,8 +2119,6 @@ async function loadCatamaranConfiguration() {
                 }
             }
             
-            console.log('✅ Configurazione BOX 1-2 caricata con successo');
-            console.log('🚀 Inizializzazione currentBasePrice:', currentBasePrice);
             
             // 🎯 Mostra elementi nascosti dopo caricamento configurazione
             showConfigElements();
@@ -2191,17 +2127,15 @@ async function loadCatamaranConfiguration() {
         }
         
         // 📦 Prova a caricare dal formato pubblico unificato 'data'
-        console.log('📄 BOX 1-2 non trovato, carico dalla struttura data...');
         const config = CatamaranStorage.load();
         
         if (!config) {
-            console.error('❌ Configurazione non caricata');
+            console.error('Configurazione non caricata');
             return;
         }
         
         // 🔄 Controllo nuovo formato unificato
         if (config.data && Object.keys(config.data).length > 0) {
-            console.log('📦 Caricando dalla struttura unificata DATA:', config.data);
             
             // Aggiorna dal formato unificato
             updateElement('site-logo', config.data.logo?.text || 'Elite Escape');
@@ -2229,22 +2163,17 @@ async function loadCatamaranConfiguration() {
             updateElement('catamaran-water-tank', config.data.technical?.waterTank || '400 L acqua');
             updateElement('catamaran-fuel-tank', config.data.technical?.fuelTank || '150 L gasolio');
             
-            console.log('✅ Configurazione DATA caricata con successo');
-            console.log('🚀 Inizializzazione currentBasePrice:', currentBasePrice);
             
         } else if (config.basic) {
             // Fallback per vecchia struttura
-            console.log('📄 Fallback: caricando dalla vecchia struttura BASIC');
             updateElement('catamaran-name', config.basic.name);
             
             // Aggiorna prezzo base (inizializza currentBasePrice con il valore dalla configurazione)
             currentBasePrice = config.basic.basePrice || 3499;
-            console.log('🚀 Inizializzazione currentBasePrice:', currentBasePrice);
             updateElement('base-price', `€ ${currentBasePrice.toLocaleString()}`);
         } else {
-            console.error('❌ Nessun formato di configurazione riconosciuto');
+            console.error('Nessun formato di configurazione riconosciuto');
         }
-        console.log('🔧 Config all\'inizializzazione:', config);
         updateElement('base-price', `€ ${currentBasePrice.toLocaleString()}`);
         
         // Aggiorna anno (vecchia struttura)
@@ -2269,7 +2198,6 @@ async function loadCatamaranConfiguration() {
         const skipperCheckbox = document.querySelector('.service-checkbox[data-name="Skipper"]');
         if (skipperCheckbox) {
             skipperCheckbox.setAttribute('data-price', config.additionalServices.skipper.price);
-            console.log('✅ Skipper checkbox price aggiornato:', config.additionalServices.skipper.price);
         }
         
         // === FASE 3: Aggiorna contenuti dinamici ===
@@ -2279,7 +2207,6 @@ async function loadCatamaranConfiguration() {
             const mainImage = document.getElementById('catamaran-main-image');
             if (mainImage) {
                 mainImage.src = config.images.main;
-                console.log('✅ Immagine principale aggiornata');
             }
         }
         
@@ -2298,18 +2225,6 @@ async function loadCatamaranConfiguration() {
             updateIncludedEquipmentList(config.includedEquipment);
         }
         
-        console.log('✅ Configurazione catamarano caricata con successo (Fase 3 inclusa)');
-        console.log('Dati caricati:', {
-            name: config.basic.name,
-            price: config.basic.basePrice,
-            year: config.basic.year,
-            linensPrice: config.mandatoryPackages.linens.pricePerGuest,
-            skipperPrice: config.additionalServices.skipper.price,
-            hasImage: !!(config.images && config.images.main),
-            hasDescription: !!config.description,
-            featuresCount: config.mainFeatures ? config.mainFeatures.length : 0,
-            equipmentCount: config.includedEquipment ? config.includedEquipment.length : 0
-        });
         
         // 🎯 Mostra elementi nascosti dopo caricamento configurazione (fallback)
         showConfigElements();
@@ -2323,7 +2238,6 @@ async function loadCatamaranConfiguration() {
 
 // 🎯 Funzione per mostrare elementi nascosti dopo caricamento configurazione
 function showConfigElements() {
-    console.log('🎨 Mostrando elementi configurazione...');
     
     // Mostra elementi specifici che erano nascosti per prevenire flash
     const elementsToShow = [
@@ -2342,7 +2256,6 @@ function showConfigElements() {
         const elements = document.querySelectorAll(selector);
         elements.forEach(element => {
             element.classList.add('config-loaded');
-            console.log(`✓ Elemento mostrato: ${selector}`);
         });
     });
     
@@ -2352,7 +2265,6 @@ function showConfigElements() {
         element.classList.add('price-loaded');
     });
     
-    console.log('🎨 Elementi configurazione mostrati con successo');
 }
 
 // Gestione robusta aggiornamenti DOM con fallback
@@ -2361,18 +2273,16 @@ function updateElement(id, content, fallbackValue = null) {
         const element = document.getElementById(id);
         if (element) {
             element.textContent = content;
-            console.log(`✅ Aggiornato ${id}:`, content);
             return true;
         } else {
-            console.warn(`⚠️ Elemento non trovato: ${id}`);
+            console.warn(`Elemento non trovato: ${id}`);
             if (fallbackValue !== null) {
-                console.log(`🔄 Applicando fallback per ${id}:`, fallbackValue);
                 // Potrebbe essere implementato un fallback alternativo
             }
             return false;
         }
     } catch (error) {
-        console.error(`❌ Errore aggiornamento elemento ${id}:`, error);
+        console.error(`Errore aggiornamento elemento ${id}:`, error);
         return false;
     }
 }
@@ -2384,7 +2294,7 @@ function updateMainFeaturesList(features) {
     try {
         const featuresList = document.getElementById('main-features-list');
         if (!featuresList) {
-            console.warn('⚠️ Lista caratteristiche principali non trovata');
+            console.warn('Lista caratteristiche principali non trovata');
             return false;
         }
         
@@ -2404,11 +2314,10 @@ function updateMainFeaturesList(features) {
             featuresList.appendChild(li);
         });
         
-        console.log(`✅ Aggiornate ${features.length} caratteristiche principali`);
         return true;
         
     } catch (error) {
-        console.error('❌ Errore aggiornamento caratteristiche:', error);
+        console.error('Errore aggiornamento caratteristiche:', error);
         return false;
     }
 }
@@ -2418,7 +2327,7 @@ function updateIncludedEquipmentList(equipment) {
     try {
         const equipmentList = document.getElementById('included-equipment-list');
         if (!equipmentList) {
-            console.warn('⚠️ Lista dotazioni incluse non trovata');
+            console.warn('Lista dotazioni incluse non trovata');
             return false;
         }
         
@@ -2438,11 +2347,10 @@ function updateIncludedEquipmentList(equipment) {
             equipmentList.appendChild(li);
         });
         
-        console.log(`✅ Aggiornate ${equipment.length} dotazioni incluse`);
         return true;
         
     } catch (error) {
-        console.error('❌ Errore aggiornamento dotazioni:', error);
+        console.error('Errore aggiornamento dotazioni:', error);
         return false;
     }
 }
@@ -2466,14 +2374,11 @@ function checkDOMHealth() {
         }
     });
     
-    console.log('🏥 Stato salute DOM:', {
-        presenti: present.length,
-        mancanti: missing.length,
         elementMancanti: missing
     });
     
     if (missing.length > 0) {
-        console.warn('⚠️ Elementi critici mancanti potrebbero causare errori:', missing);
+        console.warn('Elementi critici mancanti potrebbero causare errori:', missing);
     }
     
     return missing.length === 0;
@@ -2483,13 +2388,12 @@ function checkDOMHealth() {
 
 function renderAdditionalServices() {
     try {
-        console.log('🛠️ Inizializzazione servizi aggiuntivi dinamici...');
         
         const config = CatamaranStorage.load();
         const container = document.getElementById('additional-services-container');
         
         if (!container) {
-            console.error('❌ Container servizi aggiuntivi non trovato');
+            console.error('Container servizi aggiuntivi non trovato');
             return;
         }
         
@@ -2501,14 +2405,11 @@ function renderAdditionalServices() {
         if (config.box1_2?.box3) {
             servicesArray = config.box1_2.box3.services || [];
             skipperConfig = config.box1_2.box3.skipper;
-            console.log('📦 BOX 3: Caricando da nuova struttura:', servicesArray.length, 'servizi + skipper');
         } else if (config.box3) {
             servicesArray = config.box3.services || [];
             skipperConfig = config.box3.skipper;
-            console.log('📦 BOX 3: Caricando da box3:', servicesArray.length, 'servizi + skipper');
         } else if (config.additionalServices) {
             // Fallback per vecchio formato
-            console.log('📦 LEGACY: Caricando servizi da vecchio formato additionalServices');
             const legacyServices = Object.entries(config.additionalServices)
                 .filter(([key, service]) => key !== 'skipper')
                 .map(([key, service]) => ({ id: key, ...service }));
@@ -2525,7 +2426,7 @@ function renderAdditionalServices() {
         const activeServices = servicesArray.filter(service => service.active !== false);
         
         if (activeServices.length === 0) {
-            console.warn('⚠️ Nessun servizio aggiuntivo attivo');
+            console.warn('Nessun servizio aggiuntivo attivo');
             container.innerHTML = `
                 <div class="col-span-full text-center py-8 text-gray-500">
                     <i class="ri-service-line text-4xl mb-4"></i>
@@ -2540,7 +2441,6 @@ function renderAdditionalServices() {
         const normalServices = activeServices.filter(s => !s.recommended && !s.mandatory).sort((a, b) => (a.order || 10) - (b.order || 10));
         const mandatoryServices = activeServices.filter(s => s.mandatory).sort((a, b) => (a.order || 10) - (b.order || 10));
         
-        console.log(`📋 Servizi ordinati: ${recommendedServices.length} raccomandati, ${normalServices.length} normali, ${mandatoryServices.length} obbligatori`);
         
         // Pulisci container
         container.innerHTML = '';
@@ -2563,10 +2463,9 @@ function renderAdditionalServices() {
         // Ri-aggancia event listeners per i nuovi servizi
         attachServiceEventListeners();
         
-        console.log(`✅ ${activeServices.length} servizi renderizzati con ordinamento strategico`);
         
     } catch (error) {
-        console.error('❌ Errore nel renderizzare servizi aggiuntivi:', error);
+        console.error('Errore nel renderizzare servizi aggiuntivi:', error);
     }
 }
 
@@ -2603,10 +2502,9 @@ function updateSkipperFromConfig(skipperConfig) {
             }
         }
         
-        console.log('⚓ Skipper aggiornato da BOX 3:', skipperConfig);
         
     } catch (error) {
-        console.error('❌ Errore aggiornamento skipper:', error);
+        console.error('Errore aggiornamento skipper:', error);
     }
 }
 
@@ -2738,19 +2636,17 @@ function updateSkipperService() {
         if (skipperConfig) {
             updateSkipperFromConfig(skipperConfig);
         } else {
-            console.warn('⚠️ Configurazione Skipper non trovata');
+            console.warn('Configurazione Skipper non trovata');
         }
         
     } catch (error) {
-        console.error('❌ Errore aggiornamento skipper:', error);
+        console.error('Errore aggiornamento skipper:', error);
     }
 }
 
-console.log('✅ Funzioni servizi aggiuntivi caricate con successo');
 
 // === AUTO-REFRESH OGNI 15 SECONDI ===
 setInterval(() => {
-    console.log('🔄 Auto-refresh servizi aggiuntivi...');
     renderAdditionalServices();
 }, 15000);
 
@@ -2761,17 +2657,15 @@ setTimeout(renderAdditionalServices, 2000); // Delay iniziale per caricamento co
 
 // Carica la configurazione quando la pagina è pronta
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Inizializzazione pagina prenotazione...');
     
     // Verifica stato salute DOM prima di procedere
     const domHealthy = checkDOMHealth();
     
     if (domHealthy) {
-        console.log('✅ DOM verificato, procedo con caricamento configurazione');
         
         // 🚨 TIMEOUT DI SICUREZZA - Nasconde loading screen dopo 5 secondi massimo
         const loadingTimeout = setTimeout(() => {
-            console.warn('⚠️ TIMEOUT: Nascondimento forzato loading screen dopo 5 secondi');
+            console.warn('TIMEOUT: Nascondimento forzato loading screen dopo 5 secondi');
             updateLoadingText('Caricamento completato');
             
             // Metodo diretto per nascondere loading screen
@@ -2779,7 +2673,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const mainContent = document.getElementById('main-content');
             
             if (loadingScreen) {
-                console.warn('🔧 Nascondimento DIRETTO loading screen');
                 loadingScreen.style.display = 'none';
                 loadingScreen.style.visibility = 'hidden';
                 loadingScreen.style.opacity = '0';
@@ -2797,19 +2690,18 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 hideLoadingScreen();
             } catch (error) {
-                console.warn('⚠️ hideLoadingScreen() fallita:', error);
+                console.warn('hideLoadingScreen() fallita:', error);
             }
         }, 5000);
 
         // 🚨 TIMEOUT IMMEDIATO PER TEST - 2 secondi
         const immediateTimeout = setTimeout(() => {
-            console.warn('⚠️ TIMEOUT IMMEDIATO: Nascondimento forzato loading screen dopo 2 secondi');
+            console.warn('TIMEOUT IMMEDIATO: Nascondimento forzato loading screen dopo 2 secondi');
             
             const loadingScreen = document.getElementById('loading-screen');
             const mainContent = document.getElementById('main-content');
             
             if (loadingScreen) {
-                console.warn('🔧 RIMOZIONE IMMEDIATA loading screen');
                 loadingScreen.style.display = 'none';
                 loadingScreen.remove();
             }
@@ -2823,44 +2715,37 @@ document.addEventListener('DOMContentLoaded', function() {
         // Carica configurazione con sincronizzazione Supabase + Loading Screen
         setTimeout(async () => {
             try {
-                console.log('🚀 Inizio inizializzazione pagina prenotazione');
                 
                 // Step 1: Sincronizzazione Supabase (con timeout e gestione errori)
                 updateLoadingText('Sincronizzazione configurazione');
                 
                 try {
                     if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.syncFromSupabase) {
-                        console.log('📡 Avvio sincronizzazione Supabase...');
                         const result = await Promise.race([
                             CatamaranStorage.syncFromSupabase(),
                             new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout Supabase sync')), 3000))
                         ]);
                         
                         if (result.success) {
-                            console.log('✅ Sincronizzazione Supabase completata');
                         } else {
-                            console.log('ℹ️ Sincronizzazione Supabase: nessun aggiornamento');
                         }
                         
                         // Force refresh con timeout
                         if (typeof CatamaranStorage.forceRefresh === 'function') {
-                            console.log('🔄 Force refresh da Supabase...');
                             const refreshResult = await Promise.race([
                                 CatamaranStorage.forceRefresh(),
                                 new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout force refresh')), 2000))
                             ]);
                             
                             if (refreshResult.success) {
-                                console.log('✅ Force refresh completato');
                             } else {
-                                console.warn('⚠️ Force refresh fallito:', refreshResult.error);
+                                console.warn('Force refresh fallito:', refreshResult.error);
                             }
                         }
                     } else {
-                        console.log('📱 Uso configurazione localStorage (Supabase non disponibile)');
                     }
                 } catch (error) {
-                    console.warn('⚠️ Sincronizzazione Supabase fallita:', error.message);
+                    console.warn('Sincronizzazione Supabase fallita:', error.message);
                     // Continua con localStorage
                 }
                 
@@ -2869,13 +2754,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 await new Promise(resolve => setTimeout(resolve, 200));
                 
                 try {
-                    console.log('⚡ Caricamento configurazione finale...');
                     await Promise.race([
                         loadCatamaranConfiguration(),
                         new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout config loading')), 3000))
                     ]);
                 } catch (error) {
-                    console.warn('⚠️ Errore caricamento configurazione:', error.message);
+                    console.warn('Errore caricamento configurazione:', error.message);
                     // Continua con configurazione base
                 }
                 
@@ -2886,7 +2770,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     renderAdditionalServices();
                     updateSkipperService();
                 } catch (error) {
-                    console.warn('⚠️ Errore rendering servizi:', error.message);
+                    console.warn('Errore rendering servizi:', error.message);
                     // Servizi opzionali, continua
                 }
                 
@@ -2894,7 +2778,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateLoadingText('Completamento caricamento');
                 await new Promise(resolve => setTimeout(resolve, 300));
                 
-                console.log('✅ Inizializzazione completata con successo');
                 
                 // Cancella timeout di sicurezza (non più necessario)
                 clearTimeout(loadingTimeout);
@@ -2905,7 +2788,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 hideLoadingScreen();
                 
             } catch (error) {
-                console.error('❌ Errore fatale durante caricamento:', error);
+                console.error('Errore fatale durante caricamento:', error);
                 
                 // Cancella timeout di sicurezza per gestire l'errore manualmente
                 clearTimeout(loadingTimeout);
@@ -2918,9 +2801,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     await loadCatamaranConfiguration();
                     renderAdditionalServices();
                     updateSkipperService();
-                    console.log('✅ Configurazione base caricata dopo errore');
                 } catch (baseError) {
-                    console.error('❌ Anche configurazione base fallita:', baseError);
+                    console.error('Anche configurazione base fallita:', baseError);
                 }
                 
                 // Nascondi loading dopo errore in ogni caso
@@ -2932,11 +2814,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
         
     } else {
-        console.warn('⚠️ DOM con elementi mancanti, caricamento potrebbe avere problemi');
+        console.warn('DOM con elementi mancanti, caricamento potrebbe avere problemi');
         
         // Timeout di sicurezza anche per DOM parziale
         const partialLoadingTimeout = setTimeout(() => {
-            console.warn('⚠️ TIMEOUT DOM PARZIALE: Nascondimento forzato loading screen');
+            console.warn('TIMEOUT DOM PARZIALE: Nascondimento forzato loading screen');
             updateLoadingText('Caricamento completato');
             hideLoadingScreen();
         }, 6000);
@@ -2949,26 +2831,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Prima sincronizza da Supabase (con timeout ridotto)
                 if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.syncFromSupabase) {
                     try {
-                        console.log('📡 Avvio sincronizzazione Supabase (DOM parziale)...');
                         const result = await Promise.race([
                             CatamaranStorage.syncFromSupabase(),
                             new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout sync parziale')), 2000))
                         ]);
                         
                         if (result.success) {
-                            console.log('✅ Sincronizzazione Supabase completata');
                         } else {
-                            console.log('ℹ️ Sincronizzazione Supabase: nessun aggiornamento');
                         }
                     } catch (error) {
-                        console.warn('⚠️ Sincronizzazione Supabase fallita:', error.message);
+                        console.warn('Sincronizzazione Supabase fallita:', error.message);
                     }
                 }
                 
                 updateLoadingText('Caricamento configurazione base');
                 await new Promise(resolve => setTimeout(resolve, 200));
                 
-                console.log('⚡ Caricamento configurazione finale (DOM parziale)...');
                 await Promise.race([
                     loadCatamaranConfiguration(),
                     new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout config parziale')), 2000))
@@ -2978,7 +2856,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     renderAdditionalServices();
                     updateSkipperService();
                 } catch (error) {
-                    console.warn('⚠️ Errore rendering servizi DOM parziale:', error.message);
+                    console.warn('Errore rendering servizi DOM parziale:', error.message);
                 }
                 
                 // Cancella timeout e nascondi loading screen
@@ -2988,7 +2866,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 hideLoadingScreen();
                 
             } catch (error) {
-                console.error('❌ Errore caricamento DOM parziale:', error);
+                console.error('Errore caricamento DOM parziale:', error);
                 
                 clearTimeout(partialLoadingTimeout);
                 updateLoadingText('Errore - caricamento base');
@@ -2998,7 +2876,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     renderAdditionalServices();
                     updateSkipperService();
                 } catch (baseError) {
-                    console.error('❌ Errore configurazione base DOM parziale:', baseError);
+                    console.error('Errore configurazione base DOM parziale:', baseError);
                 }
                 
                 setTimeout(() => {
@@ -3020,10 +2898,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const versionResult = await window.SupabaseManager.checkVersion();
                 if (versionResult.success) {
                     currentVersion = versionResult.version || 0;
-                    console.log(`🏷️ Versione iniziale: ${currentVersion}`);
                 }
             } catch (error) {
-                console.warn('⚠️ Errore caricamento versione iniziale:', error);
+                console.warn('Errore caricamento versione iniziale:', error);
             }
         }
     }
@@ -3042,26 +2919,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Solo se versione diversa, aggiorna configurazione
                     if (serverVersion !== currentVersion) {
-                        console.log(`🔄 Nuova versione rilevata: ${serverVersion} (attuale: ${currentVersion})`);
                         currentVersion = serverVersion;
                         
                         // Ricarica configurazione completa solo quando necessario
                         if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.forceRefresh) {
                             const refreshResult = await CatamaranStorage.forceRefresh();
                             if (refreshResult.success) {
-                                console.log('✅ Configurazione aggiornata da nuova versione');
                                 await loadCatamaranConfiguration();
                                 renderAdditionalServices();
                                 updateSkipperService();
                             }
                         }
                     } else {
-                        console.log(`📡 Version check OK: ${serverVersion} (nessun aggiornamento)`);
                     }
                 }
             }
         } catch (error) {
-            console.warn('⚠️ Errore version check:', error);
+            console.warn('Errore version check:', error);
         }
     }, 30000); // Ogni 30 secondi invece di 15, e solo check versione
 });
@@ -3079,7 +2953,6 @@ function hideLoadingScreen() {
         mainContent.classList.remove('content-hidden');
         mainContent.classList.add('content-visible');
         
-        console.log('✨ Loading screen nascosto - contenuto visibile');
         
         // Rimuovi loading screen dal DOM dopo l'animazione
         setTimeout(() => {

@@ -13,10 +13,10 @@ import path from 'path'
 const SUPABASE_URL = 'https://aaqqkxrhtgxxfeexbpgs.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhcXFreHJodGd4eGZlZXhicGdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA1MTY5NDcsImV4cCI6MjA2NjA5Mjk0N30.5fLV8_EmkbdSx0vCUd8HXMP1SDsOG1p0fyYMqdVmUAQ'
 
-console.log('🏗️ Starting Elite Escape SSG Build...')
+console.log('Starting Elite Escape SSG Build...')
 
 async function fetchConfigurationData() {
-  console.log('📡 Fetching latest configuration from Supabase...')
+  console.log('Fetching latest configuration from Supabase...')
   
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
   
@@ -34,14 +34,14 @@ async function fetchConfigurationData() {
 
     if (data && data.length > 0) {
       const configData = data[0].config_data
-      console.log(`✅ Configuration loaded (version: ${configData.version || 'unknown'})`)
+      console.log(`Configuration loaded (version: ${configData.version || 'unknown'})`)
       return configData
     }
 
-    console.warn('⚠️ No configuration found in database')
+    console.warn('No configuration found in database')
     return null
   } catch (err) {
-    console.error('❌ Exception fetching configuration:', err)
+    console.error('Exception fetching configuration:', err)
     return null
   }
 }
@@ -55,7 +55,7 @@ function getConfigValue(config, path, fallback = '') {
 }
 
 async function generateStaticHTML() {
-  console.log('📄 Reading index.html template...')
+  console.log('Reading index.html template...')
   
   const indexPath = path.join(process.cwd(), 'index.html')
   let htmlContent = fs.readFileSync(indexPath, 'utf8')
@@ -64,11 +64,11 @@ async function generateStaticHTML() {
   const config = await fetchConfigurationData()
   
   if (!config) {
-    console.warn('⚠️ Building with default values (no config found)')
+    console.warn('Building with default values (no config found)')
     return htmlContent
   }
 
-  console.log('🔄 Pre-populating HTML with configuration data...')
+  console.log('Pre-populating HTML with configuration data...')
 
   // Extract data from unified format (config.data) or BOX format (config.box1_2)
   const data = config.data || {}
@@ -140,9 +140,9 @@ async function generateStaticHTML() {
   // Insert SSG meta after existing head content
   htmlContent = htmlContent.replace('</head>', ssgMeta + '</head>')
 
-  console.log('✅ HTML pre-populated with live data')
-  console.log(`📊 Config version: ${configVersion}`)
-  console.log(`🕐 Build time: ${buildTime}`)
+  console.log('HTML pre-populated with live data')
+  console.log(`Config version: ${configVersion}`)
+  console.log(`Build time: ${buildTime}`)
 
   return htmlContent
 }
@@ -161,7 +161,7 @@ async function main() {
     // Write static index.html
     const outputPath = path.join(distDir, 'index.html')
     fs.writeFileSync(outputPath, staticHTML)
-    console.log(`✅ Static index.html written to: ${outputPath}`)
+    console.log(`Static index.html written to: ${outputPath}`)
 
     // Copy other static files to dist
     const staticFiles = [
@@ -177,15 +177,15 @@ async function main() {
     staticFiles.forEach(file => {
       if (fs.existsSync(file)) {
         fs.copyFileSync(file, path.join(distDir, file))
-        console.log(`📁 Copied: ${file}`)
+        console.log(`Copied: ${file}`)
       }
     })
 
-    console.log('🚀 SSG Build completed successfully!')
-    console.log(`📂 Output directory: ${distDir}`)
+    console.log('SSG Build completed successfully!')
+    console.log(`Output directory: ${distDir}`)
     
   } catch (error) {
-    console.error('❌ Build failed:', error)
+    console.error('Build failed:', error)
     process.exit(1)
   }
 }
