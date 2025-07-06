@@ -57,7 +57,7 @@ function getConfigValue(config, path, fallback = '') {
 async function generateStaticHTML() {
   console.log('Reading index.html template...')
   
-  const indexPath = path.join(process.cwd(), 'index.html')
+  const indexPath = path.join(process.cwd(), 'dist', 'pages', 'index.html')
   let htmlContent = fs.readFileSync(indexPath, 'utf8')
   
   // Fetch configuration data
@@ -159,22 +159,14 @@ async function main() {
     }
 
     // Write static index.html
-    const outputPath = path.join(distDir, 'index.html')
+    const outputPath = path.join(distDir, 'pages', 'index.html')
     fs.writeFileSync(outputPath, staticHTML)
     console.log(`Static index.html written to: ${outputPath}`)
 
-    // Copy other static files to dist
-    const staticFiles = [
-      'Admin-Configurazione-Catamarano.html',
-      'catamaran-config.js',
-      'supabase-client.js',
-      'auth-manager.js',
-      'storage-wrapper.js',
-      'template-email-prenotazione.html',
-      'netlify.toml'
-    ]
-
-    staticFiles.forEach(file => {
+    // Files are already organized in folders - just copy netlify.toml
+    const rootFiles = ['netlify.toml']
+    
+    rootFiles.forEach(file => {
       if (fs.existsSync(file)) {
         fs.copyFileSync(file, path.join(distDir, file))
         console.log(`Copied: ${file}`)

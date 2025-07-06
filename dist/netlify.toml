@@ -17,9 +17,8 @@
 [[redirects]]
   # SPA fallback for any 404s
   from = "/*"
-  to = "/prenotazione_violante.html"
+  to = "/pages/index.html"
   status = 200
-  conditions = {Role = ["admin"]}
 
 [[headers]]
   # Security headers
