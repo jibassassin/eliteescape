@@ -28,10 +28,14 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Backup files
+# Test and backup files
+test-*.html
 *-BACKUP-*
 *-OLD-*
 *-BROKEN-*
+*-Simple.html
 
-# Test files (keep in repo but document)
-# test-*.html files are kept for development reference
+# Build output and dependencies
+node_modules/
+dist/
+*.log
