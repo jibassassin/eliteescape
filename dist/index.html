@@ -481,6 +481,17 @@ transform: translateX(26px);
 <meta property="og:title" content="Prenota il tuo Catamarano - Elite Escape">
 <meta property="og:description" content="Catamarano Violante per vacanze indimenticabili in Sardegna. Prenota ora!">
 <meta property="og:type" content="website">
+
+<!-- SSG Build Info -->
+<meta name="ssg-build-time" content="2025-07-07T15:40:36.345Z">
+<meta name="ssg-config-version" content="1751902333802">
+<meta name="ssg-generator" content="Elite Escape SSG v1.0">
+
+<!-- Enhanced SEO with dynamic content -->
+<meta name="description" content="Prenota Violante - Catamarano 11.8m per vacanze in Sardegna. 4 cabine, a partire da €2.999.">
+<meta property="og:title" content="Prenota il tuo Catamarano - Elite Escape">
+<meta property="og:description" content="Catamarano Violante per vacanze indimenticabili in Sardegna. Prenota ora!">
+<meta property="og:type" content="website">
 </head>
 <body class="bg-gray-50">
 
@@ -2047,6 +2058,8 @@ function updateElement(elementId, content, attribute = null, value = null) {
 }
 
 // Caricamento configurazione dinamica
+// DISABLED: Dynamic configuration loading function - using static SSG data instead
+/*
 async function loadCatamaranConfiguration() {
     try {
         
@@ -2264,6 +2277,18 @@ async function loadCatamaranConfiguration() {
         // 🎯 Mostra elementi anche in caso di errore per evitare pagina vuota
         showConfigElements();
     }
+}
+*/
+
+// SSG STATIC MODE: Replacement function for static mode
+async function loadCatamaranConfiguration() {
+    console.log('SSG STATIC MODE: loadCatamaranConfiguration called but disabled - using static HTML data');
+    
+    // Only show the static elements that were pre-built by SSG
+    showConfigElements();
+    
+    // No dynamic loading from localStorage or Supabase
+    return;
 }
 
 // 🎯 Funzione per mostrare elementi nascosti dopo caricamento configurazione
@@ -2739,6 +2764,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 2000);
 
+        // DISABLED: Dynamic configuration loading - using static SSG data instead
+        /*
         // Carica configurazione con sincronizzazione Supabase + Loading Screen
         setTimeout(async () => {
             try {
@@ -2842,6 +2869,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 1000);
             }
         }, 300);
+        */
+        
+        // SSG STATIC MODE: Only show static elements and hide loading screen
+        console.log('SSG STATIC MODE: Using pre-built static data, skipping dynamic configuration loading');
+        
+        // Clear safety timeouts
+        clearTimeout(loadingTimeout);
+        clearTimeout(immediateTimeout);
+        
+        // Show static elements that were pre-built by SSG
+        showConfigElements();
+        
+        // Hide loading screen after brief delay to ensure DOM is ready
+        setTimeout(() => {
+            updateLoadingText('Caricamento completato');
+            hideLoadingScreen();
+        }, 500);
         
     } else {
         console.warn('DOM con elementi mancanti, caricamento potrebbe avere problemi');
@@ -2853,6 +2897,8 @@ document.addEventListener('DOMContentLoaded', function() {
             hideLoadingScreen();
         }, 6000);
         
+        // DISABLED: Dynamic configuration loading for partial DOM - using static SSG data instead
+        /*
         // Carica comunque ma con avviso + Loading Screen
         setTimeout(async () => {
             try {
@@ -2917,6 +2963,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 1000);
             }
         }, 300);
+        */
+        
+        // SSG STATIC MODE: Handle partial DOM with static data only
+        console.log('SSG STATIC MODE: Partial DOM detected, using static data only');
+        
+        // Clear partial loading timeout
+        clearTimeout(partialLoadingTimeout);
+        
+        // Show static elements that were pre-built by SSG
+        showConfigElements();
+        
+        // Hide loading screen after brief delay
+        setTimeout(() => {
+            updateLoadingText('Caricamento completato');
+            hideLoadingScreen();
+        }, 500);
     }
     
     // 🔄 CACHE BUSTING - DISABLED FOR STATIC SSG
