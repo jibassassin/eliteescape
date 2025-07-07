@@ -2064,7 +2064,8 @@ async function loadCatamaranConfiguration() {
                 console.error('Errore caricamento Supabase:', error);
             }
         } else {
-            console.warn('CatamaranStorage o forceRefresh non disponibili');
+            // DISABLED: CatamaranStorage sync calls - using static SSG data instead
+            // console.warn('CatamaranStorage o forceRefresh non disponibili');
         }
         
         // Tentativo 2: Se non trovato su Supabase, prova localStorage
@@ -2660,10 +2661,10 @@ function updateSkipperService() {
 }
 
 
-// === AUTO-REFRESH OGNI 15 SECONDI ===
-setInterval(() => {
-    renderAdditionalServices();
-}, 15000);
+// === AUTO-REFRESH OGNI 15 SECONDI === [DISABLED FOR STATIC SSG]
+// setInterval(() => {
+//     renderAdditionalServices();
+// }, 15000);
 
 // Chiamata iniziale
 setTimeout(renderAdditionalServices, 2000); // Delay iniziale per caricamento completo
@@ -2731,9 +2732,11 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(async () => {
             try {
                 
-                // Step 1: Sincronizzazione Supabase (con timeout e gestione errori)
-                updateLoadingText('Sincronizzazione configurazione');
+                // Step 1: Sincronizzazione Supabase (con timeout e gestione errori) [DISABLED FOR STATIC SSG]
+                updateLoadingText('Caricamento configurazione statica');
                 
+                // DISABLED: Real-time sync from Supabase - using static SSG data instead
+                /*
                 try {
                     if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.syncFromSupabase) {
                         const result = await Promise.race([
@@ -2763,6 +2766,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.warn('Sincronizzazione Supabase fallita:', error.message);
                     // Continua con localStorage
                 }
+                */
                 
                 // Step 2: Caricamento configurazione (con fallback)
                 updateLoadingText('Caricamento dati catamarano');
@@ -2843,7 +2847,8 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 updateLoadingText('DOM parziale - sincronizzazione');
                 
-                // Prima sincronizza da Supabase (con timeout ridotto)
+                // DISABLED: Prima sincronizza da Supabase - using static SSG data instead
+                /*
                 if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.syncFromSupabase) {
                     try {
                         const result = await Promise.race([
@@ -2858,6 +2863,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.warn('Sincronizzazione Supabase fallita:', error.message);
                     }
                 }
+                */
                 
                 updateLoadingText('Caricamento configurazione base');
                 await new Promise(resolve => setTimeout(resolve, 200));
@@ -2902,9 +2908,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     }
     
-    // 🔄 CACHE BUSTING - Check versione leggero invece di polling pesante
-    let currentVersion = 0;
+    // 🔄 CACHE BUSTING - DISABLED FOR STATIC SSG
+    // let currentVersion = 0;
     
+    // DISABLED: Version checking and cache busting - using static SSG data instead
+    /*
     // Funzione async per inizializzare cache busting
     async function initializeCacheBusting() {
         // Carica versione iniziale
@@ -2953,6 +2961,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.warn('Errore version check:', error);
         }
     }, 30000); // Ogni 30 secondi invece di 15, e solo check versione
+    */
 });
 
 // === GESTIONE LOADING SCREEN ===
