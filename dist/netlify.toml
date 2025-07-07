@@ -1,6 +1,6 @@
 [build]
-  # No build command needed - deploy existing dist folder
-  command = ""
+  # SSG build command - pre-generates HTML with Supabase data
+  command = "npm install && npm run build"
   publish = "dist"
 
 [build.environment]

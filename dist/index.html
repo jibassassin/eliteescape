@@ -492,6 +492,17 @@ transform: translateX(26px);
 <meta property="og:title" content="Prenota il tuo Catamarano - Elite Escape">
 <meta property="og:description" content="Catamarano Violante per vacanze indimenticabili in Sardegna. Prenota ora!">
 <meta property="og:type" content="website">
+
+<!-- SSG Build Info -->
+<meta name="ssg-build-time" content="2025-07-07T16:04:39.736Z">
+<meta name="ssg-config-version" content="1751903725002">
+<meta name="ssg-generator" content="Elite Escape SSG v1.0">
+
+<!-- Enhanced SEO with dynamic content -->
+<meta name="description" content="Prenota Violante - Catamarano 11.8m per vacanze in Sardegna. 4 cabine, a partire da €2.999.">
+<meta property="og:title" content="Prenota il tuo Catamarano - Elite Escape">
+<meta property="og:description" content="Catamarano Violante per vacanze indimenticabili in Sardegna. Prenota ora!">
+<meta property="og:type" content="website">
 </head>
 <body class="bg-gray-50">
 
@@ -2804,36 +2815,35 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.warn('Sincronizzazione Supabase fallita:', error.message);
                     // Continua con localStorage
                 }
-                */
                 
-                // Step 2: Caricamento configurazione (con fallback)
+                // Step 2: Caricamento configurazione (con fallback) - DISABLED FOR STATIC SSG
                 updateLoadingText('Caricamento dati catamarano');
-                await new Promise(resolve => setTimeout(resolve, 200));
+                // await new Promise(resolve => setTimeout(resolve, 200));
                 
                 try {
-                    await Promise.race([
-                        loadCatamaranConfiguration(),
-                        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout config loading')), 3000))
-                    ]);
+                    // await Promise.race([
+                    //     loadCatamaranConfiguration(),
+                    //     new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout config loading')), 3000))
+                    // ]);
                 } catch (error) {
                     console.warn('Errore caricamento configurazione:', error.message);
                     // Continua con configurazione base
                 }
                 
-                // Step 3: Rendering servizi (con gestione errori)
+                // Step 3: Rendering servizi (con gestione errori) - DISABLED FOR STATIC SSG
                 updateLoadingText('Preparazione servizi');
                 
                 try {
-                    renderAdditionalServices();
-                    updateSkipperService();
+                    // renderAdditionalServices();
+                    // updateSkipperService();
                 } catch (error) {
                     console.warn('Errore rendering servizi:', error.message);
                     // Servizi opzionali, continua
                 }
                 
-                // Step 4: Finalizzazione
+                // Step 4: Finalizzazione - DISABLED FOR STATIC SSG
                 updateLoadingText('Completamento caricamento');
-                await new Promise(resolve => setTimeout(resolve, 300));
+                // await new Promise(resolve => setTimeout(resolve, 300));
                 
                 
                 // Cancella timeout di sicurezza (non più necessario)
@@ -2854,10 +2864,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateLoadingText('Errore caricamento - uso configurazione base');
                 
                 try {
-                    // Tentativo di caricamento base
-                    await loadCatamaranConfiguration();
-                    renderAdditionalServices();
-                    updateSkipperService();
+                    // Tentativo di caricamento base - DISABLED FOR STATIC SSG
+                    // await loadCatamaranConfiguration();
+                    // renderAdditionalServices();
+                    // updateSkipperService();
                 } catch (baseError) {
                     console.error('Anche configurazione base fallita:', baseError);
                 }
