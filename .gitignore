@@ -35,7 +35,7 @@ test-*.html
 *-BROKEN-*
 *-Simple.html
 
-# Build output and dependencies
+# Build output and dependencies  
 node_modules/
-dist/
+# dist/ - commented out to deploy static files
 *.log
