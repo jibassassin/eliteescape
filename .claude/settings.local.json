@@ -27,7 +27,8 @@
       "Bash(mv:*)",
       "Bash(python3:*)",
       "Bash(grep:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(node:*)"
     ],
     "deny": []
   }

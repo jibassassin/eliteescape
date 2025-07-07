@@ -503,6 +503,17 @@ transform: translateX(26px);
 <meta property="og:title" content="Prenota il tuo Catamarano - Elite Escape">
 <meta property="og:description" content="Catamarano Violante per vacanze indimenticabili in Sardegna. Prenota ora!">
 <meta property="og:type" content="website">
+
+<!-- SSG Build Info -->
+<meta name="ssg-build-time" content="2025-07-07T16:21:56.735Z">
+<meta name="ssg-config-version" content="1751904442747">
+<meta name="ssg-generator" content="Elite Escape SSG v1.0">
+
+<!-- Enhanced SEO with dynamic content -->
+<meta name="description" content="Prenota Violante - Catamarano 11.8m per vacanze in Sardegna. 4 cabine, a partire da €2.999.">
+<meta property="og:title" content="Prenota il tuo Catamarano - Elite Escape">
+<meta property="og:description" content="Catamarano Violante per vacanze indimenticabili in Sardegna. Prenota ora!">
+<meta property="og:type" content="website">
 </head>
 <body class="bg-gray-50">
 
@@ -2915,30 +2926,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateLoadingText('DOM parziale - sincronizzazione');
                 
                 // DISABLED: Prima sincronizza da Supabase - using static SSG data instead
-                /*
-                if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.syncFromSupabase) {
-                    try {
-                        const result = await Promise.race([
-                            CatamaranStorage.syncFromSupabase(),
-                            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout sync parziale')), 2000))
-                        ]);
-                        
-                        if (result.success) {
-                        } else {
-                        }
-                    } catch (error) {
-                        console.warn('Sincronizzazione Supabase fallita:', error.message);
-                    }
-                }
-                */
+                // if (typeof CatamaranStorage !== 'undefined' && CatamaranStorage.syncFromSupabase) {
+                //     try {
+                //         const result = await Promise.race([
+                //             CatamaranStorage.syncFromSupabase(),
+                //             new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout sync parziale')), 2000))
+                //         ]);
+                //         
+                //         if (result.success) {
+                //         } else {
+                //         }
+                //     } catch (error) {
+                //         console.warn('Sincronizzazione Supabase fallita:', error.message);
+                //     }
+                // }
                 
                 updateLoadingText('Caricamento configurazione base');
-                await new Promise(resolve => setTimeout(resolve, 200));
+                // await new Promise(resolve => setTimeout(resolve, 200)); // Disabled for SSG static mode
                 
-                await Promise.race([
-                    loadCatamaranConfiguration(),
-                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout config parziale')), 2000))
-                ]);
+                // await Promise.race([
+                //     loadCatamaranConfiguration(),
+                //     new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout config parziale')), 2000))
+                // ]); // Disabled for SSG static mode
                 
                 try {
                     renderAdditionalServices();
@@ -2949,9 +2958,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Cancella timeout e nascondi loading screen
                 clearTimeout(partialLoadingTimeout);
-                await new Promise(resolve => setTimeout(resolve, 300));
-                updateLoadingText('Caricamento completato');
-                hideLoadingScreen();
+                // await new Promise(resolve => setTimeout(resolve, 300)); // Disabled for SSG static mode
+                setTimeout(() => {
+                    updateLoadingText('Caricamento completato');
+                    hideLoadingScreen();
+                }, 300);
                 
             } catch (error) {
                 console.error('Errore caricamento DOM parziale:', error);
@@ -2960,7 +2971,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateLoadingText('Errore - caricamento base');
                 
                 try {
-                    await loadCatamaranConfiguration();
+                    // await loadCatamaranConfiguration(); // Disabled for SSG static mode
                     renderAdditionalServices();
                     updateSkipperService();
                 } catch (baseError) {
