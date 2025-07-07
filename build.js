@@ -57,7 +57,7 @@ function getConfigValue(config, path, fallback = '') {
 async function generateStaticHTML() {
   console.log('Reading index.html template...')
   
-  const indexPath = path.join(process.cwd(), 'dist', 'pages', 'index.html')
+  const indexPath = path.join(process.cwd(), 'dist', 'index.html')
   let htmlContent = fs.readFileSync(indexPath, 'utf8')
   
   // Fetch configuration data
@@ -159,7 +159,7 @@ async function main() {
     }
 
     // Write static index.html
-    const outputPath = path.join(distDir, 'pages', 'index.html')
+    const outputPath = path.join(distDir, 'index.html')
     fs.writeFileSync(outputPath, staticHTML)
     console.log(`Static index.html written to: ${outputPath}`)
 
