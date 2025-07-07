@@ -1,0 +1,48 @@
+[build]
+  # No build command needed - deploy existing dist folder
+  command = ""
+  publish = "dist"
+
+[build.environment]
+  # Environment for build process
+  NODE_VERSION = "18"
+
+[[redirects]]
+  # Redirect www to non-www
+  from = "https://www.eliteescape.netlify.app/*"
+  to = "https://eliteescape.netlify.app/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  # Admin page redirect
+  from = "/admin"
+  to = "/pages/admin.html"
+  status = 200
+
+[[redirects]]
+  # Admin page redirect with extension
+  from = "/admin.html"
+  to = "/pages/admin.html"
+  status = 200
+
+[[headers]]
+  # Security headers
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  # Cache static assets
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  # Don't cache HTML files
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache"
