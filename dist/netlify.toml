@@ -15,6 +15,12 @@
   force = true
 
 [[redirects]]
+  # Homepage redirect
+  from = "/"
+  to = "/pages/index.html"
+  status = 200
+
+[[redirects]]
   # SPA fallback for any 404s
   from = "/*"
   to = "/pages/index.html"

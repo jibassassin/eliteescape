@@ -26,7 +26,8 @@
       "Bash(mkdir:*)",
       "Bash(mv:*)",
       "Bash(python3:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(cp:*)"
     ],
     "deny": []
   }
