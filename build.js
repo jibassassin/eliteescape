@@ -88,13 +88,13 @@ async function generateStaticHTML() {
       `<title>${getValue('page.title', 'box1.page.title', 'Prenota il tuo Catamarano')} - ${getValue('logo.text', 'box1.logo.text', 'Elite Escape')}</title>`,
     
     // Logo and branding
-    'Elite Escape': getValue('logo.text', 'box1.logo.text', 'Elite Escape'),
+    'Elite Escape': config?.data?.logo?.text || config?.logo?.text || 'Elite Escape',
     
     // Catamaran name
-    'Violante': getValue('boat.name', 'box2.boat.name', 'Violante'),
+    'Violante': config?.data?.boat?.name || config?.boat?.name || 'Violante',
     
     // Pricing (extract number from €X.XXX format)
-    '€2.999': getValue('badge.price', 'box2.badge.price', '€2.999'),
+    '€2.999': config?.data?.badge?.startingPrice || config?.badge?.startingPrice || '€2.999',
     '€ 3.499': (() => {
       const badgePrice = getValue('badge.price', 'box2.badge.price', '€3.499')
       const numericPrice = badgePrice.replace(/[€.,]/g, '') || '3499'
