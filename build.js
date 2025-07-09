@@ -87,14 +87,14 @@ async function generateStaticHTML() {
     '<title>Prenota il tuo Catamarano - Vacanze in Sardegna</title>': 
       `<title>${getValue('page.title', 'box1.page.title', 'Prenota il tuo Catamarano')} - ${getValue('logo.text', 'box1.logo.text', 'Elite Escape')}</title>`,
     
-    // Logo and branding (use level 2 data)
-    'Elite Escape': config?.data?.logo?.text || 'Elite Escape',
+    // Logo and branding (use level 3 data)
+    'Elite Escape': config?.data?.data?.logo?.text || 'Elite Escape',
     
-    // Catamaran name (use level 2 data)
-    'Violante': config?.data?.boat?.name || 'Violante',
+    // Catamaran name (use level 3 data)
+    'Violante': config?.data?.data?.boat?.name || 'Violante',
     
-    // Pricing (extract number from €X.XXX format, use level 2 data)
-    '€2.999': config?.data?.badge?.startingPrice || '€2.999',
+    // Pricing (extract number from €X.XXX format, use level 3 data)
+    '€2.999': config?.data?.data?.badge?.startingPrice || '€2.999',
     '€ 3.499': (() => {
       const badgePrice = getValue('badge.price', 'box2.badge.price', '€3.499')
       const numericPrice = badgePrice.replace(/[€.,]/g, '') || '3499'
@@ -115,8 +115,16 @@ async function generateStaticHTML() {
     })()
   }
 
-  // Apply replacements
+  // Debug configuration structure
+  console.log('🔍 Config structure debug:');
+  console.log('- config.data.data.boat.name:', config?.data?.data?.boat?.name);
+  console.log('- config.data.data.logo.text:', config?.data?.data?.logo?.text);
+  console.log('- config.data.data.badge.startingPrice:', config?.data?.data?.badge?.startingPrice);
+  console.log('🔍 Full config.data structure:', JSON.stringify(config?.data, null, 2));
+  
+  // Apply replacements with debug
   Object.entries(replacements).forEach(([search, replace]) => {
+    console.log(`🔄 Replacing "${search}" with "${replace}"`);
     htmlContent = htmlContent.replace(new RegExp(search, 'g'), replace)
   })
 
