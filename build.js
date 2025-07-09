@@ -87,14 +87,14 @@ async function generateStaticHTML() {
     '<title>Prenota il tuo Catamarano - Vacanze in Sardegna</title>': 
       `<title>${getValue('page.title', 'box1.page.title', 'Prenota il tuo Catamarano')} - ${getValue('logo.text', 'box1.logo.text', 'Elite Escape')}</title>`,
     
-    // Logo and branding
-    'Elite Escape': config?.data?.logo?.text || config?.logo?.text || 'Elite Escape',
+    // Logo and branding (use level 2 data)
+    'Elite Escape': config?.data?.logo?.text || 'Elite Escape',
     
-    // Catamaran name
-    'Violante': config?.data?.boat?.name || config?.boat?.name || 'Violante',
+    // Catamaran name (use level 2 data)
+    'Violante': config?.data?.boat?.name || 'Violante',
     
-    // Pricing (extract number from €X.XXX format)
-    '€2.999': config?.data?.badge?.startingPrice || config?.badge?.startingPrice || '€2.999',
+    // Pricing (extract number from €X.XXX format, use level 2 data)
+    '€2.999': config?.data?.badge?.startingPrice || '€2.999',
     '€ 3.499': (() => {
       const badgePrice = getValue('badge.price', 'box2.badge.price', '€3.499')
       const numericPrice = badgePrice.replace(/[€.,]/g, '') || '3499'
